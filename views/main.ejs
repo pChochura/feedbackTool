@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.13.0/css/all.css">
+	<link rel="stylesheet" href="styles/global/global.css">
+	<link rel="stylesheet" href="styles/main/main.css">
+	<link rel="stylesheet" href="styles/main/popup.css">
+	<script defer src="/reload/reload.js"></script> 
+	<title>Feedback tool</title>
+</head>
+<body>
+	<div class="header">
+		<p class="title">My rooms</p>
+		<a href="#popupCreateRoom" class="button">Create new room</a>
+	</div>
+	<div class="cardContainer">
+		<% rooms.forEach(function(room) { %>
+			<div class="card">
+				<div class="title"><%= room.name %></div>
+				<i class="fas fa-ellipsis-h more"></i>
+				<ul class="lists">
+					<% room.lists.forEach(function(list) { %>
+						<li><%= list.name %> (<%= list.notes.length %> notes)</li>
+					<% }); %>
+				</ul>
+				<% if (room.ready) { %>
+					<div class="ready">Ready</div>
+				<% } %>
+			</div>
+		<% }); %>
+	</div>
+
+	<div id="popupCreateRoom" class="overlay">
+		<div class="popup">
+			<p class="title">Create a new room</p>
+			<a class="close" href="#">&times;</a>
+			<div class="content">
+				<label for="roomName">Room name</label>
+				<input type="text" id="roomName" name="roomName" value="<%= createRoom.name %>">
+				<label>Room lists</label>
+				<div class="listNames">
+					<% createRoom.lists.forEach(function(list) { %> 
+						<input type="text" name="listName" value="<%= list.name %>">
+					<% }); %> 
+					<input type="text" name="listName" placeholder="Dodaj nową listę">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
