@@ -1,57 +1,13 @@
-module.exports = (_, res) => {
-	res.render('main.ejs', {
-		rooms: [
-			{
-				name: 'Paweł',
-				lists: [
-					{
-						name: 'Asia',
-						notes: ['Notka 3'],
-					},
-					{
-						name: 'Konrad',
-						notes: ['Notka 1', 'Notka 2'],
-					},
-				],
-				ready: true,
-			},
-			{
-				name: 'Asia',
-				lists: [
-					{
-						name: 'Paweł',
-						notes: ['Notka 1', 'Notka 2'],
-					},
-					{
-						name: 'Konrad',
-						notes: ['Notka 1', 'Notka 2'],
-					},
-				],
-				ready: false,
-			},
-			{
-				name: 'Konrad',
-				lists: [
-					{
-						name: 'Paweł',
-						notes: ['Notka 1', 'Notka 2'],
-					},
-					{
-						name: 'Asia',
-						notes: ['Notka 1', 'Notka 2'],
-					},
-				],
-				ready: false,
-			},
-		],
-		createRoom: {
-			name: 'Nic tu nie ma',
-			lists: [
-				{
-					name: 'Lista 1',
-					notes: [],
-				},
-			],
-		},
-	});
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
+	const mainPage = await (await fetch('http://localhost:8080/api/main')).json();
+	if (mainPage.id !== req.params.id) {
+		res.status(404).send({
+			message: 'Not found',
+		});
+		return;
+	}
+	const rooms = await (await fetch('http://localhost:8080/api/rooms')).json();
+	res.render('main.ejs', { rooms, createRoom: { name: '', lists: [] } });
 };
