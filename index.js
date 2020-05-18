@@ -8,8 +8,7 @@ app.use(express.static('./views'));
 app.use('/styles', express.static('./styles'));
 
 app.get('/', ROUTES.main);
+app.get('/room/:id', ROUTES.room);
 
-reload(app).then((_) => {
-	// Passing PORT as a first argument to the script
-	app.listen(process.argv[2]);
-});
+// Passing PORT as a first argument to the script
+app.listen(process.argv[2]);
