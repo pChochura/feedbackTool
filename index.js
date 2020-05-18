@@ -1,5 +1,6 @@
-const express = require('express');
 const ROUTES = require('./routes');
+const reload = require('reload');
+const express = require('express');
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -8,5 +9,7 @@ app.use('/styles', express.static('./styles'));
 
 app.get('/', ROUTES.main);
 
-// Passing PORT as a first argument to the script
-app.listen(process.argv[2]);
+reload(app).then((_) => {
+	// Passing PORT as a first argument to the script
+	app.listen(process.argv[2]);
+});
