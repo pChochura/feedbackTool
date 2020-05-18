@@ -101,13 +101,9 @@ module.exports = {
 		res.json({
 			id: main.id,
 		});
-
-		return main.id;
 	},
 
 	getMainPage: (_, res) => {
-		res.json({
-			id: main.id,
-		});
+		res.json(main);
 	},
 };

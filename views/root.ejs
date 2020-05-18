@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.13.0/css/all.css">
+	<link rel="stylesheet" href="styles/global/global.css">
+	<link rel="stylesheet" href="styles/root/root.css">
+	<script defer src="/reload/reload.js"></script> 
+	<title>Feedback tool</title>
+</head>
+<body>
+	<div class="card">
+		<% if (locked) { %>
+			<p class="title">Sorry, this session is occupied</p>
+			<p class="subtitle">You have to wait</p>
+			<img src="public/wait.svg" alt="Wait!">
+		<% } else { %>
+			<p class="title">Generated a new session</p>
+			<a class="link" href="<%= link %>"><%= link %></a>
+		<% } %>
+	</div>
+</body>
+</html>
