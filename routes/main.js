@@ -7,5 +7,5 @@ module.exports = async (req, res) => {
 		return;
 	}
 	const rooms = await (await fetch('http://localhost:8080/api/rooms')).json();
-	res.render('main.ejs', { rooms, createRoom: { name: '', lists: [] } });
+	res.render('main.ejs', { rooms, createRoom: { name: '', lists: [] }, addLink: mainPage.addLink });
 };

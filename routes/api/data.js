@@ -19,6 +19,7 @@ const rooms = [
 const main = {
 	id: '123',
 	locked: false,
+	addLink: '',
 };
 
 module.exports = {

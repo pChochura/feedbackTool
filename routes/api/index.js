@@ -97,6 +97,7 @@ module.exports = {
 	createMainPage: (_, res) => {
 		main.id = generateId();
 		main.locked = true;
+		main.addLink = generateId();
 
 		res.json({
 			id: main.id,
