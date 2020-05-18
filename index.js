@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 
 app.set('view engine', 'ejs');
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.static('./views'));
 app.use('/styles', express.static('./styles'));
 app.use('/public', express.static('./public'));
@@ -28,6 +28,7 @@ app.patch('/api/rooms/:id/ready', API.markRoomAsReady);
 
 app.post('/api/main', API.createMainPage);
 app.get('/api/main', API.getMainPage);
+app.post('/api/main/end', API.endSession);
 
 reload(app).then((_) => {
 	// Passing PORT as a first argument to the script

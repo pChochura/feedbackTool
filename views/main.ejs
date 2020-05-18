@@ -20,13 +20,15 @@
 	<body>
 		<div class="header">
 			<p class="title">My rooms</p>
-			<a href="#popupCreateRoom" class="button">Create new room</a>
+			<span>
+				<a class="button secondary" onclick="nextPhase()">Continue</a>
+			</span>
 		</div>
 		<div class="cardContainer">
 			<% rooms.forEach(function(room) { %>
-			<div class="card">
+			<div class="card" onclick="openCard('<%= room.id %>')">
 				<div class="title"><%= room.name %></div>
-				<i class="fas fa-ellipsis-h more"></i>
+				<!-- <i class="fas fa-ellipsis-h more"></i> -->
 				<ul class="lists">
 					<% room.lists.forEach(function(list) { %>
 					<li><%= list.name %> (<%= list.notes.length %> notes)</li>
@@ -96,6 +98,16 @@
 					checkInputs();
 				}
 			});
+
+			const nextPhase = async () => {
+				
+				await fetch('http://localhost:8080/api/main/end', { method: 'POST' });
+				window.location = '/notFound';
+			};
+
+			const openCard = (id) => {
+				window.open(`http://localhost:8080/room/${id}`, '_blank');
+			};
 		</script>
 	</body>
 </html>
