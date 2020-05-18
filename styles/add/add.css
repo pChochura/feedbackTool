@@ -44,4 +44,25 @@ body {
       -ms-grid-row-align: center;
       align-self: center;
 }
+
+input[type='text'] {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  outline-color: #3750db;
+  font-family: inherit;
+}
+
+.submitBtn {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-top: 15px;
+}
 /*# sourceMappingURL=add.css.map */
