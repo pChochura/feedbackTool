@@ -68,13 +68,15 @@
 						</div>
 					</div>
 
-					<button class="button submitBtn">Create room</button>
+					<button id="createRoomBtn" class="button submitBtn">
+						Create room
+					</button>
 				</div>
 			</div>
 		</div>
 
 		<script>
-			const checkInputs = function (e) {
+			const checkInputs = () => {
 				const listInputs = document.querySelectorAll('.listNames input');
 				for (let i = listInputs.length - 2; i >= 0; i--) {
 					if (!listInputs[i].value.length) {
@@ -91,11 +93,37 @@
 				}
 			};
 
-			document.addEventListener('input', function (e) {
+			document.addEventListener('input', (e) => {
 				if (e.target && e.target.getAttribute('name') === 'listName') {
 					checkInputs();
 				}
 			});
+
+			const createRoom = () => {
+				const roomTitle = document.querySelector('#roomName').value;
+				let listsNames = [];
+				[...document.querySelectorAll('.listNames input')].map((input) => {
+					const val = input.value;
+					if (val.length) {
+						listsNames.push(val);
+					}
+				});
+				let lists = [...listNames];
+				lists.map((listName) => ({
+					name: listName,
+					notes: [],
+				}));
+			};
+
+			document
+				.querySelector('#createRoomBtn')
+				.addEventListener('click', createRoom);
 		</script>
 	</body>
 </html>
+
+<!-- to jest endpoint POST /api/rooms. I body to:
+{
+lists: [{name: 'string', notes: ['string']}],
+ready: true/false
+} -->

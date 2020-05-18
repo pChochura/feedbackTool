@@ -5,7 +5,7 @@ const express = require('express');
 const app = express();
 
 app.set('view engine', 'ejs');
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.static('./views'));
 app.use('/styles', express.static('./styles'));
 app.use('/public', express.static('./public'));
@@ -25,6 +25,7 @@ app.get('/api/rooms/:id', API.getRoomById);
 app.delete('/api/rooms/:id', API.removeRoomById);
 app.patch('/api/rooms/:id/regenerate', API.regenerateRoomIdById);
 app.patch('/api/rooms/:id/ready', API.markRoomAsReady);
+app.patch('/api/rooms/:id/addNote', API.addNoteToRoom);
 
 app.post('/api/main', API.createMainPage);
 app.get('/api/main', API.getMainPage);
