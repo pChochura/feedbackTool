@@ -4,6 +4,7 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.use(express.static('./views'));
+app.use('/styles', express.static('./styles'));
 
 app.get('/', ROUTES.main);
 
