@@ -21,21 +21,27 @@ module.exports = {
 	},
 
 	createRoom: (req, res) => {
-		const room = req.body;
-		if (!room) {
-			res.status(400).send({
-				message: 'Bad request',
+		const name = req.body.name;
+
+		rooms.forEach((room) => {
+			room.lists.push({
+				name,
+				notes: [],
 			});
-			return;
+		});
+
+		const room = {
+			name,
+			lists: rooms.map((room) => ({ name: room.name, notes: [] })),
+			id: generateId()
 		}
 
-		room.id = generateId();
-		room.ready = false;
 		rooms.push(room);
 
 		res.status(201).send({
 			id: room.id,
 		});
+
 	},
 
 	removeRoomById: (req, res) => {
@@ -107,4 +113,13 @@ module.exports = {
 	getMainPage: (_, res) => {
 		res.json(main);
 	},
+
+	endSession: (_, res) => {
+		main.locked = false;
+		main.id = undefined;
+
+		res.json({
+			message: 'OK',
+		});
+	}
 };

@@ -29,6 +29,7 @@ app.patch('/api/rooms/:id/ready', API.markRoomAsReady);
 
 app.post('/api/main', API.createMainPage);
 app.get('/api/main', API.getMainPage);
+app.post('/api/main/end', API.endSession);
 
 reload(app).then((_) => {
 	// Passing PORT as a first argument to the script

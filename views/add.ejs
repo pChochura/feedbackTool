@@ -24,8 +24,14 @@
         });
         document.querySelector('.submitBtn').addEventListener('click', function() {
             if(name) {
-                fetch('http://localhost:8080/api/rooms', {method: 'post', body: {name}}).then(res => {
-                    window.location.pathname = `/${res.id}`
+                fetch('http://localhost:8080/api/rooms',
+                {method: 'post',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({name})})
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+                    window.location.pathname = `/room/${res.id}`
                 })
             }
         })
