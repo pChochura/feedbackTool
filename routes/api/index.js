@@ -94,6 +94,33 @@ module.exports = {
 		});
 	},
 
+	addNoteToRoom: (req, res) => {
+		console.log(req.body);
+		const room = rooms.find((r) => r.id === req.params.id);
+		if (!room) {
+			res.status(404).send({
+				message: 'Room not found',
+			});
+			return;
+		}
+
+		const { listId } = req.body;
+		const list = room.lists.find((item) => item.id === listId);
+
+		if (!list) {
+			res.status(404).send({
+				message: 'Room not found',
+			});
+			return;
+		}
+
+		list.push(req.body.note);
+
+		res.json({
+			message: 'OK',
+		});
+	},
+
 	createMainPage: (_, res) => {
 		main.id = generateId();
 		main.locked = true;
