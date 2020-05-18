@@ -57,16 +57,55 @@
 
 .popup .content input[type='text'] {
   width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
   display: inline-block;
   border: 1px solid #ccc;
   border-radius: 4px;
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
+  outline-color: #3750db;
+  font-family: inherit;
+}
+
+.popup .content label {
+  color: #515151;
+  font-weight: 300;
+  margin-bottom: 5px;
+}
+
+.popup .content .listNames {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  margin-top: 1rem;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.popup .content .listNames input[type='text'] {
+  margin: 0.2rem 0;
+  width: 48%;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.popup .content__group {
+  margin-bottom: 10px;
 }
 
 .popup .title {
   margin-top: 0;
   padding: 0 0.5rem;
+}
+
+.popup .submitBtn {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-top: 15px;
 }

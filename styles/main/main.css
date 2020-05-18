@@ -35,30 +35,6 @@ body {
 	color: #212121;
 }
 
-.button {
-	background-color: #3750db;
-	text-decoration: none;
-	color: white;
-	text-align: center;
-	border-radius: 5px;
-	padding-left: 2rem;
-	padding-right: 2rem;
-	padding-top: 1rem;
-	padding-bottom: 1rem;
-	-webkit-box-shadow: none;
-	box-shadow: none;
-	-webkit-transition: all 0.3s;
-	transition: all 0.3s;
-}
-
-.button:hover {
-	-webkit-filter: grayscale(0.5);
-	filter: grayscale(0.5);
-	cursor: pointer;
-	-webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-}
-
 .cardContainer {
 	display: -webkit-box;
 	display: -ms-flexbox;

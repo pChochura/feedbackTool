@@ -44,5 +44,14 @@ module.exports = (_, res) => {
 				ready: false,
 			},
 		],
+		createRoom: {
+			name: 'Nic tu nie ma',
+			lists: [
+				{
+					name: 'Lista 1',
+					notes: [],
+				},
+			],
+		},
 	});
 };
