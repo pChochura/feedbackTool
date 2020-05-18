@@ -50,8 +50,8 @@ module.exports = (_, res) => {
 				{
 					name: 'Lista 1',
 					notes: [],
-				}
-			]
+				},
+			],
 		},
 	});
 };
