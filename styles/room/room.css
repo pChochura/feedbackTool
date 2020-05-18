@@ -12,9 +12,40 @@ body, .wrapper { min-height: 100vh; height: 100vh; }
 
 .note { background: white; padding: 10px 15px; font-size: 14px; border-radius: 6px; margin-bottom: 10px; border: 1px solid rgba(0, 0, 0, 0.1); width: 100%; }
 
+
 .addNote { width: 100%; font-size: 14px; padding-top: 0.7rem; padding-bottom: 0.7rem; margin-bottom: 10px; position: -webkit-sticky; position: sticky; top: 0px; }
 
 ::-webkit-scrollbar { width: 7px; border-radius: 10px; height: 7px; }
+
+.addNote {
+	display: block;
+	width: 100%;
+	font-size: 14px;
+	padding-top: 0.7rem;
+	padding-bottom: 0.7rem;
+	margin-bottom: 10px;
+	position: -webkit-sticky;
+	position: sticky;
+	top: 0px;
+}
+
+.addNote i {
+	margin-left: 5px;
+}
+
+.submitNote {
+	width: -webkit-fit-content;
+	width: -moz-fit-content;
+	width: fit-content;
+	margin-left: auto;
+	margin-top: 15px;
+}
+
+::-webkit-scrollbar {
+	width: 7px;
+	border-radius: 10px;
+	height: 7px;
+}
 
 ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.05); }
 
