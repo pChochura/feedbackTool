@@ -95,7 +95,6 @@ module.exports = {
 	},
 
 	addNoteToRoom: (req, res) => {
-		console.log(req.body);
 		const room = rooms.find((r) => r.id === req.params.id);
 		if (!room) {
 			res.status(404).send({
@@ -114,7 +113,7 @@ module.exports = {
 			return;
 		}
 
-		list.push(req.body.note);
+		list.notes.push(req.body.note);
 
 		res.json({
 			message: 'OK',
