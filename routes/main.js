@@ -6,60 +6,43 @@ module.exports = (_, res) => {
 				lists: [
 					{
 						name: 'Asia',
-						notes: [
-							'Notka 3',
-						],
+						notes: ['Notka 3'],
 					},
 					{
 						name: 'Konrad',
-						notes: [
-							'Notka 1',
-							'Notka 2'
-						]
+						notes: ['Notka 1', 'Notka 2'],
 					},
 				],
-				ready: true
+				ready: true,
 			},
 			{
 				name: 'Asia',
 				lists: [
 					{
 						name: 'Paweł',
-						notes: [
-							'Notka 1',
-							'Notka 2'
-						]
+						notes: ['Notka 1', 'Notka 2'],
 					},
 					{
 						name: 'Konrad',
-						notes: [
-							'Notka 1',
-							'Notka 2'
-						]
+						notes: ['Notka 1', 'Notka 2'],
 					},
 				],
-				ready: false
+				ready: false,
 			},
 			{
 				name: 'Konrad',
 				lists: [
 					{
 						name: 'Paweł',
-						notes: [
-							'Notka 1',
-							'Notka 2'
-						]
+						notes: ['Notka 1', 'Notka 2'],
 					},
 					{
 						name: 'Asia',
-						notes: [
-							'Notka 1',
-							'Notka 2'
-						]
+						notes: ['Notka 1', 'Notka 2'],
 					},
 				],
-				ready: false
-			}
+				ready: false,
+			},
 		],
 	});
 };

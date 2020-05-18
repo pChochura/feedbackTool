@@ -52,6 +52,7 @@ body,
 }
 
 .addNote {
+  display: block;
   width: 100%;
   font-size: 14px;
   padding-top: 0.7rem;
@@ -60,6 +61,18 @@ body,
   position: -webkit-sticky;
   position: sticky;
   top: 0px;
+}
+
+.addNote i {
+  margin-left: 5px;
+}
+
+.submitNote {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-top: 15px;
 }
 
 ::-webkit-scrollbar {
