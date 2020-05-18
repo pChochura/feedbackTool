@@ -1,9 +1,7 @@
 const routeMain = require('./main');
 const routeRoom = require('./room');
 
-const ROUTES = {
+module.exports = {
 	main: routeMain,
 	room: routeRoom,
 };
-
-module.exports = ROUTES;
