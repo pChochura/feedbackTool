@@ -3,9 +3,7 @@ const fetch = require('node-fetch');
 module.exports = async (req, res) => {
 	const mainPage = await (await fetch('http://localhost:8080/api/main')).json();
 	if (mainPage.id !== req.params.id) {
-		res.status(404).send({
-			message: 'Not found',
-		});
+		res.redirect('/notFound');
 		return;
 	}
 	const rooms = await (await fetch('http://localhost:8080/api/rooms')).json();

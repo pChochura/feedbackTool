@@ -8,8 +8,11 @@ app.set('view engine', 'ejs');
 app.use(express.json()); 
 app.use(express.static('./views'));
 app.use('/styles', express.static('./styles'));
+app.use('/public', express.static('./public'));
 
 // Views
+app.get(`/`, ROUTES.root);
+app.get('/notFound', ROUTES.notFound);
 app.get(`/:id`, ROUTES.main);
 app.get('/room/:id', ROUTES.room);
 
