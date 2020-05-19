@@ -12,14 +12,6 @@ body {
   color: #212121;
 }
 
-.subtitle {
-  text-align: center;
-  font-weight: 300;
-  font-size: 1.5rem;
-  margin: 1rem;
-  color: #515151;
-}
-
 .card {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -33,7 +25,8 @@ body {
   margin: 1rem auto;
   padding: 1.5rem 1rem 1rem 1rem;
   width: 60%;
-  max-height: 512px;
+  max-width: 768px;
+  max-height: 768px;
   background-color: white;
   -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
           box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
@@ -45,20 +38,31 @@ body {
 .card img {
   margin: 2rem;
   width: 60%;
+  max-width: 100%;
+  max-height: 100%;
   -ms-flex-item-align: center;
       -ms-grid-row-align: center;
       align-self: center;
 }
 
-.card .link {
-  -ms-flex-item-align: center;
-      -ms-grid-row-align: center;
-      align-self: center;
-  padding: 1rem 3rem 1rem 3rem;
+input[type='text'] {
+  width: 100%;
+  padding: 0.5rem 1rem;
   margin: 1rem 0;
-  background-color: #515151;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  outline-color: #3750db;
+  font-family: inherit;
 }
-/*# sourceMappingURL=root.css.map */
+
+.submitBtn {
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin-left: auto;
+  margin-top: 15px;
+}
+/*# sourceMappingURL=add.css.map */

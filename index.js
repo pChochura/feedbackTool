@@ -15,6 +15,7 @@ app.get(`/`, ROUTES.root);
 app.get('/notFound', ROUTES.notFound);
 app.get(`/:id`, ROUTES.main);
 app.get('/room/:id', ROUTES.room);
+app.get(`/add/:id`, ROUTES.add)
 
 // API
 app.get('/api/rooms', API.getAllRooms);
@@ -29,6 +30,7 @@ app.patch('/api/rooms/:id/addNote', API.addNoteToRoom);
 
 app.post('/api/main', API.createMainPage);
 app.get('/api/main', API.getMainPage);
+app.post('/api/main/end', API.endSession);
 
 reload(app).then((_) => {
 	// Passing PORT as a first argument to the script

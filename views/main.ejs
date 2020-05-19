@@ -11,22 +11,22 @@
 			rel="stylesheet"
 			href="//use.fontawesome.com/releases/v5.13.0/css/all.css"
 		/>
-		<link rel="stylesheet" href="styles/global/global.css" />
-		<link rel="stylesheet" href="styles/main/main.css" />
-		<link rel="stylesheet" href="styles/global/popup.css" />
+		<link rel="stylesheet" href="/styles/global/global.css" />
+		<link rel="stylesheet" href="/styles/main/main.css" />
+		<link rel="stylesheet" href="/styles/global/popup.css" />
 		<script defer src="/reload/reload.js"></script>
 		<title>Feedback tool</title>
 	</head>
 	<body>
 		<div class="header">
-			<p class="title">My rooms</p>
+			<p class="title">My rooms (<a href='/add/<%= addLink %>'><%= addLink %></a>)</p>
 			<a href="#popupCreateRoom" class="button">Create new room</a>
 		</div>
 		<div class="cardContainer">
 			<% rooms.forEach(function(room) { %>
-			<div class="card">
+			<div class="card" onclick="openCard('<%= room.id %>')">
 				<div class="title"><%= room.name %></div>
-				<i class="fas fa-ellipsis-h more"></i>
+				<!-- <i class="fas fa-ellipsis-h more"></i> -->
 				<ul class="lists">
 					<% room.lists.forEach(function(list) { %>
 					<li><%= list.name %> (<%= list.notes.length %> notes)</li>
@@ -99,6 +99,16 @@
 				}
 			});
 
+			const nextPhase = async () => {
+
+				await fetch('http://localhost:8080/api/main/end', { method: 'POST' });
+				window.location = '/notFound';
+			};
+
+			const openCard = (id) => {
+				window.open(`http://localhost:8080/room/${id}`, '_blank');
+			};
+
 			const createRoom = () => {
 				const roomTitle = document.querySelector('#roomName').value;
 				let listsNames = [];
@@ -121,9 +131,3 @@
 		</script>
 	</body>
 </html>
-
-<!-- to jest endpoint POST /api/rooms. I body to:
-{
-lists: [{name: 'string', notes: ['string']}],
-ready: true/false
-} -->

@@ -17,12 +17,12 @@
 		<script>
 			const markReady = () => {
 				fetch('http://localhost:8080/api/rooms/<%= room.id %>/ready', { method: 'PATCH' });
-				document.getElementById('markReady').classList.push('tapped');
+				document.getElementById('markReady').disabled = true;
 			};
 		</script>
 		<div class="wrapper">
 			<div class="header">
-				<p class="title">My lists</p>
+				<p class="title"><%= room.name %></p>
 				<button class="button" id="markReady" <%= room.ready ? 'disabled' : '' %> onclick="markReady()">Ready</button>
 			</div>
 
