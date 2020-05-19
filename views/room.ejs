@@ -15,12 +15,6 @@
 		<script defer src="/public/refresh.js"></script>
 	</head>
 	<body>
-		<script>
-			const markReady = () => {
-				fetch('<%= process.env.URL %>/api/rooms/<%= room.id %>/ready', { method: 'PATCH' });
-				document.getElementById('markReady').disabled = true;
-			};
-		</script>
 		<div class="wrapper">
 			<div class="header">
 				<p class="title"><%= room.name %></p>
@@ -51,7 +45,7 @@
 		<div id="popupAddNote" class="overlay">
 			<div class="popup">
 				<p class="title">Add a note</p>
-				<a class="close" href="#">&times;</a>
+				<a class="close" oncl>&times;</a>
 				<div class="content">
 					<label for="noteContent">Note content</label>
 					<textarea
@@ -66,6 +60,11 @@
 		</div>
 
 		<script>
+			const markReady = async () => {
+				await fetch('<%= process.env.URL %>/api/rooms/<%= room.id %>/ready', { method: 'PATCH' });
+				window.location.reload();
+			};
+
 			if(window.location.hash && (!history.state || !history.state.listId)) {
 				window.location.href = window.location.pathname
 			}

@@ -20,13 +20,14 @@
 	</head>
 	<body>
 		<div class="header">
-			<p class="title">My rooms (<a target='_blank' href='/add/<%= addLink %>'><%= addLink %></a>)</p>
+			<p class="title">My rooms (<a target='_blank' href='/add/<%= addLink %>'>Invite link</a>)</p>
 			<button class="button" onclick="nextPhase()" <%= rooms.every(r => r.ready) ? '' : 'disabled' %>><%= phase === 0 ? 'Agregate notes' : 'End session' %></button>
 		</div>
 		<div class="cardContainer">
 			<% rooms.forEach(function(room) { %>
-			<div class="card" onclick="openCard('<%= room.id %>')">
+			<div class="card">
 				<div class="title"><%= room.name %></div>
+				<a class="more" onclick="removeRoom('<%= room.id %>')">&times;</a>
 				<ul class="lists">
 					<% room.lists.forEach(function(list) { %>
 					<li><%= list.name %> (<%= list.notes.length %> notes)</li>
@@ -40,6 +41,11 @@
 		</div>
 
 		<script>
+			const removeRoom = async (id) => {
+					await fetch(`<%= process.env.URL %>/api/rooms/${id}`, { method: 'DELETE' });
+					window.location.reload();
+			}
+
 			const checkInputs = () => {
 				const listInputs = document.querySelectorAll('.listNames input');
 				for (let i = listInputs.length - 2; i >= 0; i--) {
@@ -72,31 +78,6 @@
 					window.location.reload();
 				}
 			};
-
-			const openCard = (id) => {
-				// Lock opening cards
-				// window.open(`/room/${id}`, '_blank');
-			};
-
-			const createRoom = () => {
-				const roomTitle = document.querySelector('#roomName').value;
-				let listsNames = [];
-				[...document.querySelectorAll('.listNames input')].map((input) => {
-					const val = input.value;
-					if (val.length) {
-						listsNames.push(val);
-					}
-				});
-				let lists = [...listNames];
-				lists.map((listName) => ({
-					name: listName,
-					notes: [],
-				}));
-			};
-
-			document
-				.querySelector('#createRoomBtn')
-				.addEventListener('click', createRoom);
 		</script>
 	</body>
 </html>

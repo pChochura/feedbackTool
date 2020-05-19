@@ -31,6 +31,7 @@ module.exports = {
 				name,
 				notes: [],
 			});
+			room.ready = false;
 		});
 
 		const room = {
