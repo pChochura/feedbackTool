@@ -3,6 +3,7 @@ const API = require('./routes/api/');
 const reload = require('reload');
 const express = require('express');
 const app = express();
+require('dotenv').config();
 
 app.set('view engine', 'ejs');
 app.use(express.json());
@@ -15,7 +16,7 @@ app.get(`/`, ROUTES.root);
 app.get('/notFound', ROUTES.notFound);
 app.get(`/:id`, ROUTES.main);
 app.get('/room/:id', ROUTES.room);
-app.get(`/add/:id`, ROUTES.add)
+app.get(`/add/:id`, ROUTES.add);
 
 // API
 app.get('/api/rooms', API.getAllRooms);
@@ -29,10 +30,15 @@ app.patch('/api/rooms/:id/ready', API.markRoomAsReady);
 app.patch('/api/rooms/:id/addNote', API.addNoteToRoom);
 
 app.post('/api/main', API.createMainPage);
+app.patch('/api/main', API.lockMainPage);
 app.get('/api/main', API.getMainPage);
 app.post('/api/main/end', API.endSession);
+app.post('/api/main/agregate', API.agregateNotes);
 
-reload(app).then((_) => {
-	// Passing PORT as a first argument to the script
-	app.listen(process.argv[2]);
-});
+if (process.env.DEV) {
+	reload(app).then((_) => {
+		app.listen(process.env.PORT);
+	});
+} else {
+	app.listen(process.env.PORT);
+}

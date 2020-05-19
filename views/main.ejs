@@ -15,18 +15,18 @@
 		<link rel="stylesheet" href="/styles/main/main.css" />
 		<link rel="stylesheet" href="/styles/global/popup.css" />
 		<script defer src="/reload/reload.js"></script>
+		<script defer src="/public/refresh.js"></script>
 		<title>Feedback tool</title>
 	</head>
 	<body>
 		<div class="header">
-			<p class="title">My rooms (<a href='/add/<%= addLink %>'><%= addLink %></a>)</p>
-			<a href="#popupCreateRoom" class="button">Create new room</a>
+			<p class="title">My rooms (<a target='_blank' href='/add/<%= addLink %>'><%= addLink %></a>)</p>
+			<button class="button" onclick="nextPhase()" <%= rooms.every(r => r.ready) ? '' : 'disabled' %>><%= phase === 0 ? 'Agregate notes' : 'End session' %></button>
 		</div>
 		<div class="cardContainer">
 			<% rooms.forEach(function(room) { %>
 			<div class="card" onclick="openCard('<%= room.id %>')">
 				<div class="title"><%= room.name %></div>
-				<!-- <i class="fas fa-ellipsis-h more"></i> -->
 				<ul class="lists">
 					<% room.lists.forEach(function(list) { %>
 					<li><%= list.name %> (<%= list.notes.length %> notes)</li>
@@ -37,42 +37,6 @@
 				<% } %>
 			</div>
 			<% }); %>
-		</div>
-
-		<div id="popupCreateRoom" class="overlay">
-			<div class="popup">
-				<p class="title">Create a new room</p>
-				<a class="close" href="#">&times;</a>
-				<div class="content">
-					<div class="content__group">
-						<label for="roomName">Room name</label>
-						<input
-							type="text"
-							id="roomName"
-							name="roomName"
-							value="<%= createRoom.name %>"
-						/>
-					</div>
-
-					<div class="content__group">
-						<label>Room lists</label>
-						<div class="listNames">
-							<% createRoom.lists.forEach(function(list) { %>
-							<input type="text" name="listName" value="<%= list.name %>" />
-							<% }); %>
-							<input
-								type="text"
-								name="listName"
-								placeholder="Dodaj nową listę"
-							/>
-						</div>
-					</div>
-
-					<button id="createRoomBtn" class="button submitBtn">
-						Create room
-					</button>
-				</div>
-			</div>
 		</div>
 
 		<script>
@@ -100,13 +64,18 @@
 			});
 
 			const nextPhase = async () => {
-
-				await fetch('http://localhost:8080/api/main/end', { method: 'POST' });
-				window.location = '/notFound';
+				if (<%= phase %> === 1) {
+					await fetch('<%= process.env.URL %>/api/main/end', { method: 'POST' });
+					window.location = '/notFound';
+				} else {
+					await fetch('<%= process.env.URL %>/api/main/agregate', { method: 'POST' });
+					window.location.reload();
+				}
 			};
 
 			const openCard = (id) => {
-				window.open(`http://localhost:8080/room/${id}`, '_blank');
+				// Lock opening cards
+				// window.open(`/room/${id}`, '_blank');
 			};
 
 			const createRoom = () => {
