@@ -68,23 +68,24 @@
 			};
 
 			if(window.location.hash && !listId) {
-				window.location.reload();
+				window.location.href = window.location.pathname;
 			}
 
-			const createNote = () => {
+			const createNote = async () => {
 				const noteContent = document.querySelector('#noteContent').value;
 				const requestBody = {
 					listId,
 					note: noteContent,
 				}
 				if(requestBody && requestBody.listId && requestBody.note.length) {
-					fetch('<%= process.env.URL %>/api/rooms/<%= room.id %>/addNote', { 
+					await fetch('<%= process.env.URL %>/api/rooms/<%= room.id %>/addNote', { 
 						method: 'PATCH', 
 						body: JSON.stringify(requestBody), 
 						headers: {
 							'Content-Type': 'application/json'
 						}, 
 					});
+					listId = undefined;
 					window.location.href = window.location.pathname;
 				}
 			}
