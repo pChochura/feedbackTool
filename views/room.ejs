@@ -21,25 +21,32 @@
 				<button class="button" id="markReady" <%= room.ready ? 'disabled' : '' %> onclick="markReady()">Ready</button>
 			</div>
 
-			<div class="listsContainer" id="listsContainer">
-				<% room.lists.forEach(function(list) { %>
-				<div class="list" data-id="<%= list.id %>">
-					<h3 class="list__title"><%= list.name %></h3>
-					<div class="notesContainer">
-						<% if (!room.ready) { %> 
-							<a href="#popupAddNote" data-listId="<%= list.id %>" class="button addNote">
-								Add new note <i class="fas fa-plus"></i>
-							</a>
-						<% } %>
-						<% list.notes.forEach(function(note) { %>
-						<div class="note">
-							<%= note %>
+			<% if (room.lists.length > 0) { %> 
+				<div class="listsContainer" id="listsContainer">
+					<% room.lists.forEach(function(list) { %>
+					<div class="list" data-id="<%= list.id %>">
+						<h3 class="list__title"><%= list.name %></h3>
+						<div class="notesContainer">
+							<% if (!room.ready) { %> 
+								<a href="#popupAddNote" data-listId="<%= list.id %>" class="button addNote">
+									Add new note <i class="fas fa-plus"></i>
+								</a>
+							<% } %>
+							<% list.notes.forEach(function(note) { %>
+							<div class="note">
+								<%= note %>
+							</div>
+							<%}) %>
 						</div>
-						<%}) %>
 					</div>
+					<%}) %>
 				</div>
-				<%}) %>
-			</div>
+			<% } else { %>
+				<div class="emptyHolder">
+					<img src="/public/alone.svg" alt="Alone">
+					<span class="title">You're here alone. Wait for others to join</span>
+				</div>
+			<% } %>
 		</div>
 
 		<div id="popupAddNote" class="overlay">

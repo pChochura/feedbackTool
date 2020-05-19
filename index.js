@@ -21,11 +21,9 @@ app.get(`/add/:id`, ROUTES.add);
 // API
 app.get('/api/rooms', API.getAllRooms);
 app.post('/api/rooms', API.createRoom);
-app.patch('/api/rooms/regenerate', API.regenerateRoomId);
 
 app.get('/api/rooms/:id', API.getRoomById);
 app.delete('/api/rooms/:id', API.removeRoomById);
-app.patch('/api/rooms/:id/regenerate', API.regenerateRoomIdById);
 app.patch('/api/rooms/:id/ready', API.markRoomAsReady);
 app.patch('/api/rooms/:id/addNote', API.addNoteToRoom);
 

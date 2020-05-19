@@ -15,59 +15,74 @@
 		<link rel="stylesheet" href="/styles/main/main.css" />
 		<link rel="stylesheet" href="/styles/global/popup.css" />
 		<script defer src="/reload/reload.js"></script>
-		<script defer src="/public/refresh.js"></script>
+		<!-- <script defer src="/public/refresh.js"></script> -->
 		<title>Feedback tool</title>
 	</head>
 	<body>
 		<div class="header">
-			<p class="title">My rooms (<a target='_blank' href='/add/<%= addLink %>'>Invite link</a>)</p>
-			<button class="button" onclick="nextPhase()" <%= rooms.every(r => r.ready) ? '' : 'disabled' %>><%= phase === 0 ? 'Agregate notes' : 'End session' %></button>
+			<% if (phase === 0) { %>
+				<p class="title">My rooms (<a target='_blank' href='/add/<%= addLink %>'>Invite link</a>)</p>
+			<% } else { %>
+					<p class="title">My rooms</p>
+			<% } %>
+			<p class="timer">01:00:00</p>
+			<button class="button" onclick="nextPhase()"
+				<%= rooms.length > 1 && rooms.every(r => r.ready) ? '' : 'disabled' %>>
+				<%= phase === 0 ? 'Agregate notes' : 'End session' %>
+			</button>
 		</div>
-		<div class="cardContainer">
-			<% rooms.forEach(function(room) { %>
-			<div class="card">
-				<div class="title"><%= room.name %></div>
-				<a class="more" onclick="removeRoom('<%= room.id %>')">&times;</a>
-				<ul class="lists">
-					<% room.lists.forEach(function(list) { %>
-					<li><%= list.name %> (<%= list.notes.length %> notes)</li>
-					<% }); %>
-				</ul>
-				<% if (room.ready) { %>
-				<div class="ready">Ready</div>
-				<% } %>
+		<% if (rooms.length > 0) { %>
+			<div class="cardContainer">
+				<% rooms.forEach(function(room) { %>
+				<div class="card">
+					<div class="title"><%= room.name %></div>
+					<% if (phase === 0) { %>
+						<a class="more" onclick="removeRoom('<%= room.id %>')">&times;</a>
+					<% } %>
+					<ul class="lists">
+						<% room.lists.forEach(function(list) { %>
+						<li><%= list.name %> (<%= list.notes.length %> notes)</li>
+						<% }); %>
+					</ul>
+					<% if (room.ready) { %>
+					<div class="ready">Ready</div>
+					<% } %>
+				</div>
+				<% }); %>
 			</div>
-			<% }); %>
-		</div>
+		<% } else { %>
+			<div class="emptyHolder">
+				<img src="/public/add.svg" alt="Add room">
+				<span class="title">Send <a target='_blank' href='/add/<%= addLink %>'>invite link</a> to your team</span>
+			</div>
+		<% } %>
 
 		<script>
-			const removeRoom = async (id) => {
-					await fetch(`<%= process.env.URL %>/api/rooms/${id}`, { method: 'DELETE' });
-					window.location.reload();
-			}
+			let expirationTimestamp = <%= expirationTimestamp || 0 %>;
 
-			const checkInputs = () => {
-				const listInputs = document.querySelectorAll('.listNames input');
-				for (let i = listInputs.length - 2; i >= 0; i--) {
-					if (!listInputs[i].value.length) {
-						listInputs[i].parentNode.removeChild(listInputs[i]);
-					}
-				}
-				if (listInputs[listInputs.length - 1].value.length) {
-					const newInput = document.createElement('input');
-					newInput.type = 'text';
-					newInput.name = 'listName';
-					newInput.placeholder = 'Dodaj nową listę';
-					newInput.value = '';
-					listInputs[listInputs.length - 1].parentNode.appendChild(newInput);
+			const refreshTimer = async () => {
+				const diff = expirationTimestamp - Date.now() / 1000;
+				let hours = Math.floor(diff / (60 * 60));
+				let minutes = Math.floor((diff - hours * 60 * 60) / 60);
+				let seconds = Math.floor(diff - minutes * 60 - hours * 60 * 60);
+				hours = hours < 10 ? '0' + hours : hours;
+				minutes = minutes < 10 ? '0' + minutes : minutes;
+				seconds = seconds < 10 ? '0' + seconds : seconds;
+				document.querySelector('.timer').textContent = `${hours}:${minutes}:${seconds}`;
+
+				if (seconds + minutes + hours <= 0) {
+					await fetch('<%= process.env.URL %>/api/main/end', { method: 'POST' });
+					window.location = '/notFound';
 				}
 			};
 
-			document.addEventListener('input', (e) => {
-				if (e.target && e.target.getAttribute('name') === 'listName') {
-					checkInputs();
-				}
-			});
+			setInterval(refreshTimer, 1000);
+			refreshTimer();
+
+			const removeRoom = async (id) => {
+					await fetch(`<%= process.env.URL %>/api/rooms/${id}`, { method: 'DELETE' });
+					window.location.reload();
+			};
 
 			const nextPhase = async () => {
 				if (<%= phase %> === 1) {

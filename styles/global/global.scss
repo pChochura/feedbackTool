@@ -21,7 +21,7 @@ body {
 
 .wrapper {
 	//max-width: 1200px;
-	margin: 0 50px;
+	margin: 0;
 	display: flex;
 	flex-direction: column;
 	max-height: 100vh;
@@ -61,6 +61,7 @@ body {
 		filter: grayscale(0.7);
 		opacity: 0.5;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 
 	&:hover {
@@ -70,16 +71,20 @@ body {
 	}
 }
 
-.secondary {
-	background: none;
-	color: #3750db;
-	border-color: #3750db;
-	border-width: 1px;
-	border-style: solid;
+.emptyHolder {
+	display: flex;
+	flex-direction: column;
+	align-self: center;
+	margin: auto 5rem;
 
-	&:hover {
-		background-color: #dbdada;
-		filter: none;
-		cursor: pointer;
+	img {
+		max-width: 60%;
+		align-self: center;
+	}
+
+	.title {
+		margin: 2rem;
+		font-size: 1.5rem;
+		align-self: center;
 	}
 }

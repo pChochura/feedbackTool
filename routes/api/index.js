@@ -56,35 +56,18 @@ module.exports = {
 			return;
 		}
 
-		rooms.splice(roomIndex, 1);
+		const removedRoom = rooms.splice(roomIndex, 1)[0];
+
+		rooms.forEach((room) => {
+			const index = room.lists.findIndex((note) => note.id === removedRoom.id);
+			if (index !== -1) {
+				room.lists.splice(index, 1);
+			}
+		});
 
 		res.json({
 			message: 'Removed',
 		});
-	},
-
-	regenerateRoomIdById: (req, res) => {
-		const room = rooms.find((r) => r.id === req.params.id);
-		if (!room) {
-			res.status(404).send({
-				message: 'Room not found',
-			});
-			return;
-		}
-
-		room.id = generateId();
-
-		res.json({
-			id: room.id,
-		});
-	},
-
-	regenerateRoomId: (_, res) => {
-		rooms.forEach((room) => {
-			room.id = generateId();
-		});
-
-		res.json(rooms.map((room) => room.id));
 	},
 
 	markRoomAsReady: (req, res) => {
@@ -140,6 +123,7 @@ module.exports = {
 
 	lockMainPage: (_, res) => {
 		main.locked = true;
+		main.expirationTimestamp = Date.now() / 1000 + 3600;
 
 		res.json({
 			message: 'OK',
@@ -147,6 +131,16 @@ module.exports = {
 	},
 
 	getMainPage: (_, res) => {
+		if (main.expirationTimestamp <= Date.now() / 1000) {
+			// Session is inactive too long
+			main.locked = false;
+			main.id = undefined;
+			main.phase = 0;
+			main.expirationTimestamp = undefined;
+
+			rooms.splice(0, rooms.length);
+		}
+
 		res.json(main);
 	},
 
@@ -154,6 +148,7 @@ module.exports = {
 		main.locked = false;
 		main.id = undefined;
 		main.phase = 0;
+		main.expirationTimestamp = undefined;
 
 		rooms.splice(0, rooms.length);
 
@@ -188,6 +183,7 @@ module.exports = {
 		rooms.push(...roomsTemp);
 
 		main.phase = 1;
+		main.addLink = undefined;
 
 		res.json({
 			message: 'OK',
