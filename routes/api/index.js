@@ -23,8 +23,11 @@ module.exports = {
 	createRoom: (req, res) => {
 		const name = req.body.name;
 
+		const roomId = generateId();
+
 		rooms.forEach((room) => {
 			room.lists.push({
+				id: roomId,
 				name,
 				notes: [],
 			});
@@ -32,16 +35,15 @@ module.exports = {
 
 		const room = {
 			name,
-			lists: rooms.map((room) => ({ name: room.name, notes: [] })),
-			id: generateId()
-		}
+			lists: rooms.map((room) => ({ name: room.name, notes: [], id: room.id })),
+			id: roomId,
+		};
 
 		rooms.push(room);
 
 		res.status(201).send({
 			id: room.id,
 		});
-
 	},
 
 	removeRoomById: (req, res) => {
@@ -128,11 +130,18 @@ module.exports = {
 
 	createMainPage: (_, res) => {
 		main.id = generateId();
-		main.locked = true;
 		main.addLink = generateId();
 
 		res.json({
 			id: main.id,
+		});
+	},
+
+	lockMainPage: (_, res) => {
+		main.locked = true;
+
+		res.json({
+			message: 'OK',
 		});
 	},
 
@@ -143,9 +152,44 @@ module.exports = {
 	endSession: (_, res) => {
 		main.locked = false;
 		main.id = undefined;
+		main.phase = 0;
+
+		rooms.splice(0, rooms.length);
 
 		res.json({
 			message: 'OK',
 		});
-	}
+	},
+
+	agregateNotes: (_, res) => {
+		const roomsTemp = [];
+		rooms.forEach((room, index) => {
+			const notes = [];
+			rooms.forEach((room2, index2) => {
+				if (index !== index2) {
+					notes.push(...room2.lists.find((l) => l.id === room.id).notes);
+				}
+			});
+			roomsTemp.push({
+				id: room.id,
+				name: room.name,
+				lists: [
+					{
+						name: 'Notes',
+						notes,
+					},
+				],
+				ready: true,
+			});
+		});
+
+		rooms.splice(0, rooms.length);
+		rooms.push(...roomsTemp);
+
+		main.phase = 1;
+
+		res.json({
+			message: 'OK',
+		});
+	},
 };

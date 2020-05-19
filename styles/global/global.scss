@@ -56,6 +56,13 @@ body {
 	font-family: inherit;
 	text-decoration: none;
 
+	&:disabled {
+		box-shadow: none;
+		filter: grayscale(0.7);
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
+
 	&:hover {
 		filter: grayscale(0.5);
 		cursor: pointer;
