@@ -13,7 +13,7 @@
 <body>
 	<div class="card">
         <p class="title">Type your name!</p>
-        <input type="text" class="input">
+        <input type="text" class="input" autofocus>
         <button class="button submitBtn">Join</button>
     </div>
 
@@ -22,18 +22,26 @@
         document.addEventListener('input', function (e) {
             name = e.target.value
         });
-        document.querySelector('.submitBtn').addEventListener('click', function() {
+        document.querySelector('.submitBtn').addEventListener('click', addRoom)
+        document.addEventListener('keyup', addRoomCheck)
+
+        function addRoom() {
             if(name) {
-                fetch('<%= process.env.URL %>/api/rooms',
-                {method: 'post',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({name})})
+                fetch('<%= process.env.URL %>/api/rooms',{
+                    method: 'post',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name})
+                })
                 .then(res => res.json())
                 .then(res => {
                     window.location.pathname = `/room/${res.id}`
                 })
             }
-        })
+        }
+
+        function addRoomCheck(e) {
+            if(e.keyCode === 13) addRoom()
+        }
     </script>
 </body>
 </html>
