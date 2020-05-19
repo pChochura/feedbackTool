@@ -45,7 +45,7 @@
 		<div id="popupAddNote" class="overlay">
 			<div class="popup">
 				<p class="title">Add a note</p>
-				<a class="close" oncl>&times;</a>
+				<a class="close" href="#">&times;</a>
 				<div class="content">
 					<label for="noteContent">Note content</label>
 					<textarea
@@ -60,18 +60,19 @@
 		</div>
 
 		<script>
+			let listId;
+
 			const markReady = async () => {
 				await fetch('<%= process.env.URL %>/api/rooms/<%= room.id %>/ready', { method: 'PATCH' });
 				window.location.reload();
 			};
 
-			if(window.location.hash && (!history.state || !history.state.listId)) {
-				window.location.href = window.location.pathname
+			if(window.location.hash && !listId) {
+				window.location.reload();
 			}
 
 			const createNote = () => {
 				const noteContent = document.querySelector('#noteContent').value;
-				const { listId } = history.state;
 				const requestBody = {
 					listId,
 					note: noteContent,
@@ -91,7 +92,6 @@
 			document.querySelectorAll('a.addNote').forEach(btn => {
 				btn.addEventListener('click', function (e) {
 					listId = e.target.getAttribute('data-listId');
-					history.pushState({ listId }, null, '/room/<%= room.id %>#popupAddNote');
 				});
 			});
 
