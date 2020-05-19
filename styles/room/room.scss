@@ -1,11 +1,10 @@
 body {
 	line-height: 1.5;
-}
-
-body,
-.wrapper {
-	min-height: 100vh;
-	height: 100vh;
+	padding-left: 10rem;
+	padding-right: 10rem;
+	padding-top: 3rem;
+	min-height: 100%;
+	height: 100%;
 }
 
 .listsContainer {
@@ -86,5 +85,6 @@ body,
 		filter: grayscale(0.7);
 		opacity: 0.5;
 		cursor: not-allowed;
+		pointer-events: none;
 	}
 }

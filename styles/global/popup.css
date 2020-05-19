@@ -1,112 +1,111 @@
 .overlay {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  top: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  -webkit-transition: opacity 0.5s;
-  transition: opacity 0.5s;
-  visibility: hidden;
-  opacity: 0;
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	top: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.7);
+	-webkit-transition: opacity 0.5s;
+	transition: opacity 0.5s;
+	visibility: hidden;
+	opacity: 0;
 }
 
 .overlay:target {
-  visibility: visible;
-  opacity: 1;
+	visibility: visible;
+	opacity: 1;
 }
 
 .popup {
-  position: relative;
-  padding: 1.5rem 1rem 1rem 1rem;
-  border-radius: 5px;
-  background: white;
-  width: 40%;
-  margin: 5rem auto;
-  -webkit-transition: all 0.5s;
-  transition: all 0.5s;
+	position: relative;
+	padding: 1.5rem 1rem 1rem 1rem;
+	border-radius: 5px;
+	background: white;
+	width: 40%;
+	margin: 5rem auto;
+	-webkit-transition: all 0.5s;
+	transition: all 0.5s;
 }
 
 .popup .close {
-  position: absolute;
-  right: 1.5rem;
-  top: 1.5rem;
-  font-size: 30px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-  -webkit-transition: all 0.3;
-  transition: all 0.3;
+	position: absolute;
+	right: 1.5rem;
+	top: 1.5rem;
+	font-size: 30px;
+	font-weight: bold;
+	text-decoration: none;
+	color: #333;
+	-webkit-transition: all 0.3;
+	transition: all 0.3;
 }
 
 .popup .close:hover {
-  color: #a95151;
+	color: #a95151;
 }
 
 .popup .content {
-  margin-top: 2rem;
-  padding: 0.5rem;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: vertical;
-  -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column;
+	margin-top: 2rem;
+	padding: 0.5rem;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
 }
 
 .popup .content input[type='text'] {
-  width: 100%;
-  padding: 0.5rem 1rem;
-  margin: 1rem 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  outline-color: #3750db;
-  font-family: inherit;
+	width: 100%;
+	padding: 0.5rem 1rem;
+	margin: 1rem 0;
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	outline-color: #3750db;
+	font-family: inherit;
 }
 
 .popup .content label {
-  color: #515151;
-  font-weight: 300;
-  margin-bottom: 5px;
+	color: #515151;
+	font-weight: 300;
+	margin-bottom: 5px;
 }
 
 .popup .content .listNames {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  margin-top: 1rem;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	margin-top: 1rem;
+	-webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+	justify-content: space-between;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
 }
 
 .popup .content .listNames input[type='text'] {
-  margin: 0.2rem 0;
-  width: 48%;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+	margin: 0.2rem 0;
+	width: 48%;
+	-ms-flex-negative: 0;
+	flex-shrink: 0;
 }
 
 .popup .content__group {
-  margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 .popup .title {
-  margin-top: 0;
-  padding: 0 0.5rem;
+	margin-top: 0;
+	padding: 0 0.5rem;
 }
 
 .popup .submitBtn {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  margin-left: auto;
-  margin-top: 15px;
+	width: -webkit-fit-content;
+	width: -moz-fit-content;
+	width: fit-content;
+	margin-left: auto;
+	margin-top: 15px;
 }
-/*# sourceMappingURL=popup.css.map */

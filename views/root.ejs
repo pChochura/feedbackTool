@@ -11,10 +11,12 @@
 	<title>Feedback tool</title>
 </head>
 <body>
+	<h1 class="title">Feedback tool</h1>
+	<p class="subtitle">It's a simple tool to help your team share feedback anonymously</p>
 	<div class="card">
 		<% if (locked) { %>
 			<p class="title">Sorry, this session is occupied</p>
-			<p class="subtitle">You have to wait</p>
+			<p class="subtitle">You have to wait up to <%= date %></p>
 			<img src="public/wait.svg" alt="Wait!">
 		<% } else { %>
 			<p class="title">Generated a new session</p>

@@ -3,8 +3,9 @@ const rooms = [];
 const main = {
 	id: undefined,
 	locked: false,
-	addLink: '',
+	addLink: undefined,
 	phase: 0,
+	expirationTimestamp: undefined,
 };
 
 module.exports = {
