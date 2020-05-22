@@ -4,12 +4,12 @@ import './style.css'
 const Root = () => {
 
     const [locked, setLocked] = useState(false)
-    const [link, setLink] = useState('http://localhost:8080/add/4xy8yn3jix2')
-    const [date, setDate] = useState('12:12:12')
+    const [link, setLink] = useState('')
+    const [date, setDate] = useState('')
 
     const getData = async (res, req) => {
         let mainPage;
-        mainPage = (await fetch(`${process.env.URL}/api/main`)).body
+        mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`)).body
         console.log(mainPage);
 
         if (mainPage.locked) {
@@ -24,9 +24,8 @@ const Root = () => {
             setDate(`${hours}:${minutes}:${seconds}`)
             //return;
         } else {
-            mainPage = (await fetch(`${process.env.URL}/api/main`, { method: 'POST' })).body;
+            mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'POST' })).body;
             setLocked(false)
-            console.log(mainPage);
             setLink(`${window.location.href}${mainPage.id}`)
         }
     }
