@@ -7,9 +7,9 @@ const Root = () => {
     const [link, setLink] = useState('')
     const [date, setDate] = useState('')
 
-    const getData = async (res, req) => {
+    const getData = async () => {
         let mainPage;
-        mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`)).body
+        mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`)).json()
         console.log(mainPage);
 
         if (mainPage.locked) {
@@ -24,7 +24,7 @@ const Root = () => {
             setDate(`${hours}:${minutes}:${seconds}`)
             //return;
         } else {
-            mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'POST' })).body;
+            mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'POST' })).json();
             setLocked(false)
             setLink(`${window.location.href}${mainPage.id}`)
         }
@@ -33,10 +33,6 @@ const Root = () => {
     useEffect(() => {
         getData()
     }, [])
-
-
-    //console.log(window.location.protocol);
-
 
 
     return(
