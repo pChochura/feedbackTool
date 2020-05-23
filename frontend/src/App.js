@@ -12,8 +12,9 @@ function App() {
   return (
     <Router>
       <Switch>
-        <Route exact path="/" component={Main}/>
+        <Route exact path="/" component={Root}/>
         {/* <Route path="/:id"/> */}
+        <Route exact path="/haha/dfdf/asas" component={Main}/>
         <Route path="/add/:id" component={Root}/>
         <Route path="/room/:id"/>
         <Route path="*" component={NotFound}/>

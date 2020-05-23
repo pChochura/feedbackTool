@@ -28,10 +28,12 @@ const Main = () => {
         }
         const rooms = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms`)).json();
         setRooms(rooms);
-        setAddLink(addLink);
-        setPhase(phase);
-        setExpirationTimestamp(expirationTimestamp)
+        setAddLink(mainPage.addLink);
+        setPhase(mainPage.phase);
+        setExpirationTimestamp(mainPage.expirationTimestamp)
     }
+
+    console.log(window.location);
 
     const refreshTimer = async () => {
         const diff = expirationTimestamp - Date.now() / 1000;

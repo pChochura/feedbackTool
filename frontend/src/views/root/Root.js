@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import waitImg from '../../assets/images/wait.svg'
 import './style.css'
 
 const Root = () => {
@@ -44,7 +45,7 @@ const Root = () => {
                     <>
                         <p className="title">Sorry, this session is occupied</p>
                         <p className="subtitle">You have to wait up to {date}</p>
-                        <img src="public/wait.svg" alt="Wait!"></img>
+                        <img src={waitImg} alt="Wait!"></img>
                     </>
                     :
                     <>
