@@ -1,40 +1,39 @@
-import React, { useState, useEffect } from 'react'
-import waitImg from '../../assets/images/wait.svg'
-import './style.css'
+import React, { useState, useEffect } from 'react';
+import moment from 'moment';
+import waitImg from '../../assets/images/wait.svg';
+import { useCookies } from 'react-cookie';
+import './style.css';
 
 const Root = () => {
-
-    const [locked, setLocked] = useState(false)
-    const [link, setLink] = useState('')
-    const [date, setDate] = useState('')
-
-    const getData = async () => {
-        let mainPage;
-        mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`)).json()
-        console.log(mainPage);
-
-        if (mainPage.locked) {
-            const date = new Date(mainPage.expirationTimestamp * 1000);
-            const hours =
-                date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-            const minutes =
-                date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-            const seconds =
-                date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            setLocked(true)
-            setDate(`${hours}:${minutes}:${seconds}`)
-            //return;
-        } else {
-            mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'POST' })).json();
-            setLocked(false)
-            setLink(`${window.location.href}${mainPage.id}`)
-        }
-    }
+    const [locked, setLocked] = useState(false);
+    const [link, setLink] = useState('');
+    const [date, setDate] = useState('');
+    const [cookie, setCookie] = useCookies(['seed']);
+    const [seed] = useState(Math.random().toString(36).slice(2));
 
     useEffect(() => {
-        getData()
-    }, [])
+        const getData = async () => {
+            let mainPage;
+            mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`)).json();
+    
+            if (mainPage.locked) {
+                setLocked(true);
+                setDate(`${moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss')}`);
+            } else {
+                mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        seed,
+                    }),
+                    headers: { 'Content-Type': 'application/json'},
+                })).json();
+                setLocked(false);
+                setLink(`${window.location.href}${mainPage.id}`);
+            }
+        }
 
+        getData();
+    }, [seed]);
 
     return(
         <div className="container">
@@ -50,12 +49,14 @@ const Root = () => {
                     :
                     <>
                         <p className="title">Generated a new session</p>
-                        <a className="link" href={link}>{link}</a>
+                        <a className="link" href={link} onClick={() => {
+                            setCookie('seed', seed, { maxAge: 60 * 60 });
+                        }}>{link}</a>
                     </>
                 }
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Root
+export default Root;

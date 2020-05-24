@@ -7,16 +7,18 @@ import {
 import NotFound from './views/notFound/NotFound';
 import Root from './views/root/Root';
 import Main from './views/main/Main';
+import Room from './views/room/Room';
+import Add from './views/add/Add';
 
 function App() {
   return (
     <Router>
       <Switch>
         <Route exact path="/" component={Root}/>
-        {/* <Route path="/:id"/> */}
-        <Route exact path="/haha/dfdf/asas" component={Main}/>
-        <Route path="/add/:id" component={Root}/>
-        <Route path="/room/:id"/>
+        <Route exact path="/notFound" component={NotFound}/>
+        <Route exact path="/:id" component={Main}/>
+        <Route exact path="/add/:id" component={Add}/>
+        <Route exact path="/room/:id" component={Room}/>
         <Route path="*" component={NotFound}/>
       </Switch>
     </Router>

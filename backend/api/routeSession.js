@@ -43,12 +43,21 @@ module.exports = {
 		});
 	},
 
-	getMainPage: (_, res) => {
+	getMainPage: (req, res) => {
+		if (!req.adminAuth) {
+			res.json({
+				locked: main.locked,
+				expirationTimestamp: main.expirationTimestamp,
+			});
+			return;
+		}
+
 		if (main.expirationTimestamp <= Date.now() / 1000) {
 			// Session is inactive too long
 			main.locked = false;
 			main.id = undefined;
 			main.phase = 0;
+			main.addLink = undefined;
 			main.expirationTimestamp = undefined;
 
 			rooms.splice(0, rooms.length);

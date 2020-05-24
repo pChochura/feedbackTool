@@ -6,7 +6,10 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+    credentials: true,
+    origin: 'http://localhost:3000'
+}));
 app.use(express.json());
 app.use(cookieParser());
 
@@ -28,7 +31,7 @@ app.post('/api/main', API.createMainPage);
 // Lock session (only admin)
 app.patch('/api/main', API.adminAuth, API.lockMainPage);
 // Return session (only admin)
-app.get('/api/main', API.adminAuth, API.getMainPage);
+app.get('/api/main', API.adminAuthSoft, API.getMainPage);
 // End session (only admin)
 app.post('/api/main/end', API.adminAuth, API.endSession);
 // Aggregate all notes (only admin)

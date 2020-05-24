@@ -11,6 +11,7 @@ module.exports = {
 					name: list.name,
 					count: list.notes.length,
 				})),
+				ready: room.ready,
 			})),
 		);
 	},
@@ -36,7 +37,7 @@ module.exports = {
 			return;
 		}
 
-		if (!main.id || main.phase !== 0) {
+		if (!main.locked || main.phase !== 0) {
 			res.status(423).send({
 				message: 'This action is now locked',
 			});
@@ -122,7 +123,7 @@ module.exports = {
 			return;
 		}
 
-		const { listId } = req.body;
+		const { listId, note } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
 		if (!list) {
@@ -132,7 +133,7 @@ module.exports = {
 			return;
 		}
 
-		list.notes.push(req.body.note);
+		list.notes.push(note);
 
 		res.json({
 			message: 'OK',
