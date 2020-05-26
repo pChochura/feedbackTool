@@ -3,7 +3,7 @@ import './style.css';
 import { useCookies } from 'react-cookie';
 
 const Add = ({ history }) => {
-    const [cookie, setCookie] = useCookies('seed');
+    const [cookies, setCookie] = useCookies(['seed']);
     const [seed] = useState(Math.random().toString(36).slice(2));
     const [name, setName] = useState('');
 
@@ -12,15 +12,15 @@ const Add = ({ history }) => {
             method: 'POST',
             credentials: 'include',
             body: JSON.stringify({
-                seed: cookie || seed,
+                seed: cookies.seed || seed,
                 name
             }),
             headers: { 'Content-Type': 'application/json' },
         })).json();
 
-        setCookie('seed', cookie || seed);
+        setCookie('seed', cookies.seed || seed, { path: '/' });
         history.push(`/room/${room.id}`);
-    }, [history, seed, cookie, setCookie, name]);
+    }, [history, seed, cookies, setCookie, name]);
 
     return (
         <div className="card">

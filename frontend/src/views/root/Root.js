@@ -8,7 +8,7 @@ const Root = () => {
     const [locked, setLocked] = useState(false);
     const [link, setLink] = useState('');
     const [date, setDate] = useState('');
-    const [cookie, setCookie] = useCookies(['seed']);
+    const [cookies, setCookie] = useCookies(['seed']);
     const [seed] = useState(Math.random().toString(36).slice(2));
 
     useEffect(() => {
@@ -50,7 +50,7 @@ const Root = () => {
                     <>
                         <p className="title">Generated a new session</p>
                         <a className="link" href={link} onClick={() => {
-                            setCookie('seed', seed, { maxAge: 60 * 60 });
+                            setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
                         }}>{link}</a>
                     </>
                 }
