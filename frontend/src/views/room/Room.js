@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from "react-router-dom";
 import alone from '../../assets/images/alone.svg';
+import socketIOClient from "socket.io-client";
 import './style.css';
 
 const Room = ({ history }) => {
@@ -48,6 +49,13 @@ const Room = ({ history }) => {
     useEffect(() => {
         getRoom();
     }, [getRoom]);
+
+    useEffect(() => {
+        const io = socketIOClient(process.env.REACT_APP_URL);
+        io.on('roomJoined', () => {
+            getRoom();
+        });
+    }, []);
 
     return (
         <div className="wrapper">

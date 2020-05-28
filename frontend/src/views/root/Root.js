@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import waitImg from '../../assets/images/wait.svg';
+import socketIOClient from "socket.io-client";
 import { useCookies } from 'react-cookie';
 import './style.css';
 
@@ -13,12 +14,11 @@ const Root = () => {
 
     useEffect(() => {
         const getData = async () => {
-            let mainPage;
-            mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`)).json();
+            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
     
             if (mainPage.locked) {
                 setLocked(true);
-                setDate(`${moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss')}`);
+                setDate(moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss'));
             } else {
                 mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, {
                     method: 'POST',
@@ -26,6 +26,7 @@ const Root = () => {
                         seed,
                     }),
                     headers: { 'Content-Type': 'application/json'},
+                    credentials: 'include',
                 })).json();
                 setLocked(false);
                 setLink(`${window.location.href}${mainPage.id}`);
@@ -34,6 +35,17 @@ const Root = () => {
 
         getData();
     }, [seed]);
+
+    useEffect(() => {
+        const io = socketIOClient(process.env.REACT_APP_URL);
+        io.on('mainExpired', () => {
+            setLink('Refresh the page');
+        });
+        io.on('mainLocked', (data) => {
+            setLocked(true);
+            setDate(moment.unix(data.until).format('HH:mm:ss'));
+        });
+    }, [setLink, setLocked, setDate]);
 
     return(
         <div className="container">

@@ -1,14 +1,18 @@
 const cookieParser = require('cookie-parser');
+const socket = require("socket.io");
 const express = require('express');
 const API = require('./api');
 const cors = require('cors');
 require('dotenv').config();
 
 const app = express();
+const server = require('http').createServer(app);
+const io = socket(server);
+socket.io = io;
 
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:3000'
+    origin: process.env.CLIENT_URL,
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -35,6 +39,6 @@ app.get('/api/main', API.adminAuthSoft, API.getMainPage);
 // End session (only admin)
 app.post('/api/main/end', API.adminAuth, API.endSession);
 // Aggregate all notes (only admin)
-app.post('/api/main/agregate', API.adminAuth, API.agregateNotes);
+app.post('/api/main/aggregate', API.adminAuth, API.aggregateNotes);
 
-app.listen(process.env.PORT);
+server.listen(process.env.PORT);

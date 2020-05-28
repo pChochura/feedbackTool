@@ -70,6 +70,8 @@ module.exports = {
 
 		rooms.push(room);
 
+		require('../socket').roomJoined(room);
+
 		res.status(201).send({
 			id: room.id,
 		});
@@ -109,6 +111,8 @@ module.exports = {
 
 		room.ready = true;
 
+		require('../socket').roomChanged(room);
+
 		res.json({
 			message: 'OK',
 		});
@@ -134,6 +138,8 @@ module.exports = {
 		}
 
 		list.notes.push(note);
+
+		require('../socket').roomChanged(room);
 
 		res.json({
 			message: 'OK',

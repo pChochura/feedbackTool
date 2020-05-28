@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import addImg from '../../assets/images/add.svg';
 import { useParams } from "react-router-dom";
+import socketIOClient from "socket.io-client";
 import './style.css'
 
 const Main = ({ history }) => {
@@ -42,7 +43,7 @@ const Main = ({ history }) => {
             await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
             history.push('/notFound')
         } else {
-            await fetch(`${process.env.REACT_APP_URL}/api/main/agregate`, { method: 'POST', credentials: 'include' });
+            await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, { method: 'POST', credentials: 'include' });
             getRooms();
         }
     };
@@ -91,6 +92,18 @@ const Main = ({ history }) => {
         }
     }, [refreshTimer]);
 
+    useEffect(() => {
+        const io = socketIOClient(process.env.REACT_APP_URL);
+        io.on('roomJoined', (_) => {
+            getRooms();
+        });
+
+        io.on('roomChanged', (data) => {
+            Object.assign(rooms.find(room => room.id === data.room.id) || {}, data.room);
+            setRooms(rooms);
+        });
+    }, [rooms, setRooms]);
+
     return (
         <>
             <div className="header">
@@ -101,7 +114,7 @@ const Main = ({ history }) => {
                 }
                 <p className="timer">{time}</p>
                 <button className="button" onClick={nextPhase} disabled={!(rooms.length > 1 && rooms.every(r => r.ready))}>
-                    {phase === 0 ? 'Agregate notes' : 'End session'}
+                    {phase === 0 ? 'Aggregate notes' : 'End session'}
                 </button>
             </div>
             {rooms.length > 0 ?

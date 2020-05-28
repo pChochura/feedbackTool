@@ -22,6 +22,8 @@ module.exports = {
 		main.id = generateId(seed);
 		main.addLink = generateId();
 
+		require('../socket').mainExpired(req.cookies.io);
+		
 		res.json({
 			id: main.id,
 		});
@@ -37,6 +39,8 @@ module.exports = {
 
 		main.locked = true;
 		main.expirationTimestamp = Date.now() / 1000 + 3600;
+
+		require('../socket').mainLocked(main.expirationTimestamp);
 
 		res.json({
 			message: 'OK',
@@ -79,7 +83,7 @@ module.exports = {
 		});
 	},
 
-	agregateNotes: (_, res) => {
+	aggregateNotes: (_, res) => {
 		const roomsTemp = [];
 		rooms.forEach((room, index) => {
 			const notes = [];
