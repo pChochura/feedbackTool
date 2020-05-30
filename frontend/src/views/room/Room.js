@@ -2,11 +2,17 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from "react-router-dom";
 import alone from '../../assets/images/alone.svg';
 import socketIOClient from "socket.io-client";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faThumbsUp as faThumbsUpEmpty, faThumbsDown as faThumbsDownEmpty } from '@fortawesome/free-regular-svg-icons'
+import { faThumbsUp as faThumbsUpFull, faThumbsDown as faThumbsDownFull } from '@fortawesome/free-solid-svg-icons'
 import './style.css';
 
 const Room = ({ history }) => {
     const [room, setRoom] = useState({ lists: [] });
+    const [rate, setRate] = useState(0)
     const { id } = useParams();
+    const [noteId, setNoteId] = useState(0);
+    const [noteText, setNoteText] = useState('')
 
     const getRoom = useCallback(async () => {
         const room = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { credentials: 'include' })).json();
@@ -29,7 +35,7 @@ const Room = ({ history }) => {
         });
     };
 
-    const submitNote = async (listId, note) => {
+    const submitNote = async (listId, note, rate) => {
         const response = await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}/addNote`, {
             method: 'PATCH',
             credentials: 'include',
@@ -44,7 +50,11 @@ const Room = ({ history }) => {
             return;
         }
         getRoom();
+        setNoteId(0);
+        setNoteText('');
+        setRate(0);
     };
+
 
     useEffect(() => {
         getRoom();
@@ -85,14 +95,40 @@ const Room = ({ history }) => {
                                     }
                                     {
                                         !room.ready && (
-                                            <textarea className='note' placeholder='Add new note'
-                                                onKeyPress={(e) => {
-                                                    if (!e.shiftKey && e.key === 'Enter') {
-                                                        e.preventDefault();
-                                                        submitNote(list.id, e.target.value);
-                                                        e.target.value = '';
-                                                    }
-                                                }}></textarea>
+                                            <div className="note">
+                                                <textarea placeholder='Add new note'
+                                                    value={noteText}
+                                                    onChange={(e) => {
+                                                        setNoteId(list.id);
+                                                        setNoteText(e.target.value)
+                                                    }}
+                                                    onKeyPress={(e) => {
+
+                                                        if (!e.shiftKey && e.key === 'Enter') {
+                                                            e.preventDefault();
+                                                            submitNote(noteId, noteText, rate ? rate : 1);
+                                                            e.target.value = '';
+                                                        }
+                                                    }}>
+                                                </textarea>
+                                                <div className="buttons">
+                                                    <div className="thumbUp" onClick={(e) => {
+                                                            setRate(1);
+                                                            submitNote(noteId, noteText, rate);
+
+                                                        }}>
+                                                        <FontAwesomeIcon icon={rate === 1 ? faThumbsUpFull : faThumbsUpEmpty} />
+                                                    </div>
+                                                    <div className="thumbDown" onClick={(e) => {
+                                                            setRate(-1);
+                                                            submitNote(noteId, noteText, rate);
+
+                                                        }}>
+                                                        <FontAwesomeIcon icon={rate == -1 ? faThumbsDownFull : faThumbsDownEmpty} />
+                                                    </div>
+
+                                                </div>
+                                            </div>
                                         )
                                     }
                                 </div>

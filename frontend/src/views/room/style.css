@@ -99,6 +99,89 @@ body {
 
 textarea {
   resize: none;
+  width: 100%;
   min-height: 6rem;
+  padding-bottom: 3rem;
+  border: none;
+}
+
+.buttons {
+  right: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.buttons > * {
+  font-size: x-large;
+  margin-left: 10px;
+}
+
+.buttons .thumbUp {
+  color: #66DD66;
+}
+
+.buttons .thumbUp :hover {
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0);
+          box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0);
+}
+
+.buttons .thumbDown {
+  color: #DD6666;
+}
+
+.accent {
+  color: #3750db;
+  font-weight: 900;
+}
+
+.rateBtnsContainer {
+  padding: 0;
+}
+
+.rateBtnsContainer button {
+  height: 40px;
+  width: 50%;
+  border: none;
+  position: relative;
+  z-index: 1;
+  background: none;
+}
+
+.rateBtnsContainer button.positive::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: -webkit-gradient(linear, right top, left top, from(white), to(rgba(110, 214, 71, 0.5)));
+  background-image: linear-gradient(to left, white, rgba(110, 214, 71, 0.5));
+  z-index: -1;
+  -webkit-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.rateBtnsContainer button.negative::before {
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: -webkit-gradient(linear, right top, left top, from(rgba(230, 1, 1, 0.5)), to(white));
+  background-image: linear-gradient(to left, rgba(230, 1, 1, 0.5), white);
+  z-index: -1;
+  -webkit-transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease;
+  opacity: 0;
+}
+
+.rateBtnsContainer button:hover::before {
+  opacity: 1;
 }
 /*# sourceMappingURL=style.css.map */

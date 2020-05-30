@@ -91,5 +91,91 @@ body {
 
 textarea {
 	resize: none;
+	width: 100%;
 	min-height: 6rem;
+	padding-bottom: 3rem;
+	border: none;
+}
+
+.buttons {
+	right: 0;
+	display: flex;
+	justify-content: flex-end;
+
+	& > * {
+		font-size: x-large;
+		margin-left: 10px;
+	}
+
+	& .thumbUp {
+		color: #66DD66;
+
+		& :hover {
+			//transform: scale(1.2);
+			box-shadow: 10px 10px 5px 0px rgba(0,0,0,0);
+		}
+	}
+
+	& .thumbDown {
+		color: #DD6666;
+	}
+}
+
+.accent {
+	color: #3750db;
+	font-weight: 900;
+}
+
+
+
+.rateBtnsContainer {
+	padding: 0;
+
+	button {
+		height: 40px;
+		width: 50%;
+		border: none;
+		position: relative;
+		z-index: 1;
+		background: none;
+
+		&.positive::before {
+			position: absolute;
+			content: "";
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background-image: linear-gradient(
+				to left,
+				rgb(255,255,255),
+				rgba(110,214,71,.5)
+			);
+			z-index: -1;
+			transition: opacity 0.5s ease;
+			opacity: 0;
+		}
+
+		&.negative::before {
+			position: absolute;
+			content: "";
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background-image: linear-gradient(
+				to left,
+				rgba(230,1,1,.5),
+				rgb(255,255,255)
+			);
+			z-index: -1;
+			transition: opacity 0.5s ease;
+			opacity: 0;
+		}
+
+		&:hover::before {
+			opacity: 1;
+		}
+
+	}
 }
