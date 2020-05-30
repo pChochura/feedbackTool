@@ -36,6 +36,7 @@ const Room = ({ history }) => {
     };
 
     const submitNote = async (listId, note, rate) => {
+        if (!note) return;
         const response = await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}/addNote`, {
             method: 'PATCH',
             credentials: 'include',
