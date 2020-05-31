@@ -127,7 +127,7 @@ module.exports = {
 			return;
 		}
 
-		const { listId, note } = req.body;
+		const { listId, note, rate } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
 		if (!list) {
@@ -137,7 +137,7 @@ module.exports = {
 			return;
 		}
 
-		list.notes.push(note);
+		list.notes.push({ note, rate });
 
 		require('../socket').roomChanged(room);
 

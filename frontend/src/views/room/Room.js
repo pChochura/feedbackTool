@@ -9,10 +9,10 @@ import './style.css';
 
 const Room = ({ history }) => {
     const [room, setRoom] = useState({ lists: [] });
-    const [rate, setRate] = useState(0)
+    const [rate, setRate] = useState(1);
     const { id } = useParams();
     const [noteId, setNoteId] = useState(0);
-    const [noteText, setNoteText] = useState('')
+    const [noteText, setNoteText] = useState('');
 
     const getRoom = useCallback(async () => {
         const room = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { credentials: 'include' })).json();
@@ -43,6 +43,7 @@ const Room = ({ history }) => {
             body: JSON.stringify({
                 listId,
                 note,
+                rate,
             }),
             headers: { 'Content-Type': 'application/json' },
         });
@@ -66,7 +67,7 @@ const Room = ({ history }) => {
         io.on('roomJoined', () => {
             getRoom();
         });
-    }, []);
+    }, [getRoom]);
 
     return (
         <div className="wrapper">
@@ -89,8 +90,8 @@ const Room = ({ history }) => {
                                 <div className='notesContainer'>
                                     {
                                         list.notes.map((note, index) => (
-                                            <div className='note' key={index}>
-                                                {note}
+                                            <div className={note.rate ? 'note positive' : 'note negative'} key={index}>
+                                                {note.note}
                                             </div>
                                         ))
                                     }
@@ -125,7 +126,7 @@ const Room = ({ history }) => {
                                                             submitNote(noteId, noteText, rate);
 
                                                         }}>
-                                                        <FontAwesomeIcon icon={rate == -1 ? faThumbsDownFull : faThumbsDownEmpty} />
+                                                        <FontAwesomeIcon icon={rate === -1 ? faThumbsDownFull : faThumbsDownEmpty} />
                                                     </div>
 
                                                 </div>

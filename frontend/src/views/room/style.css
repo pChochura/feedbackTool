@@ -51,6 +51,14 @@ body {
   width: 100%;
 }
 
+.positive {
+  background: #def1d5;
+}
+
+.negative {
+  background: #f1d5d5;
+}
+
 .addNote {
   display: block;
   width: 100%;
