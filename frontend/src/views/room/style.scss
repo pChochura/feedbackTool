@@ -48,11 +48,11 @@ body {
 }
 
 .positive {
-	background: rgb(222, 241, 213);
+	border-left: solid 5px rgba(110,214,71,.5)
 }
 
 .negative {
-	background: rgb(241, 213, 213);
+	border-left: solid 5px rgba(230,1,1,.5),
 }
 
 .addNote {

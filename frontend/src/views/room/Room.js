@@ -54,7 +54,7 @@ const Room = ({ history }) => {
         getRoom();
         setNoteId(0);
         setNoteText('');
-        setRate(0);
+        setRate(1);
     };
 
 
@@ -90,7 +90,7 @@ const Room = ({ history }) => {
                                 <div className='notesContainer'>
                                     {
                                         list.notes.map((note, index) => (
-                                            <div className={note.rate ? 'note positive' : 'note negative'} key={index}>
+                                            <div className={note.rate === 1 ? 'note positive' : 'note negative'} key={index}>
                                                 {note.note}
                                             </div>
                                         ))
@@ -105,7 +105,6 @@ const Room = ({ history }) => {
                                                         setNoteText(e.target.value)
                                                     }}
                                                     onKeyPress={(e) => {
-
                                                         if (!e.shiftKey && e.key === 'Enter') {
                                                             e.preventDefault();
                                                             submitNote(noteId, noteText, rate ? rate : 1);

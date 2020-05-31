@@ -52,11 +52,11 @@ body {
 }
 
 .positive {
-  background: #def1d5;
+  border-left: solid 5px rgba(110, 214, 71, 0.5);
 }
 
 .negative {
-  background: #f1d5d5;
+  border-left: solid 5px rgba(230, 1, 1, 0.5);
 }
 
 .addNote {
