@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import addImg from '../../assets/images/add.svg';
 import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCopy } from '@fortawesome/free-solid-svg-icons'
 import './style.css'
 
 const Main = ({ history }) => {
@@ -10,7 +12,10 @@ const Main = ({ history }) => {
     const [rooms, setRooms] = useState([]);
     const [time, setTime] = useState('01:00:00');
     const [expirationTimestamp, setExpirationTimestamp] = useState(0);
+    const [showCopy, setShowCopy] = useState(false);
+    const [deletedRoomStatus, setDeletedRoomStatus] = useState(0)
     const { id } = useParams();
+
 
     const getRooms = async () => {
         const rooms = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms`, { credentials: 'include' })).json();
@@ -34,7 +39,7 @@ const Main = ({ history }) => {
     }, [expirationTimestamp, history, setTime]);
 
     const removeRoom = async (id) => {
-        await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { method: 'DELETE', credentials: 'include' });
+        await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { method: 'DELETE', credentials: 'include' }).then(res => setDeletedRoomStatus(res.status));
         getRooms();
     };
 
@@ -104,11 +109,26 @@ const Main = ({ history }) => {
         });
     }, [rooms, setRooms]);
 
+
     return (
         <>
             <div className="header">
                 {rooms.length > 0 && phase === 0 ?
-                    <p className="title">My rooms (<a target='_blank' href={`/add/${addLink}`}>Invite link</a>)</p>
+                    <p className="title">My rooms (<a target='_blank' href={`/add/${addLink}`}>Invite link</a>)&#160;
+                        <FontAwesomeIcon icon={faCopy} onClick={() => {
+                            const temp = document.createElement('textarea');
+                            document.body.appendChild(temp);
+                            temp.value = `${window.location.origin}/add/${addLink}`;
+                            temp.select();
+                            document.execCommand('copy');
+                            console.log('URL has been succesfully copied!!!')
+                            document.body.removeChild(temp)
+                            setShowCopy(true);
+                            setTimeout(() => setShowCopy(false), 2000)
+                        }}
+                        />
+                        {showCopy && <span className="copyBanner"> copied!</span>}
+                    </p>
                     :
                     <p className="title">My rooms</p>
                 }
@@ -127,6 +147,8 @@ const Main = ({ history }) => {
                     <span className="title">Send <a target='_blank' href={`/add/${addLink}`}>invite link</a> to your team</span>
                 </div>
             }
+            {/* {deletedRoomStatus === 200 && <div className="isRoomDeletedBanner"></div>} */}
+            <div className="isRoomDeletedBanner"></div>
         </>
     )
 }

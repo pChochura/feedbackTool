@@ -3,8 +3,6 @@ body {
   padding-left: 10rem;
   padding-right: 10rem;
   padding-top: 3rem;
-  min-height: 100%;
-  height: 100%;
 }
 
 .listsContainer {
@@ -14,9 +12,9 @@ body {
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
   overflow-x: auto;
-  height: 100%;
   padding: 20px;
   margin-left: -20px;
+  height: 100%;
 }
 
 .list {
@@ -24,9 +22,9 @@ body {
   margin-right: 25px;
   -ms-flex-negative: 0;
       flex-shrink: 0;
-  height: auto;
   padding: 6px;
   border-radius: 10px;
+  max-height: 90vh;
 }
 
 .list__title {
@@ -36,7 +34,7 @@ body {
 }
 
 .notesContainer {
-  max-height: calc(100% - 60px);
+  height: 90%;
   overflow-y: auto;
   position: relative;
 }
@@ -191,5 +189,33 @@ textarea {
 
 .rateBtnsContainer button:hover::before {
   opacity: 1;
+}
+
+@-webkit-keyframes show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animNote {
+  -webkit-animation: show linear .5s;
+          animation: show linear .5s;
+}
+
+.addNote {
+  -webkit-transition: all 5s linear;
+  transition: all 5s linear;
 }
 /*# sourceMappingURL=style.css.map */

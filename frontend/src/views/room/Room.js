@@ -90,14 +90,14 @@ const Room = ({ history }) => {
                                 <div className='notesContainer'>
                                     {
                                         list.notes.map((note, index) => (
-                                            <div className={note.rate === 1 ? 'note positive' : 'note negative'} key={index}>
+                                            <div className={`${note.rate === 1 ? 'positive' : 'negative'} animNote note`} key={index}>
                                                 {note.note}
                                             </div>
                                         ))
                                     }
                                     {
                                         !room.ready && (
-                                            <div className="note">
+                                            <div className="note addNote">
                                                 <textarea placeholder='Add new note'
                                                     value={noteText}
                                                     onChange={(e) => {
@@ -115,14 +115,14 @@ const Room = ({ history }) => {
                                                 <div className="buttons">
                                                     <div className="thumbUp" onClick={(e) => {
                                                             setRate(1);
-                                                            submitNote(noteId, noteText, rate);
+                                                            submitNote(noteId, noteText, 1);
 
                                                         }}>
                                                         <FontAwesomeIcon icon={rate === 1 ? faThumbsUpFull : faThumbsUpEmpty} />
                                                     </div>
                                                     <div className="thumbDown" onClick={(e) => {
                                                             setRate(-1);
-                                                            submitNote(noteId, noteText, rate);
+                                                            submitNote(noteId, noteText, -1);
 
                                                         }}>
                                                         <FontAwesomeIcon icon={rate === -1 ? faThumbsDownFull : faThumbsDownEmpty} />
