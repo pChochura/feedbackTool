@@ -9,10 +9,8 @@ import './style.css';
 
 const Room = ({ history }) => {
     const [room, setRoom] = useState({ lists: [] });
-    const [rate, setRate] = useState(1);
+    const [rate, setRate] = useState({});
     const { id } = useParams();
-    const [noteId, setNoteId] = useState(0);
-    const [noteText, setNoteText] = useState('');
 
     const getRoom = useCallback(async () => {
         const room = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { credentials: 'include' })).json();
@@ -35,7 +33,7 @@ const Room = ({ history }) => {
         });
     };
 
-    const submitNote = async (listId, note, rate) => {
+    const submitNote = async (listId, note, _rate) => {
         if (!note) return;
         const response = await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}/addNote`, {
             method: 'PATCH',
@@ -43,7 +41,7 @@ const Room = ({ history }) => {
             body: JSON.stringify({
                 listId,
                 note,
-                rate,
+                rate: _rate,
             }),
             headers: { 'Content-Type': 'application/json' },
         });
@@ -52,11 +50,20 @@ const Room = ({ history }) => {
             return;
         }
         getRoom();
-        setNoteId(0);
-        setNoteText('');
-        setRate(1);
+        const temp = {};
+        room.lists.forEach((list) => {
+            temp[list.id] = rate[list.id] === -1 ? -1 : 1;
+        });
+        setRate(temp);
     };
 
+    useEffect(() => {
+        const temp = {};
+        room.lists.forEach((list) => {
+            temp[list.id] = rate[list.id] === -1 ? -1 : 1;
+        });
+        setRate(temp);
+    }, [room]);
 
     useEffect(() => {
         getRoom();
@@ -69,7 +76,6 @@ const Room = ({ history }) => {
         });
 
         io.on('roomRemoved', (room) => {
-            console.log(room, id);
             if (id === room.id) {
                 history.push('/notFound');
             }
@@ -106,33 +112,30 @@ const Room = ({ history }) => {
                                         !room.ready && (
                                             <div className="note addNote">
                                                 <textarea placeholder='Add new note'
-                                                    value={noteText}
-                                                    onChange={(e) => {
-                                                        setNoteId(list.id);
-                                                        setNoteText(e.target.value)
-                                                    }}
                                                     onKeyPress={(e) => {
                                                         if (!e.shiftKey && e.key === 'Enter') {
                                                             e.preventDefault();
-                                                            submitNote(noteId, noteText, rate ? rate : 1);
+                                                            submitNote(list.id, e.target.value, rate[list.id]);
                                                             e.target.value = '';
                                                         }
                                                     }}>
                                                 </textarea>
                                                 <div className="buttons">
-                                                    <div className="thumbUp" onClick={(e) => {
-                                                            setRate(1);
-                                                            submitNote(noteId, noteText, 1);
-
+                                                    <div className="thumbUp" onClick={(_) => {
+                                                            setRate({
+                                                                ...rate,
+                                                                [list.id]: 1,
+                                                            });
                                                         }}>
-                                                        <FontAwesomeIcon icon={rate === 1 ? faThumbsUpFull : faThumbsUpEmpty} />
+                                                        <FontAwesomeIcon icon={rate[list.id] === 1 ? faThumbsUpFull : faThumbsUpEmpty} />
                                                     </div>
-                                                    <div className="thumbDown" onClick={(e) => {
-                                                            setRate(-1);
-                                                            submitNote(noteId, noteText, -1);
-
+                                                    <div className="thumbDown" onClick={(_) => {
+                                                            setRate({
+                                                                ...rate,
+                                                                [list.id]: -1,
+                                                            });
                                                         }}>
-                                                        <FontAwesomeIcon icon={rate === -1 ? faThumbsDownFull : faThumbsDownEmpty} />
+                                                        <FontAwesomeIcon icon={rate[list.id] === -1 ? faThumbsDownFull : faThumbsDownEmpty} />
                                                     </div>
 
                                                 </div>
