@@ -111,7 +111,7 @@ body {
 .copyBanner {
 	font-size: .7em;
 	opacity: 0;
-	animation: appear 2s linear;
+	animation: appear .5s linear;
 }
 
 @keyframes showBanner {

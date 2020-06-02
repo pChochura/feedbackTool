@@ -67,7 +67,14 @@ const Room = ({ history }) => {
         io.on('roomJoined', () => {
             getRoom();
         });
-    }, [getRoom]);
+
+        io.on('roomRemoved', (room) => {
+            console.log(room, id);
+            if (id === room.id) {
+                history.push('/notFound');
+            }
+        });
+    }, [getRoom, history, id]);
 
     return (
         <div className="wrapper">

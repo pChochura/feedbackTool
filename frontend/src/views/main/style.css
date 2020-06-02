@@ -157,8 +157,8 @@ body {
 .copyBanner {
   font-size: .7em;
   opacity: 0;
-  -webkit-animation: appear 2s linear;
-          animation: appear 2s linear;
+  -webkit-animation: appear .5s linear;
+          animation: appear .5s linear;
 }
 
 @-webkit-keyframes showBanner {

@@ -121,10 +121,10 @@ const Main = ({ history }) => {
                             temp.value = `${window.location.origin}/add/${addLink}`;
                             temp.select();
                             document.execCommand('copy');
-                            console.log('URL has been succesfully copied!!!')
-                            document.body.removeChild(temp)
+                            console.log('URL has been succesfully copied!!!');
+                            document.body.removeChild(temp);
                             setShowCopy(true);
-                            setTimeout(() => setShowCopy(false), 2000)
+                            setTimeout(() => setShowCopy(false), 500);
                         }}
                         />
                         {showCopy && <span className="copyBanner"> copied!</span>}
@@ -148,7 +148,7 @@ const Main = ({ history }) => {
                 </div>
             }
             {/* {deletedRoomStatus === 200 && <div className="isRoomDeletedBanner"></div>} */}
-            <div className="isRoomDeletedBanner"></div>
+            {/* <div className="isRoomDeletedBanner"></div> */}
         </>
     )
 }

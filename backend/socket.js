@@ -40,4 +40,10 @@ module.exports = {
             }
         });
     },
+
+    roomRemoved: (room) => {
+        io.emit('roomRemoved', {
+            id: room.id,
+        });
+    },
 };

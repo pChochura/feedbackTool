@@ -95,6 +95,8 @@ module.exports = {
 			}
 		});
 
+		require('../socket').roomRemoved(removedRoom);
+
 		res.json({
 			message: 'Removed',
 		});
