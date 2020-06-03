@@ -1,0 +1,204 @@
+body {
+	line-height: 1.5;
+	padding-left: 10rem;
+	padding-right: 10rem;
+	padding-top: 3rem;
+}
+
+.listsContainer {
+	display: flex;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	padding: 20px;
+	margin-left: -20px;
+	height: 100%;
+}
+
+.list {
+	width: 330px;
+	margin-right: 25px;
+	flex-shrink: 0;
+	padding: 6px;
+	border-radius: 10px;
+	max-height: 90vh;
+
+	&__title {
+		font-size: 1.6rem;
+		margin: 5px 0 20px;
+		padding: 0 10px;
+	}
+}
+
+.notesContainer {
+	height: 90%;
+	overflow-y: auto;
+	position: relative;
+}
+
+.note {
+	background: white;
+	padding: 10px 15px;
+	font-size: 14px;
+	border-radius: 6px;
+	margin-bottom: 10px;
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	width: 100%;
+}
+
+.positive {
+	border-left: solid 5px rgba(110,214,71,.5)
+}
+
+.negative {
+	border-left: solid 5px rgba(230,1,1,.5),
+}
+
+.addNote {
+	display: block;
+	width: 100%;
+	font-size: 14px;
+	padding-top: 0.7rem;
+	padding-bottom: 0.7rem;
+	margin-bottom: 10px;
+	position: sticky;
+	top: 0px;
+
+	i {
+		margin-left: 5px;
+	}
+}
+
+::-webkit-scrollbar {
+	width: 7px;
+	border-radius: 10px;
+	height: 7px;
+}
+
+::-webkit-scrollbar-track {
+	background: rgba(0, 0, 0, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+	background: #3750db;
+	border-radius: 10px;
+}
+
+#markReady {
+	transition: all 0.3;
+
+	&:disabled {
+		box-shadow: none;
+		filter: grayscale(0.7);
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+}
+
+textarea {
+	resize: none;
+	width: 100%;
+	min-height: 6rem;
+	padding-bottom: 3rem;
+	border: none;
+}
+
+.buttons {
+	right: 0;
+	display: flex;
+	justify-content: flex-end;
+
+	& > * {
+		font-size: x-large;
+		margin-left: 10px;
+	}
+
+	& .thumbUp {
+		color: #66DD66;
+
+		& :hover {
+			//transform: scale(1.2);
+			box-shadow: 10px 10px 5px 0px rgba(0,0,0,0);
+		}
+	}
+
+	& .thumbDown {
+		color: #DD6666;
+	}
+}
+
+.accent {
+	color: #3750db;
+	font-weight: 900;
+}
+
+
+
+.rateBtnsContainer {
+	padding: 0;
+
+	button {
+		height: 40px;
+		width: 50%;
+		border: none;
+		position: relative;
+		z-index: 1;
+		background: none;
+
+		&.positive::before {
+			position: absolute;
+			content: "";
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background-image: linear-gradient(
+				to left,
+				rgb(255,255,255),
+				rgba(110,214,71,.5)
+			);
+			z-index: -1;
+			transition: opacity 0.5s ease;
+			opacity: 0;
+		}
+
+		&.negative::before {
+			position: absolute;
+			content: "";
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			background-image: linear-gradient(
+				to left,
+				rgba(230,1,1,.5),
+				rgb(255,255,255)
+			);
+			z-index: -1;
+			transition: opacity 0.5s ease;
+			opacity: 0;
+		}
+
+		&:hover::before {
+			opacity: 1;
+		}
+
+	}
+}
+
+@keyframes show {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.animNote {
+	animation: show linear .5s;
+}
+
+.addNote {
+	transition: all 5s linear;
+}

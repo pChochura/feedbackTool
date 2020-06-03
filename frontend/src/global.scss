@@ -4,27 +4,30 @@
 	box-sizing: border-box;
 }
 
-:root {
+#root {
 	font-size: 15px;
+	height: 100%;
+	overflow: hidden;
 }
 
 body,
 html {
 	padding: 0;
 	margin: 0;
+	overflow: hidden;
 }
 
 body {
 	font-family: 'Montserrat', sans-serif;
 	background-color: #efefef;
+	max-height: 100vh;
 }
 
 .wrapper {
-	//max-width: 1200px;
 	margin: 0;
 	display: flex;
 	flex-direction: column;
-	max-height: 100vh;
+	height: 100%;
 }
 
 .header {

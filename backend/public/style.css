@@ -1,7 +1,18 @@
-body {
+.container {
   padding-left: 10rem;
   padding-right: 10rem;
   padding-top: 3rem;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
 }
 
 .title {
@@ -10,6 +21,14 @@ body {
   font-size: 2rem;
   margin: 0;
   color: #212121;
+}
+
+.subtitle {
+  text-align: center;
+  font-weight: 300;
+  font-size: 1.5rem;
+  margin: 1rem;
+  color: #515151;
 }
 
 .card {
@@ -22,10 +41,10 @@ body {
           flex-direction: column;
   -ms-flex-line-pack: center;
       align-content: center;
-  margin: 1rem auto;
+  margin: 3rem auto;
   padding: 1.5rem 1rem 1rem 1rem;
   width: 60%;
-  max-width: 512px;
+  max-width: 768px;
   max-height: 768px;
   background-color: white;
   -webkit-box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
@@ -45,24 +64,15 @@ body {
       align-self: center;
 }
 
-input[type='text'] {
-  width: 100%;
-  padding: 0.5rem 1rem;
+.card .link {
+  -ms-flex-item-align: center;
+      -ms-grid-row-align: center;
+      align-self: center;
+  padding: 1rem 3rem 1rem 3rem;
   margin: 1rem 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
-  outline-color: #3750db;
-  font-family: inherit;
-}
-
-.submitBtn {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  margin-left: auto;
-  margin-top: 15px;
+  background-color: #515151;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
 }
 /*# sourceMappingURL=style.css.map */

@@ -11,6 +11,7 @@ module.exports = {
 					name: list.name,
 					count: list.notes.length,
 				})),
+				ready: room.ready,
 			})),
 		);
 	},
@@ -36,7 +37,7 @@ module.exports = {
 			return;
 		}
 
-		if (!main.id || main.phase !== 0) {
+		if (!main.locked || main.phase !== 0) {
 			res.status(423).send({
 				message: 'This action is now locked',
 			});
@@ -69,6 +70,8 @@ module.exports = {
 
 		rooms.push(room);
 
+		require('../socket').roomJoined(room);
+
 		res.status(201).send({
 			id: room.id,
 		});
@@ -92,6 +95,8 @@ module.exports = {
 			}
 		});
 
+		require('../socket').roomRemoved(removedRoom);
+
 		res.json({
 			message: 'Removed',
 		});
@@ -108,6 +113,8 @@ module.exports = {
 
 		room.ready = true;
 
+		require('../socket').roomChanged(room);
+
 		res.json({
 			message: 'OK',
 		});
@@ -122,7 +129,7 @@ module.exports = {
 			return;
 		}
 
-		const { listId } = req.body;
+		const { listId, note, rate } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
 		if (!list) {
@@ -132,7 +139,9 @@ module.exports = {
 			return;
 		}
 
-		list.notes.push(req.body.note);
+		list.notes.push({ note, rate });
+
+		require('../socket').roomChanged(room);
 
 		res.json({
 			message: 'OK',

@@ -1,43 +1,51 @@
-import React, { useState, useEffect } from 'react'
-import './style.css'
+import React, { useState, useEffect } from 'react';
+import moment from 'moment';
+import waitImg from '../../assets/images/wait.svg';
+import socketIOClient from "socket.io-client";
+import { useCookies } from 'react-cookie';
+import './style.css';
 
 const Root = () => {
-
-    const [locked, setLocked] = useState(false)
-    const [link, setLink] = useState('')
-    const [date, setDate] = useState('')
-
-    const getData = async (res, req) => {
-        let mainPage;
-        mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`)).body
-        console.log(mainPage);
-
-        if (mainPage.locked) {
-            const date = new Date(mainPage.expirationTimestamp * 1000);
-            const hours =
-                date.getHours() < 10 ? '0' + date.getHours() : date.getHours();
-            const minutes =
-                date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes();
-            const seconds =
-                date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds();
-            setLocked(true)
-            setDate(`${hours}:${minutes}:${seconds}`)
-            //return;
-        } else {
-            mainPage = (await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'POST' })).body;
-            setLocked(false)
-            setLink(`${window.location.href}${mainPage.id}`)
-        }
-    }
+    const [locked, setLocked] = useState(false);
+    const [link, setLink] = useState('');
+    const [date, setDate] = useState('');
+    const [cookies, setCookie] = useCookies(['seed']);
+    const [seed] = useState(Math.random().toString(36).slice(2));
 
     useEffect(() => {
-        getData()
-    }, [])
+        const getData = async () => {
+            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
+    
+            if (mainPage.locked) {
+                setLocked(true);
+                setDate(moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss'));
+            } else {
+                mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        seed,
+                    }),
+                    headers: { 'Content-Type': 'application/json'},
+                    credentials: 'include',
+                })).json();
+                setLocked(false);
+                setLink(`${window.location.href}${mainPage.id}`);
+            }
+        }
 
+        getData();
+    }, [seed]);
 
-    //console.log(window.location.protocol);
-
-
+    useEffect(() => {
+        const io = socketIOClient(process.env.REACT_APP_URL);
+        io.on('mainExpired', () => {
+            setLink('Refresh the page');
+        });
+        io.on('mainLocked', (data) => {
+            setLocked(true);
+            setDate(moment.unix(data.until).format('HH:mm:ss'));
+        });
+    }, [setLink, setLocked, setDate]);
 
     return(
         <div className="container">
@@ -48,17 +56,19 @@ const Root = () => {
                     <>
                         <p className="title">Sorry, this session is occupied</p>
                         <p className="subtitle">You have to wait up to {date}</p>
-                        <img src="public/wait.svg" alt="Wait!"></img>
+                        <img src={waitImg} alt="Wait!"></img>
                     </>
                     :
                     <>
                         <p className="title">Generated a new session</p>
-                        <a className="link" href={link}>{link}</a>
+                        <a className="link" href={link} onClick={() => {
+                            setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
+                        }}>{link}</a>
                     </>
                 }
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Root
+export default Root;

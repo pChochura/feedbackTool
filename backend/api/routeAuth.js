@@ -23,4 +23,10 @@ module.exports = {
 
 		next();
 	},
+
+	adminAuthSoft: (req, _, next) => {
+		req.adminAuth = main.id === generateId(req.cookies.seed);
+
+		next();
+	}
 };

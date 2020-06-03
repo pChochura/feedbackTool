@@ -22,6 +22,8 @@ module.exports = {
 		main.id = generateId(seed);
 		main.addLink = generateId();
 
+		require('../socket').mainExpired(req.cookies.io);
+		
 		res.json({
 			id: main.id,
 		});
@@ -38,17 +40,28 @@ module.exports = {
 		main.locked = true;
 		main.expirationTimestamp = Date.now() / 1000 + 3600;
 
+		require('../socket').mainLocked(main.expirationTimestamp);
+
 		res.json({
 			message: 'OK',
 		});
 	},
 
-	getMainPage: (_, res) => {
+	getMainPage: (req, res) => {
+		if (!req.adminAuth) {
+			res.json({
+				locked: main.locked,
+				expirationTimestamp: main.expirationTimestamp,
+			});
+			return;
+		}
+
 		if (main.expirationTimestamp <= Date.now() / 1000) {
 			// Session is inactive too long
 			main.locked = false;
 			main.id = undefined;
 			main.phase = 0;
+			main.addLink = undefined;
 			main.expirationTimestamp = undefined;
 
 			rooms.splice(0, rooms.length);
@@ -65,12 +78,14 @@ module.exports = {
 
 		rooms.splice(0, rooms.length);
 
+		require('../socket').endSession();
+
 		res.json({
 			message: 'OK',
 		});
 	},
 
-	agregateNotes: (_, res) => {
+	aggregateNotes: (_, res) => {
 		const roomsTemp = [];
 		rooms.forEach((room, index) => {
 			const notes = [];
@@ -97,6 +112,8 @@ module.exports = {
 
 		main.phase = 1;
 		main.addLink = undefined;
+
+		require('../socket').aggregateNotes();
 
 		res.json({
 			message: 'OK',
