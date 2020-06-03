@@ -78,6 +78,8 @@ module.exports = {
 
 		rooms.splice(0, rooms.length);
 
+		require('../socket').endSession();
+
 		res.json({
 			message: 'OK',
 		});
@@ -110,6 +112,8 @@ module.exports = {
 
 		main.phase = 1;
 		main.addLink = undefined;
+
+		require('../socket').aggregateNotes();
 
 		res.json({
 			message: 'OK',

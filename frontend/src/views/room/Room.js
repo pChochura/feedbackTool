@@ -80,6 +80,14 @@ const Room = ({ history }) => {
                 history.push('/notFound');
             }
         });
+
+        io.on('aggreateNotes', () => {
+            window.location.reload();
+        });
+
+        io.on('endSession', () => {
+            history.push('/notFound');
+        });
     }, [getRoom, history, id]);
 
     return (

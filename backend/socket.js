@@ -46,4 +46,12 @@ module.exports = {
             id: room.id,
         });
     },
+
+    aggregateNotes: () => {
+        io.emit('aggregateNotes');
+    },
+
+    endSession: () => {
+        io.emit('endSession');
+    },
 };
