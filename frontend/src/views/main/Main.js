@@ -13,7 +13,7 @@ const Main = ({ history }) => {
     const [time, setTime] = useState('01:00:00');
     const [expirationTimestamp, setExpirationTimestamp] = useState(0);
     const [showCopy, setShowCopy] = useState(false);
-    const [deletedRoomStatus, setDeletedRoomStatus] = useState(0)
+    const [deletedRoomStatus, setDeletedRoomStatus] = useState(0);
     const { id } = useParams();
 
 
@@ -46,10 +46,11 @@ const Main = ({ history }) => {
     const nextPhase = async () => {
         if (phase === 1) {
             await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/notFound')
+            history.push('/notFound');
         } else {
             await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, { method: 'POST', credentials: 'include' });
             getRooms();
+            phase = 1;
         }
     };
 

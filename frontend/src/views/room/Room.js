@@ -81,7 +81,7 @@ const Room = ({ history }) => {
             }
         });
 
-        io.on('aggreateNotes', () => {
+        io.on('aggregateNotes', () => {
             window.location.reload();
         });
 
