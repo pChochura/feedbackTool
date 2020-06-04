@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCopy } from '@fortawesome/free-solid-svg-icons'
-import './style.css'
 
 const Main = ({ history }) => {
     const [phase, setPhase] = useState(1);

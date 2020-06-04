@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import './style.css';
 import { useCookies } from 'react-cookie';
 
 const Add = ({ history }) => {

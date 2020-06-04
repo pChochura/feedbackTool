@@ -5,7 +5,6 @@ import socketIOClient from "socket.io-client";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faThumbsUp as faThumbsUpEmpty, faThumbsDown as faThumbsDownEmpty } from '@fortawesome/free-regular-svg-icons'
 import { faThumbsUp as faThumbsUpFull, faThumbsDown as faThumbsDownFull } from '@fortawesome/free-solid-svg-icons'
-import './style.css';
 
 const Room = ({ history }) => {
     const [room, setRoom] = useState({ lists: [] });
