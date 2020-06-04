@@ -7,7 +7,7 @@ export const StyledWrapper = styled.div`
     height: 100px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: end;
     padding: 0px 100px;
     box-sizing: border-box;
     z-index: -1;
@@ -15,15 +15,16 @@ export const StyledWrapper = styled.div`
 
 export const LogoWrapper = styled.div`
     display: flex;
+    margin-right: auto;
 `;
 
 export const StyledImg = styled.img`
     width: 31px;
     height: 26px;
     align-self: center;
-    margin-right: 10px;
 `;
 
 export const StyledParagraph = styled.p`
     font-size: 1.2rem;
+    margin: 0px 10px;
 `;

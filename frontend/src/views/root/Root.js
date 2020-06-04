@@ -12,27 +12,7 @@ const Root = ({ history }) => {
     const [locked, setLocked] = useState(false);
     const [date, setDate] = useState('');
     const [cookies, setCookie] = useCookies(['seed']);
-    const [notification, setNotification] = useState({});
-
-    const postNoitifcation = useCallback((title, description) => {
-        if (notification.exit === false) {
-            return;
-        }
-
-        setNotification({
-            title: title,
-            description: description,
-            exit: false,
-        });
-
-        setTimeout(() => {
-            setNotification({
-                title,
-                description,
-                exit: true,
-            });
-        }, 3000);
-    }, [notification]);
+    const [notification, setNotification] = useState();
 
     const startSession = async () => {
         const seed = Math.random().toString(36).slice(2);
@@ -49,7 +29,10 @@ const Root = ({ history }) => {
         }).then((json) => {
             history.push(`/${json.id}`);
         }).catch(() => {
-            postNoitifcation('Error', "There's been a problem with getting the main page. Please try later.");
+            setNotification({
+                title: 'Error',
+                description: "There's been a problem with getting the main page. Please try later.",
+            });
         });
     };
 
@@ -72,11 +55,13 @@ const Root = ({ history }) => {
             setLocked(true);
             setDate(moment.unix(data.until).format('HH:mm:ss'));
         });
+
+        return () => io.disconnect();
     }, [setLocked, setDate]);
 
     return (
         <StyledWrapper>
-            <TopBar buttonAction={locked ? '' : 'Start'} buttonCallback={() => startSession()} />
+            <TopBar buttonContent={locked ? '' : 'Start'} buttonCallback={() => startSession()} />
             <LandingWrapper>
                 <LandingLeft>
                     <b>Send</b> feedback<br />
@@ -90,8 +75,8 @@ const Root = ({ history }) => {
                     </ButtonWrapper>
                 </LandingLeft>
                 <StyledImg src={landing} />
-                {(notification.title && notification.description) &&
-                    <Notification title={notification.title} description={notification.description} exit={notification.exit} />
+                {notification &&
+                    <Notification title={notification.title} description={notification.description} callback={() => setNotification()} />
                 }
             </LandingWrapper>
         </StyledWrapper>

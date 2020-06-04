@@ -3,15 +3,18 @@ import { StyledWrapper, StyledImg, StyledParagraph, LogoWrapper } from './styles
 import logo from '../../assets/images/logo.svg';
 import Button from '../Button/Button';
 
-const TopBar = ({ buttonDisabled, buttonAction, buttonCallback }) => {
+const TopBar = ({ buttonDisabled, buttonContent, buttonCallback, message }) => {
     return (
         <StyledWrapper>
             <LogoWrapper>
                 <StyledImg src={logo} />
                 <StyledParagraph>FeedbackTool</StyledParagraph>
             </LogoWrapper>
-            {buttonAction &&
-                <Button onClick={buttonCallback} disabled={buttonDisabled}>{buttonAction}</Button>
+            {message &&
+                <StyledParagraph>{message}</StyledParagraph>
+            }
+            {buttonContent &&
+                <Button onClick={buttonCallback} disabled={buttonDisabled}>{buttonContent}</Button>
             }
         </StyledWrapper>
     );
