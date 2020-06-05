@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import socketIOClient from "socket.io-client";
 import { useCookies } from 'react-cookie';
@@ -7,12 +7,32 @@ import TopBar from '../../components/TopBar/TopBar';
 import landing from '../../assets/images/landing.svg';
 import Button from '../../components/Button/Button';
 import Notification from '../../components/Notification/Notification';
+import { useForceUpdate } from '../../components/hooks';
 
 const Root = ({ history }) => {
     const [locked, setLocked] = useState(false);
     const [date, setDate] = useState('');
-    const [cookies, setCookie] = useCookies(['seed']);
-    const [notification, setNotification] = useState();
+    const [, setCookie] = useCookies(['seed']);
+    const [notifications, setNotifications] = useState([]);
+    const render = useForceUpdate();
+
+    const postNotification = (_notification) => {
+        setNotifications((n) => [
+            ...n,
+            {
+                ..._notification,
+                id: Math.random(),
+            },
+        ]);
+    };
+
+    const requeueNotification = () => {
+        setNotifications((n) => { 
+            n.shift();
+            return notifications;
+        });
+        render();
+    };
 
     const startSession = async () => {
         const seed = Math.random().toString(36).slice(2);
@@ -29,7 +49,7 @@ const Root = ({ history }) => {
         }).then((json) => {
             history.push(`/${json.id}`);
         }).catch(() => {
-            setNotification({
+            postNotification({
                 title: 'Error',
                 description: "There's been a problem with getting the main page. Please try later.",
             });
@@ -75,8 +95,16 @@ const Root = ({ history }) => {
                     </ButtonWrapper>
                 </LandingLeft>
                 <StyledImg src={landing} />
-                {notification &&
-                    <Notification title={notification.title} description={notification.description} callback={() => setNotification()} />
+                {notifications &&
+                    notifications.slice(0, 3).map((notification, index) =>
+                        <Notification
+                            key={notification.id}
+                            index={Math.min(notifications.length, 3) - index - 1}
+                            title={notification.title}
+                            description={notification.description}
+                            callback={() => requeueNotification()}
+                        />
+                    )
                 }
             </LandingWrapper>
         </StyledWrapper>

@@ -11,10 +11,12 @@ const PersonCard = ({ options, isAdder, lists, isReady, name, maxNotesCount, cli
     const showOptions = useCallback(() => {
         setShowingOptions({});
 
-        const timeout = setTimeout(() => setShowingOptions({ exit: true }), 3000);
+        const timeout = setTimeout(() => {
+            showingOptions && setShowingOptions({ exit: true });
+        }, 3000);
 
         return () => clearTimeout(timeout);
-    }, []);
+    }, [showingOptions]);
 
     return (
         <StyledCard clickable={isAdder} onClick={() => clickCallback && clickCallback()} >
@@ -29,7 +31,13 @@ const PersonCard = ({ options, isAdder, lists, isReady, name, maxNotesCount, cli
                     exit={showingOptions.exit}
                     onAnimationEnd={() => showingOptions.exit && setShowingOptions()}>
                     {options.map((option, index) => 
-                        <StyledOptionItem key={index} onClick={() => optionClickCallback && optionClickCallback(index)} >{option}</StyledOptionItem>
+                        <StyledOptionItem
+                            key={index}
+                            onClick={() => {
+                                setShowingOptions();
+                                optionClickCallback && optionClickCallback(index);
+                            }}
+                        >{option}</StyledOptionItem>
                     )}
                 </StyledOptions>
             }

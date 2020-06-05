@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyledNotification, StyledTitle, StyledDescription, StyledImg, TitleWrapper } from './styles';
 import warningIcon from '../../assets/images/warning.svg';
 
-const Notification = ({ title, description, icon, callback, duration = 3000 }) => {
+const Notification = ({ title, description, icon, callback, duration = 3000, index }) => {
     const [exit, setExit] = useState(false);
 
     useEffect(() => {
@@ -12,7 +12,7 @@ const Notification = ({ title, description, icon, callback, duration = 3000 }) =
     }, [duration]);
 
     return (
-        <StyledNotification exit={exit} onAnimationEnd={() => exit && callback && callback()}>
+        <StyledNotification exit={exit} index={index} onAnimationEnd={() => exit && callback && callback()}>
             <TitleWrapper>
                 <StyledImg src={icon || warningIcon} />
                 <StyledTitle>{title}</StyledTitle>

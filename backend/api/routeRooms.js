@@ -120,6 +120,24 @@ module.exports = {
 		});
 	},
 
+	markRoomAsNotReady: (req, res) => {
+		const room = rooms.find((r) => r.id === req.params.id);
+		if (!room) {
+			res.status(404).send({
+				message: 'Room not found',
+			});
+			return;
+		}
+
+		room.ready = false;
+
+		require('../socket').roomChanged(room);
+
+		res.json({
+			message: 'OK',
+		});
+	},
+
 	addNoteToRoom: (req, res) => {
 		const room = rooms.find((r) => r.id === req.params.id);
 		if (!room) {

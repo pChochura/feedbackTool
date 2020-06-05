@@ -25,13 +25,14 @@ const exitAnimation = keyframes`
 export const StyledNotification = styled.div`
     position: absolute;
     right: 50px;
-    bottom: 50px;
+    bottom: calc(${({ index }) => index + ' * 125px + 50px'});
     width: 300px;
     min-height: 60px;
     background: #ffffff;
     box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     padding: 15px 15px 5px 15px;
+    transition: .5s bottom;
 
     animation-name: ${({ exit }) => exit ? exitAnimation : enterAnimation};
     animation-duration: .5s;

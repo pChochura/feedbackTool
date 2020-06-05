@@ -18,7 +18,6 @@ const exitAnimation = keyframes`
     }
 `;
 
-
 export const StyledCard = styled.div`
     width: 300px;
     min-height: 300px;

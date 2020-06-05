@@ -62,7 +62,7 @@ const Room = ({ history }) => {
             temp[list.id] = rate[list.id] === -1 ? -1 : 1;
         });
         setRate(temp);
-    }, [room]);
+    }, [room, rate]);
 
     useEffect(() => {
         getRoom();

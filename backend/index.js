@@ -27,6 +27,8 @@ app.get('/api/rooms/:id', API.userAuth, API.getRoomById);
 app.delete('/api/rooms/:id', API.adminAuth, API.removeRoomById);
 // Mark one room as ready (only creator)
 app.patch('/api/rooms/:id/ready', API.userAuth, API.markRoomAsReady);
+// Mark one room as not ready (only admin)
+app.patch('/api/rooms/:id/notReady', API.adminAuth, API.markRoomAsNotReady);
 // Add note to a room (only creator)
 app.patch('/api/rooms/:id/addNote', API.userAuth, API.addNoteToRoom);
 

@@ -68,7 +68,8 @@ export const StyledParagraph = styled.p`
     font-weight: 300;
 `;
 
-export const StyledBox = styled.div`
+export const StyledBox = styled.a`
+    text-decoration: none;
     position: relative;
     border-radius: 5px;
     border-style: solid;
