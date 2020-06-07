@@ -14,18 +14,26 @@ const Modal = ({ onDismissCallback, link }) => {
     const render = useForceUpdate();
 
     const copyLink = () => {
-        navigator.clipboard.writeText(link).then(() => {
+        const dummyElement = document.createElement('input');
+        dummyElement.value = link;
+        console.log(link);
+        // dummyElement.style.visibility = 'hidden';
+        document.body.appendChild(dummyElement);
+        dummyElement.select();
+        const successful = document.execCommand('copy');
+        document.body.removeChild(dummyElement);
+        if (successful) {
             postNotification({
                 title: 'Success!',
                 description: 'The link has been copied to the clipboard.',
                 success: true,
             });
-        }).catch(() => {
+        } else {
             postNotification({
                 title: 'Error!',
                 description: "We couldn't copy the link to the clipboard. Try again later.",
             });
-        });
+        }
     };
 
     const postNotification = (_notification) => {
