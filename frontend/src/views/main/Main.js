@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
-import { StyledWrapper, StyledTitle, DashboardWrapper, MainBarWrapper, CardsWrapper } from './styles';
+import { StyledWrapper, StyledTitle, DashboardWrapper, MainBarWrapper, CardsWrapper, ModalButtonsWrapper } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import Search from '../../components/Search/Search';
 import successIcon from '../../assets/images/success.svg';
@@ -11,16 +11,18 @@ import Modal from '../../components/Modal/Modal';
 import Notification from '../../components/Notification/Notification';
 import { useForceUpdate } from '../../components/hooks';
 import moment from 'moment';
+import Button from '../../components/Button/Button';
 
 const Main = ({ history }) => {
     const [expirationTimestamp, setExpirationTimestamp] = useState(0);
     const [joinModalShowed, setJoinModalShowed] = useState(false);
+    const [endSessionModal, setEndSessionModal] = useState();
     const [notifications, setNotifications] = useState([]);
     const [maxNotesCount, setMaxNotesCount] = useState(0);
     const [showedRooms, setShowedRooms] = useState([]);
     const [time, setTime] = useState('01:00:00');
     const [addLink, setAddLink] = useState('');
-    const [phase, setPhase] = useState(1);
+    const [phase, setPhase] = useState(0);
     const [rooms, setRooms] = useState([]);
     const { id } = useParams();
     const render = useForceUpdate();
@@ -87,10 +89,14 @@ const Main = ({ history }) => {
             });
     };
 
-    const nextPhase = async () => {
+    const nextPhase = async (agreed) => {
         if (phase === 1) {
-            await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/?reasonCode=1');
+            if (agreed) {
+                await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
+                history.push('/?reasonCode=1');
+            } else {
+                setEndSessionModal({});
+            }
         } else {
             if (rooms.length <= 1 || rooms.some((room) => !room.ready)) {
                 return;
@@ -98,6 +104,11 @@ const Main = ({ history }) => {
             await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, { method: 'POST', credentials: 'include' });
             getRooms();
             setPhase(1);
+            postNotification({
+                title: 'Success',
+                description: 'We have successfully aggregated all the notes.',
+                success: true,
+            })
         }
     };
 
@@ -173,7 +184,7 @@ const Main = ({ history }) => {
     return (
         <StyledWrapper>
             <TopBar
-                buttonContent='Continue'
+                buttonContent={phase === 0 ? 'Continue' : 'End session'}
                 buttonDisabled={rooms.length <= 1 || rooms.some((room) => !room.ready)}
                 buttonCallback={() => nextPhase()}
                 message={time} />
@@ -210,8 +221,21 @@ const Main = ({ history }) => {
                     <PersonCard isAdder={true} clickCallback={() => setJoinModalShowed(true)} />
                 </CardsWrapper>
             </DashboardWrapper>
-            {joinModalShowed &&
-                <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`} />
+            {joinModalShowed && <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`} />}
+            {endSessionModal &&
+                <Modal
+                    title='Are you sure you want to end this session?'
+                    description='This action cannot be undone. All notes will be discarded.'
+                    onDismissCallback={() => setEndSessionModal()}
+                    isExiting={(endSessionModal || {}).exit}>
+                    <ModalButtonsWrapper>
+                        <Button secondary onClick={() => setEndSessionModal({ exit: true })}>Take me back</Button>
+                        <Button onClick={() => {
+                            setEndSessionModal({ exit: true });
+                            nextPhase(true);
+                        }}>Yes, I'm sure</Button>
+                    </ModalButtonsWrapper>
+                </Modal>
             }
             {notifications &&
                 notifications.slice(0, 3).map((notification, index) =>

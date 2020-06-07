@@ -32,3 +32,14 @@ export const CardsWrapper = styled.div`
     width: 100%;
     margin-top: 20px;
 `;
+
+export const ModalButtonsWrapper = styled.span`
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+
+    button {
+        margin 0 20px;
+    }
+`;

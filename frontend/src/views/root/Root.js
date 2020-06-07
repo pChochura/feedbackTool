@@ -109,6 +109,10 @@ const Root = ({ history, location }) => {
             setDate(moment.unix(data.until).format('HH:mm:ss'));
         });
 
+        io.on('endSession', () => {
+            setLocked(false);
+        });
+
         return () => io.disconnect();
     }, [setLocked, setDate]);
 

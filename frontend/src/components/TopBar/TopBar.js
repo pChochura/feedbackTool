@@ -6,7 +6,7 @@ import Button from '../Button/Button';
 const TopBar = ({ buttonDisabled, buttonContent, buttonCallback, message }) => {
     return (
         <StyledWrapper>
-            <LogoWrapper>
+            <LogoWrapper onClick={() => window.location.href = '/'}>
                 <StyledImg src={logo} />
                 <StyledParagraph>FeedbackTool</StyledParagraph>
             </LogoWrapper>

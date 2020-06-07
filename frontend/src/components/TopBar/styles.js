@@ -16,6 +16,7 @@ export const StyledWrapper = styled.div`
 export const LogoWrapper = styled.div`
     display: flex;
     margin-right: auto;
+    cursor: pointer;
 `;
 
 export const StyledImg = styled.img`
