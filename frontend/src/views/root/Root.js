@@ -8,8 +8,9 @@ import landing from '../../assets/images/landing.svg';
 import Button from '../../components/Button/Button';
 import Notification from '../../components/Notification/Notification';
 import { useForceUpdate } from '../../components/hooks';
+import queryParser from 'query-string';
 
-const Root = ({ history }) => {
+const Root = ({ history, location }) => {
     const [locked, setLocked] = useState(false);
     const [date, setDate] = useState('');
     const [, setCookie] = useCookies(['seed']);
@@ -55,6 +56,38 @@ const Root = ({ history }) => {
             });
         });
     };
+
+    useEffect(() => {
+        const reasonCode = queryParser.parse(location.search).reasonCode;
+        let title, description;
+        switch (reasonCode) {
+            case '1':
+                title = 'Warning';
+                description = "Your team's session has ended.";
+                break;
+            case '2':
+                title = 'Warning';
+                description = 'Your room has been removed.';
+                break;
+            case '3':
+                title = 'Warning';
+                description = 'You cannot access this site.';
+                break;
+            default:
+                title = 'Error';
+                description = "There's been an undefined error.";
+                break;
+        }
+        if (reasonCode) {
+            postNotification({
+                title,
+                description,
+            });
+        }
+
+        // Avoid showing the same notification after the page reloads
+        window.history.replaceState({}, document.title, '/');
+    }, [location]);
 
     useEffect(() => {
         const getData = async () => {

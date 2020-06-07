@@ -25,7 +25,7 @@ const exitAnimation = keyframes`
 export const StyledNotification = styled.div`
     position: absolute;
     right: 50px;
-    bottom: calc(${({ index }) => index + ' * 125px + 50px'});
+    bottom: calc(${({ index, offset }) => index + ' * 125px + 50px - ' + offset + 'px'});
     width: 300px;
     min-height: 60px;
     background: #ffffff;

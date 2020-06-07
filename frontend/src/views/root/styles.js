@@ -2,9 +2,7 @@ import styled from 'styled-components';
 
 export const StyledWrapper = styled.div`
     height: 100vh;
-    width: 100vw;
-    max-height: 100vh;
-    max-width: 100vw;
+    width: 100%;
     margin: 0;
     padding: 0;
 `;

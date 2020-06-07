@@ -23,7 +23,7 @@ module.exports = {
 		main.addLink = generateId();
 
 		require('../socket').mainExpired(req.cookies.io);
-		
+
 		res.json({
 			id: main.id,
 		});
@@ -117,6 +117,21 @@ module.exports = {
 
 		res.json({
 			message: 'OK',
+		});
+	},
+
+	checkAddPage: (req, res) => {
+		const id = req.body.id;
+
+		if (!main.id) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
+		res.json({
+			status: id === main.addLink,
 		});
 	},
 };

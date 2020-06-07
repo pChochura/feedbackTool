@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import TopBar from '../../components/TopBar/TopBar';
 import { StyledWrapper, StyledTitle, StyledParagraph, StyledBox, StyledInput, StyledLabel, ButtonWrapper } from './styles';
 import Button from '../../components/Button/Button';
 import { useForceUpdate } from '../../components/hooks';
 import Notification from '../../components/Notification/Notification';
+import { useParams } from 'react-router-dom';
 
 const Add = ({ history }) => {
     const [cookies, setCookie] = useCookies(['seed']);
@@ -12,6 +13,7 @@ const Add = ({ history }) => {
     const [name, setName] = useState('');
     const [notifications, setNotifications] = useState([]);
     const render = useForceUpdate();
+    const { id } = useParams();
 
     const postNotification = (_notification) => {
         setNotifications((n) => [
@@ -44,7 +46,7 @@ const Add = ({ history }) => {
             if (data.status !== 201) {
                 postNotification({
                     title: 'Error',
-                    description: 'You have input a valid name.',
+                    description: (await data.json()).message,
                 });
                 return;
             }
@@ -59,6 +61,23 @@ const Add = ({ history }) => {
             });
         });
     }, [history, seed, cookies, setCookie, name]);
+
+    useEffect(() => {
+        const checkAddPage = async () => {
+            const isAddPage = await (await fetch(`${process.env.REACT_APP_URL}/api/checkAdd`, {
+                method: 'POST',
+                credentials: 'include',
+                body: JSON.stringify({ id }),
+                headers: { 'Content-Type': 'application/json' },
+            })).json();
+
+            if (!(isAddPage || {}).status) {
+                history.push('/?reasonCode=3');
+            }
+        }
+
+        checkAddPage();
+    }, [history, id]);
 
     return (
         <StyledWrapper>
@@ -75,7 +94,11 @@ const Add = ({ history }) => {
                     please enter a name
                 </StyledParagraph>
                 <StyledLabel>Your name</StyledLabel>
-                <StyledInput onChange={(e) => setName(e.target.value)} value={name} />
+                <StyledInput
+                    autoFocus
+                    onChange={(e) => setName(e.target.value)}
+                    value={name}
+                    onKeyPress={(e) => e.key === 'Enter' && join()} />
                 <ButtonWrapper>
                     <Button onClick={() => join()}>Join</Button>
                 </ButtonWrapper>

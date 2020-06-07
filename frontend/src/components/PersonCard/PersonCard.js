@@ -12,11 +12,15 @@ const PersonCard = ({ options, isAdder, lists, isReady, name, maxNotesCount, cli
         setShowingOptions({});
 
         const timeout = setTimeout(() => {
-            showingOptions && setShowingOptions({ exit: true });
+                setShowingOptions((options) => {
+                    if (options) {
+                        return { exit: true };
+                    }
+                });
         }, 3000);
 
         return () => clearTimeout(timeout);
-    }, [showingOptions]);
+    }, []);
 
     return (
         <StyledCard clickable={isAdder} onClick={() => clickCallback && clickCallback()} >

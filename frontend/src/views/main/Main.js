@@ -27,16 +27,17 @@ const Main = ({ history }) => {
 
     const getRooms = useCallback(async () => {
         const rooms = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms`, { credentials: 'include' })).json();
-        let temp = 0;
-        rooms.forEach((room) => {
-            room.lists.forEach((list) => {
-                temp = temp > list.count ? temp : list.count;
-            });
-        });
-        setMaxNotesCount(maxNotesCount > temp ? maxNotesCount : temp);
+        setMaxNotesCount(rooms.reduce((max, room) =>
+            Math.max(
+                max,
+                room.lists.reduce((acc, list) =>
+                    acc = Math.max(acc, list.count), 0
+                )
+            ), 0
+        ));
         setRooms(rooms);
         setShowedRooms(rooms);
-    }, [maxNotesCount]);
+    }, []);
 
     const refreshTimer = useCallback(async () => {
         if (!expirationTimestamp) {
@@ -47,7 +48,7 @@ const Main = ({ history }) => {
         setTime(moment.utc(millis).format('HH:mm:ss'));
         if (millis <= 0) {
             await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/notFound');
+            history.push('/?reasonCode=1');
         }
     }, [expirationTimestamp, history, setTime]);
 
@@ -63,7 +64,7 @@ const Main = ({ history }) => {
             }).catch(() => {
                 postNotification({
                     title: 'Error',
-                    description: 'We encountered some problems with removing this room.',
+                    description: 'We encountered some problems while removing this room.',
                 });
             });
         getRooms();
@@ -81,7 +82,7 @@ const Main = ({ history }) => {
             }).catch(() => {
                 postNotification({
                     title: 'Error',
-                    description: 'We encountered some problems with marking this room as not ready.',
+                    description: 'We encountered some problems while marking this room as not ready.',
                 });
             });
     };
@@ -89,7 +90,7 @@ const Main = ({ history }) => {
     const nextPhase = async () => {
         if (phase === 1) {
             await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/notFound');
+            history.push('/?reasonCode=1');
         } else {
             if (rooms.length <= 1 || rooms.some((room) => !room.ready)) {
                 return;
@@ -124,11 +125,9 @@ const Main = ({ history }) => {
 
     useEffect(() => {
         const prepareMainPage = async () => {
-            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, {
-                credentials: 'include',
-            })).json();
+            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
             if (mainPage.id !== id) {
-                history.push('/notFound')
+                history.push('/?reasonCode=3');
                 return;
             }
             if (!mainPage.locked) {
@@ -161,7 +160,7 @@ const Main = ({ history }) => {
             Object.assign(rooms.find(room => room.id === data.room.id) || {}, data.room);
             setMaxNotesCount((max) =>
                 Math.max(max, (data.room.lists || []).reduce(
-                    (acc, list) => acc = acc > list.count ? acc : list.count, 0
+                    (acc, list) => acc = Math.max(acc, list.count), 0
                 ))
             );
             setRooms(rooms);

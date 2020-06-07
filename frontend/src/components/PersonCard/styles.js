@@ -114,8 +114,8 @@ export const StyledParagraph = styled.p`
 
 export const StyledOptions = styled.div`
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: ${({ pos }) => pos ? pos.y + 'px' : '15px'};
+    right: ${({ pos }) => pos ? pos.x + 'px' : '15px'};
     padding: 10px 0;
     background-color: #ffffff;
     box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.05);

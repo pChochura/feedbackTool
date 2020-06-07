@@ -12,7 +12,7 @@ const Notification = ({ title, description, icon, callback, duration = 3000, ind
     }, [duration]);
 
     return (
-        <StyledNotification exit={exit} index={index} onAnimationEnd={() => exit && callback && callback()}>
+        <StyledNotification exit={exit} index={index} offset={window.pageYOffset} onAnimationEnd={() => exit && callback && callback()}>
             <TitleWrapper>
                 <StyledImg src={icon || warningIcon} />
                 <StyledTitle>{title}</StyledTitle>

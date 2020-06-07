@@ -48,7 +48,7 @@ module.exports = {
 
 		if (rooms.find((room) => room.id === roomId)) {
 			res.status(400).send({
-				message: 'Please try again',
+				message: 'Maybe try clearing your cookies?',
 			});
 			return;
 		}
@@ -138,7 +138,7 @@ module.exports = {
 		});
 	},
 
-	addNoteToRoom: (req, res) => {
+	submitNoteToRoom: (req, res) => {
 		const room = rooms.find((r) => r.id === req.params.id);
 		if (!room) {
 			res.status(404).send({
@@ -147,7 +147,7 @@ module.exports = {
 			return;
 		}
 
-		const { listId, note, rate } = req.body;
+		const { listId, note, rate, id } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
 		if (!list) {
@@ -157,7 +157,51 @@ module.exports = {
 			return;
 		}
 
-		list.notes.push({ note, rate });
+		const exitstingNote = list.notes.find((note) => note.id === id);
+
+		if (id && exitstingNote) {
+			exitstingNote.note = note;
+			exitstingNote.rate = rate;
+		} else {
+			list.notes.push({ note, rate, id: generateId() });
+		}
+
+		require('../socket').roomChanged(room);
+
+		res.json({
+			message: 'OK',
+		});
+	},
+
+	removeNoteFromRoom: (req, res) => {
+		const room = rooms.find((r) => r.id === req.params.id);
+		if (!room) {
+			res.status(404).send({
+				message: 'Room not found',
+			});
+			return;
+		}
+
+		const { listId, id } = req.body;
+		const list = room.lists.find((item) => item.id === listId);
+
+		if (!list) {
+			res.status(404).send({
+				message: 'Room list not found',
+			});
+			return;
+		}
+
+		const noteIndex = list.notes.findIndex((note) => note.id === id);
+
+		if (noteIndex === -1) {
+			res.status(404).send({
+				message: 'Note not found',
+			});
+			return;
+		}
+
+		list.notes.splice(noteIndex, 1);
 
 		require('../socket').roomChanged(room);
 
