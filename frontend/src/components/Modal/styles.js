@@ -21,7 +21,7 @@ const exitAnimation = keyframes`
 `;
 
 export const StyledWrapper = styled.div`
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
@@ -68,8 +68,7 @@ export const StyledParagraph = styled.p`
     font-weight: 300;
 `;
 
-export const StyledBox = styled.a`
-    text-decoration: none;
+export const StyledBox = styled.div`
     position: relative;
     border-radius: 5px;
     border-style: solid;

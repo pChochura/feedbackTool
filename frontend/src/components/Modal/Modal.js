@@ -52,9 +52,9 @@ const Modal = ({ onDismissCallback, link }) => {
                 <StyledImg src={closeIcon} clickable onClick={() => setExit(true)} />
                 <StyledTitle>Invite someone to your team!</StyledTitle>
                 <StyledParagraph>Everyone with this link can join</StyledParagraph>
-                <StyledBox href={link} target='_blank'>
+                <StyledBox onClick={() => window.open(link, '_blank')}>
                     <StyledParagraph>{link}</StyledParagraph>
-                    <StyledImg src={copyIcon} clickable style={{ 'zIndex': '100' }} onClick={(e) => {
+                    <StyledImg src={copyIcon} clickable onClick={(e) => {
                         copyLink();
                         e.stopPropagation();
                         e.preventDefault();

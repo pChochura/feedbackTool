@@ -70,7 +70,7 @@ export const StyledImg = styled.img`
     top: 10px;
     border-radius: 50%;
     padding: 5px;
-    background-color: ${({ background }) => background || 'none'};
+    background-color: ${({ background }) => background || 'unset'};
     transition: .5s background-color;
     
     ${({ clickable }) => clickable && css`
