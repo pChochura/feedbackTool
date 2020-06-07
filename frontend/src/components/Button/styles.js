@@ -5,10 +5,10 @@ export const StyledButton = styled.button`
     color: #ffffff;
     outline: none;
     border: none;
-    width: 150px;
-    height: 40px;
+    width: ${({ small }) => small ? '100px' : '150px'};
+    height: ${({ small }) => small ? '30px' : '40px'};
     border-radius: 5px;
-    font-size: 1.1rem;
+    font-size: ${({ small }) => small ? '0.8rem' : '1.1rem'};
     transition: .5s all;
     ${({ disabled }) => disabled ? css`filter: grayscale(.75);` : css`cursor: pointer;` }
 

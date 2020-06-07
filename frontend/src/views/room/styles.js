@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 export const StyledWrapper = styled.div`
     width: 100%;
@@ -52,6 +52,17 @@ export const StyledListTitle = styled.p`
     padding: 10px;
 `;
 
+const jiggleAnimation = keyframes`
+    0% {
+        transform: rotate(1deg);
+        animation-timing-function: ease-in;
+    }
+    50% {
+        transform: rotate(-1.5deg);
+        animation-timing-function: ease-out;
+    }
+`;
+
 export const StyledListNote = styled.div`
     width: 100%;
     min-height: 50px;
@@ -65,12 +76,31 @@ export const StyledListNote = styled.div`
     border-radius: 5px;
     overflow-x: hidden;
     word-break: break-all;
+
+    ${({ editing }) => editing && css`
+        transform-origin: 50% 50%;
+        animation-duration: .27s;
+        animation-name: ${jiggleAnimation};
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+        animation-play-state: running;
+        opacity: 0.5;
+    `}
+`;
+
+export const SubmitNoteWrapper = styled.div`
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 `;
 
 export const StyledNoteIndicator = styled.div`
     height: 100%;
     width: 5px;
-    background-color: ${({ positive }) => positive ? '#81B800' : '#FF5453'};
+    background-color: ${({ positive, editing }) => editing ? '#ABABAB' : (positive ? '#81B800' : '#FF5453')};
     position: absolute;
     left: 0px;
     top: 0px;

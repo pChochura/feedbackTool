@@ -211,8 +211,7 @@ const Main = ({ history }) => {
                 </CardsWrapper>
             </DashboardWrapper>
             {joinModalShowed &&
-                <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`}>
-                </Modal>
+                <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`} />
             }
             {notifications &&
                 notifications.slice(0, 3).map((notification, index) =>

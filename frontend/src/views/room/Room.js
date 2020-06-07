@@ -16,7 +16,8 @@ import {
     NoteRatingWrapper,
     StyledParagraph,
     StyledImg,
-    StyledOptionsIcon
+    StyledOptionsIcon,
+    SubmitNoteWrapper
 } from './styles';
 import Notification from '../../components/Notification/Notification';
 import TopBar from '../../components/TopBar/TopBar';
@@ -30,6 +31,7 @@ import closeIcon from '../../assets/images/close.svg';
 import optionsIcon from '../../assets/images/options.svg';
 import { useForceUpdate } from '../../components/hooks';
 import socketIOClient from 'socket.io-client';
+import Button from '../../components/Button/Button';
 
 
 const Room = ({ history }) => {
@@ -250,15 +252,15 @@ const Room = ({ history }) => {
 
     return (
         <StyledWrapper onClick={() => showingOptions && setShowingOptions({ ...showingOptions, exit: true })}>
-            <TopBar buttonContent='Ready' buttonDisabled={room.ready} buttonCallback={() => markRoomAsReady()} />
+            <TopBar buttonContent={room.lists.length > 0 ? 'Ready' : undefined} buttonDisabled={room.ready} buttonCallback={() => markRoomAsReady()} />
             <StyledTitle>It's your room, <b>{room.name}</b></StyledTitle>
             <StyledListsWrapper>
                 {room.lists.map((list) =>
                     <StyledList key={list.id}>
                         <StyledListTitle>{list.name}</StyledListTitle>
                         {list.notes.map((note) =>
-                            <StyledListNote key={note.id}>
-                                <StyledNoteIndicator positive={note.rate === 1} />
+                            <StyledListNote key={note.id} editing={(lists[list.id] || {}).editedNoteId === note.id}>
+                                <StyledNoteIndicator positive={note.rate === 1} editing={(lists[list.id] || {}).editedNoteId === note.id} />
                                 {note.note.replace('\n', '<br/>')}
                                 {!room.ready && (lists[list.id] || {}).editedNoteId !== note.id &&
                                     <StyledOptionsIcon src={optionsIcon} onClick={(e) => {
@@ -276,26 +278,32 @@ const Room = ({ history }) => {
                         {!room.ready &&
                             <>
                                 {(lists[list.id] || {}).adding ?
-                                    <AddNoteWrapper>
-                                        <StyledAddNoteInput
-                                            placeholder='Your awesome note...'
-                                            value={lists[list.id].note}
-                                            onChange={(e) => setNote(list.id, e.target.value)}
-                                            onKeyPress={(e) => {
-                                                if (e.ctrlKey && e.key === 'Enter') {
-                                                    submitNote(list.id, lists[list.id].editedNoteId);
-                                                }
-                                            }} />
-                                        <StyledLine />
-                                        <NoteRatingWrapper>
-                                            <StyledParagraph>What are the feelings behind it?</StyledParagraph>
-                                            <span>
-                                                <StyledImg src={lists[list.id].negative ? sadSelectedIcon : sadIcon} onClick={() => setNegative(list.id, true)} />
-                                                <StyledImg src={lists[list.id].negative ? happyIcon : happySelectedIcon} onClick={() => setNegative(list.id, false)} />
-                                            </span>
-                                        </NoteRatingWrapper>
-                                        <StyledOptionsIcon src={closeIcon} onClick={(e) => discardNote(list.id)} />
-                                    </AddNoteWrapper>
+                                    <>
+                                        <AddNoteWrapper>
+                                            <StyledAddNoteInput
+                                                placeholder='Your awesome note...'
+                                                value={lists[list.id].note}
+                                                onChange={(e) => setNote(list.id, e.target.value)}
+                                                onKeyPress={(e) => {
+                                                    if (e.ctrlKey && (e.which === 13 || e.keyCode === 13)) {
+                                                        submitNote(list.id, lists[list.id].editedNoteId);
+                                                    }
+                                                }} />
+                                            <StyledLine />
+                                            <NoteRatingWrapper>
+                                                <StyledParagraph>What are the feelings behind it?</StyledParagraph>
+                                                <span>
+                                                    <StyledImg src={lists[list.id].negative ? sadSelectedIcon : sadIcon} onClick={() => setNegative(list.id, true)} />
+                                                    <StyledImg src={lists[list.id].negative ? happyIcon : happySelectedIcon} onClick={() => setNegative(list.id, false)} />
+                                                </span>
+                                            </NoteRatingWrapper>
+                                            <StyledOptionsIcon src={closeIcon} onClick={(e) => discardNote(list.id)} />
+                                        </AddNoteWrapper>
+                                        <SubmitNoteWrapper>
+                                            <StyledParagraph>Press ctrl + enter to submit</StyledParagraph>
+                                            <Button small onClick={() => submitNote(list.id, lists[list.id].editedNoteId)}>Submit</Button>
+                                        </SubmitNoteWrapper>
+                                    </>
                                     :
                                     <StyledAddNoteButton
                                         onClick={() => setLists((lists) => ({

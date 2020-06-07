@@ -54,7 +54,7 @@ const Modal = ({ onDismissCallback, link }) => {
                 <StyledParagraph>Everyone with this link can join</StyledParagraph>
                 <StyledBox href={link} target='_blank'>
                     <StyledParagraph>{link}</StyledParagraph>
-                    <StyledImg src={copyIcon} clickable onClick={(e) => {
+                    <StyledImg src={copyIcon} clickable style={{ 'zIndex': '100' }} onClick={(e) => {
                         copyLink();
                         e.stopPropagation();
                         e.preventDefault();
