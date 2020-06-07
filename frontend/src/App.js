@@ -17,7 +17,6 @@ function App() {
         <Route exact path="/:id" component={Main}/>
         <Route exact path="/add/:id" component={Add}/>
         <Route exact path="/room/:id" component={Room}/>
-        <Route path="*" component={NotFound}/>
       </Switch>
     </Router>
   );
