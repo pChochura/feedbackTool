@@ -55,9 +55,10 @@ const Modal = ({ onDismissCallback, link }) => {
                 <StyledBox onClick={() => window.open(link, '_blank')}>
                     <StyledParagraph>{link}</StyledParagraph>
                     <StyledImg src={copyIcon} clickable onClick={(e) => {
-                        copyLink();
+                        e.nativeEvent.stopImmediatePropagation();
                         e.stopPropagation();
                         e.preventDefault();
+                        copyLink();
                     }} />
                 </StyledBox>
             </StyledCard>
