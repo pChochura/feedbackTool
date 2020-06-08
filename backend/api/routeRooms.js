@@ -147,6 +147,13 @@ module.exports = {
 			return;
 		}
 
+		if (room.ready) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
 		const { listId, note, rate, id } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
@@ -182,6 +189,13 @@ module.exports = {
 			return;
 		}
 
+		if (room.ready) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
 		const { listId, id } = req.body;
 		const list = room.lists.find((item) => item.id === listId);
 
@@ -207,6 +221,31 @@ module.exports = {
 
 		res.json({
 			message: 'OK',
+		});
+	},
+
+	findMatchingRoom: (req, res) => {
+		if (!main.id) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
+		const seed = req.cookies.seed;
+		const id = generateId(seed);
+
+		const room = rooms.find((room) => room.id === id);
+
+		if (!room) {
+			res.status(404).send({
+				message: 'Room not found',
+			});
+			return;
+		}
+
+		res.json({
+			id: room.id,
 		});
 	},
 };

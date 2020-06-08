@@ -39,9 +39,9 @@ const PersonCard = ({ options, isAdder, lists, isReady, name, maxNotesCount, cli
                             key={index}
                             onClick={() => {
                                 setShowingOptions();
-                                optionClickCallback && optionClickCallback(index);
+                                optionClickCallback && optionClickCallback(option.id);
                             }}
-                        >{option}</StyledOptionItem>
+                        >{option.name}</StyledOptionItem>
                     )}
                 </StyledOptions>
             }

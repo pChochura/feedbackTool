@@ -21,6 +21,8 @@ app.use(cookieParser());
 app.get('/api/rooms', API.adminAuth, API.getAllRooms);
 // Create room (all)
 app.post('/api/rooms', API.createRoom);
+// Check if room based on the given seed exists (all)
+app.get('/api/rooms/find', API.findMatchingRoom);
 // Return one room (only creator)
 app.get('/api/rooms/:id', API.userAuth, API.getRoomById);
 // Remove one room (only admin)
@@ -46,5 +48,7 @@ app.post('/api/main/end', API.adminAuth, API.endSession);
 app.post('/api/main/aggregate', API.adminAuth, API.aggregateNotes);
 // Check if the given id is from add link (all)
 app.post('/api/checkAdd', API.checkAddPage);
+// Check if the session based on the given seed exists (all)
+app.get('/api/main/find', API.findMatchingSession);
 
 server.listen(process.env.PORT);

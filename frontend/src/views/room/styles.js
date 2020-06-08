@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from 'styled-components';
+import TextareaAutosize from 'react-textarea-autosize';
 
 export const StyledWrapper = styled.div`
     width: 100%;
@@ -117,7 +118,7 @@ export const StyledAddNoteButton = styled.p`
     border-radius: 5px;
     transition: .5s background-color;
 
-    &:before {
+    &::before {
         content: '+';
         width: 24px;
         height: 24px;
@@ -147,13 +148,16 @@ export const AddNoteWrapper = styled.div`
     }
 `;
 
-export const StyledAddNoteInput = styled.textarea`
+export const StyledAddNoteInput = styled(TextareaAutosize)`
     width: 100%;
-    min-height: 150px;
     box-sizing: border-box;
     outline: none;
     border: none;
-    padding: 15px 30px 15px 15px;
+    ${({ readOnly }) => !readOnly && css`
+        max-height: 500px;
+        min-height: 150px;
+        padding: 15px 30px 15px 15px;
+    `}
     resize: none;
     color: #515151;
     font-size: 0.9rem;
@@ -189,6 +193,7 @@ export const StyledParagraph = styled.p`
     font-size: 0.75rem;
     color: ${({ primary }) => primary ? '#515151' : '#ABABAB'};
     font-weight: 300;
+    ${({ centered }) => centered && css`text-align: center;`}
 `;
 
 export const StyledImg = styled.img`

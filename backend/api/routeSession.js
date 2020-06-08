@@ -159,4 +159,27 @@ module.exports = {
 			status: id === main.addLink,
 		});
 	},
+
+	findMatchingSession: (req, res) => {
+		if (!main.id) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
+		const seed = req.cookies.seed;
+		const id = generateId(seed);
+
+		if (main.id !== id) {
+			res.status(404).send({
+				message: 'Session not found',
+			});
+			return;
+		}
+
+		res.json({
+			id: main.id,
+		});
+	},
 };

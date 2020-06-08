@@ -134,6 +134,29 @@ const Main = ({ history }) => {
         render();
     };
 
+    const getOptionsForRoom = (room) => {
+        const options = [{
+            name: 'Remove',
+            id: 1,
+        }];
+
+        if (room.ready) {
+            options.push({
+                name: 'Mark as not ready',
+                id: 2,
+            })
+        }
+
+        if (room.own) {
+            options.push({
+                name: 'Open',
+                id: 3,
+            });
+        }
+
+        return options;
+    }
+
     useEffect(() => {
         const prepareMainPage = async () => {
             let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
@@ -153,6 +176,17 @@ const Main = ({ history }) => {
 
         prepareMainPage();
     }, [history, id, getRooms]);
+
+    useEffect(() => {
+        const checkMatchingRoom = async () => {
+            const matchingRoom = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/find`, { credentials: 'include' })).json();
+            if (matchingRoom.id) {
+                (rooms.find((room) => room.id === matchingRoom.id) || {}).own = true;
+            }
+        };
+
+        checkMatchingRoom();
+    }, [rooms]);
 
     useEffect(() => {
         const timerInterval = setInterval(refreshTimer, 1000);
@@ -201,16 +235,19 @@ const Main = ({ history }) => {
                             key={index}
                             maxNotesCount={maxNotesCount}
                             name={room.name}
-                            options={phase === 1 ? null : (room.ready ? ['Remove', 'Mark as not ready'] : ['Remove'])}
+                            options={phase === 1 ? null : getOptionsForRoom(room)}
                             isReady={room.ready}
                             lists={phase === 1 ? [] : room.lists}
                             optionClickCallback={(index) => {
                                 switch (index) {
-                                    case 0:
+                                    case 1:
                                         removeRoom(room.id);
                                         break;
-                                    case 1:
+                                    case 2:
                                         markRoomAsNotReady(room.id);
+                                        break;
+                                    case 3:
+                                        window.open(`/room/${room.id}`, '_blank');
                                         break;
                                     default:
                                         break;

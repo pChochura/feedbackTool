@@ -317,9 +317,7 @@ const Room = ({ history }) => {
                         {list.notes.map((note) =>
                             <StyledListNote key={note.id} editing={(lists[list.id] || {}).editedNoteId === note.id}>
                                 <StyledNoteIndicator positive={note.rate === 1} editing={(lists[list.id] || {}).editedNoteId === note.id} />
-                                {note.note.split('\n').map((item, i) =>
-                                    <StyledParagraph primary key={i}>{item}</StyledParagraph>
-                                )}
+                                <StyledAddNoteInput readOnly value={note.note}/>
                                 {!room.ready && (lists[list.id] || {}).editedNoteId !== note.id &&
                                     <StyledOptionsIcon src={optionsIcon} onClick={(e) => {
                                         e.stopPropagation();
@@ -333,6 +331,11 @@ const Room = ({ history }) => {
                                 }
                             </StyledListNote>
                         )}
+                        {list.notes.length === 0 &&
+                            <StyledParagraph centered>
+                                {room.ready ? "You didn't write anything here" : 'Please describe things that you like and dislike about me.'}
+                            </StyledParagraph>
+                        }
                         {!room.ready &&
                             <>
                                 {(lists[list.id] || {}).adding ?
