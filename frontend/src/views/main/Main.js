@@ -1,79 +1,167 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import addImg from '../../assets/images/add.svg';
 import { useParams } from "react-router-dom";
 import socketIOClient from "socket.io-client";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCopy } from '@fortawesome/free-solid-svg-icons'
-import './style.css'
+import { StyledWrapper, StyledTitle, DashboardWrapper, MainBarWrapper, CardsWrapper, ModalButtonsWrapper } from './styles';
+import TopBar from '../../components/TopBar/TopBar';
+import Search from '../../components/Search/Search';
+import successIcon from '../../assets/images/success.svg';
+import warningIcon from '../../assets/images/warning.svg';
+import PersonCard from '../../components/PersonCard/PersonCard';
+import Modal from '../../components/Modal/Modal';
+import Notification from '../../components/Notification/Notification';
+import { useForceUpdate } from '../../components/hooks';
+import moment from 'moment';
+import Button from '../../components/Button/Button';
 
 const Main = ({ history }) => {
-    const [phase, setPhase] = useState(1);
-    const [addLink, setAddLink] = useState('');
-    const [rooms, setRooms] = useState([]);
-    const [time, setTime] = useState('01:00:00');
     const [expirationTimestamp, setExpirationTimestamp] = useState(0);
-    const [showCopy, setShowCopy] = useState(false);
-    const [deletedRoomStatus, setDeletedRoomStatus] = useState(0);
+    const [joinModalShowed, setJoinModalShowed] = useState(false);
+    const [endSessionModal, setEndSessionModal] = useState();
+    const [notifications, setNotifications] = useState([]);
+    const [maxNotesCount, setMaxNotesCount] = useState(0);
+    const [showedRooms, setShowedRooms] = useState([]);
+    const [time, setTime] = useState('01:00:00');
+    const [addLink, setAddLink] = useState('');
+    const [phase, setPhase] = useState(0);
+    const [rooms, setRooms] = useState([]);
     const { id } = useParams();
+    const render = useForceUpdate();
 
-
-    const getRooms = async () => {
+    const getRooms = useCallback(async () => {
         const rooms = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms`, { credentials: 'include' })).json();
+        setMaxNotesCount(rooms.reduce((max, room) =>
+            Math.max(
+                max,
+                room.lists.reduce((acc, list) =>
+                    acc = Math.max(acc, list.count), 0
+                )
+            ), 0
+        ));
         setRooms(rooms);
-    };
+        setShowedRooms(rooms);
+    }, []);
 
     const refreshTimer = useCallback(async () => {
-        const diff = expirationTimestamp - Date.now() / 1000;
-        let hours = Math.floor(diff / (60 * 60));
-        let minutes = Math.floor((diff - hours * 60 * 60) / 60);
-        let seconds = Math.floor(diff - minutes * 60 - hours * 60 * 60);
-        hours = hours < 10 ? '0' + hours : hours;
-        minutes = minutes < 10 ? '0' + minutes : minutes;
-        seconds = seconds < 10 ? '0' + seconds : seconds;
-        setTime(`${hours}:${minutes}:${seconds}`);
+        if (!expirationTimestamp) {
+            return;
+        }
 
-        if (seconds + minutes + hours <= 0) {
+        const millis = moment.duration(expirationTimestamp * 1000 - Date.now()).asMilliseconds();
+        setTime(moment.utc(millis).format('HH:mm:ss'));
+        if (millis <= 0) {
             await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/notFound')
+            history.push('/?reasonCode=1');
         }
     }, [expirationTimestamp, history, setTime]);
 
     const removeRoom = async (id) => {
-        await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { method: 'DELETE', credentials: 'include' }).then(res => setDeletedRoomStatus(res.status));
+        fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, { method: 'DELETE', credentials: 'include' })
+            .then(() => {
+                getRooms();
+                postNotification({
+                    title: 'Sucess',
+                    description: 'The room has been succesfully removed.',
+                    success: true,
+                });
+            }).catch(() => {
+                postNotification({
+                    title: 'Error',
+                    description: 'We encountered some problems while removing this room.',
+                });
+            });
         getRooms();
     };
 
-    const nextPhase = async () => {
+    const markRoomAsNotReady = async (id) => {
+        fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}/notReady`, { method: 'PATCH', credentials: 'include' })
+            .then(() => {
+                getRooms();
+                postNotification({
+                    title: 'Sucess',
+                    description: 'The room has been succesfully marked as not ready.',
+                    success: true,
+                });
+            }).catch(() => {
+                postNotification({
+                    title: 'Error',
+                    description: 'We encountered some problems while marking this room as not ready.',
+                });
+            });
+    };
+
+    const nextPhase = async (agreed) => {
         if (phase === 1) {
-            await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
-            history.push('/notFound');
+            if (agreed) {
+                await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
+                history.push('/?reasonCode=1');
+            } else {
+                setEndSessionModal({});
+            }
         } else {
+            if (rooms.length <= 1 || rooms.some((room) => !room.ready)) {
+                return;
+            }
             await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, { method: 'POST', credentials: 'include' });
             getRooms();
-            phase = 1;
+            setPhase(1);
+            postNotification({
+                title: 'Success',
+                description: 'We have successfully aggregated all the notes.',
+                success: true,
+            })
         }
     };
 
-    const roomsArr = rooms.map((el, index) => (
-        <div className="card" key={index}>
-            <div className="title">{el.name}</div>
-            {phase === 0 && <a className="more" onClick={() => removeRoom(el.id)}>&times;</a>}
-            <ul className="lists">
-                {el.lists.map((list, index2) =>
-                    <li key={index2}>{list.name} ({list.count} notes)</li>
-                )}
-            </ul>
-            {el.ready && <div className="ready">Ready</div>}
-        </div>
-    ));
+    const filterCards = (name) => {
+        setShowedRooms(rooms.filter((room) => room.name.toLowerCase().includes(name.toLowerCase())));
+    };
+
+    const postNotification = (_notification) => {
+        setNotifications((n) => [
+            ...n,
+            {
+                ..._notification,
+                id: Math.random(),
+            },
+        ]);
+    };
+
+    const requeueNotification = () => {
+        setNotifications((n) => {
+            n.shift();
+            return notifications;
+        });
+        render();
+    };
+
+    const getOptionsForRoom = (room) => {
+        const options = [{
+            name: 'Remove',
+            id: 1,
+        }];
+
+        if (room.ready) {
+            options.push({
+                name: 'Mark as not ready',
+                id: 2,
+            })
+        }
+
+        if (room.own) {
+            options.push({
+                name: 'Open',
+                id: 3,
+            });
+        }
+
+        return options;
+    }
 
     useEffect(() => {
         const prepareMainPage = async () => {
-            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, {
-                credentials: 'include',
-            })).json();
+            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
             if (mainPage.id !== id) {
-                history.push('/notFound')
+                history.push('/?reasonCode=3');
                 return;
             }
             if (!mainPage.locked) {
@@ -83,19 +171,28 @@ const Main = ({ history }) => {
             getRooms();
             setAddLink(mainPage.addLink);
             setPhase(mainPage.phase);
-            setExpirationTimestamp(mainPage.expirationTimestamp)
+            setExpirationTimestamp(mainPage.expirationTimestamp);
         }
 
         prepareMainPage();
-    }, [history, id]);
+    }, [history, id, getRooms]);
+
+    useEffect(() => {
+        const checkMatchingRoom = async () => {
+            const matchingRoom = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/find`, { credentials: 'include' })).json();
+            if (matchingRoom.id) {
+                (rooms.find((room) => room.id === matchingRoom.id) || {}).own = true;
+            }
+        };
+
+        checkMatchingRoom();
+    }, [rooms]);
 
     useEffect(() => {
         const timerInterval = setInterval(refreshTimer, 1000);
         refreshTimer();
 
-        return () => {
-            clearTimeout(timerInterval);
-        }
+        return () => clearTimeout(timerInterval);
     }, [refreshTimer]);
 
     useEffect(() => {
@@ -106,52 +203,93 @@ const Main = ({ history }) => {
 
         io.on('roomChanged', (data) => {
             Object.assign(rooms.find(room => room.id === data.room.id) || {}, data.room);
+            setMaxNotesCount((max) =>
+                Math.max(max, (data.room.lists || []).reduce(
+                    (acc, list) => acc = Math.max(acc, list.count), 0
+                ))
+            );
             setRooms(rooms);
+            setShowedRooms(rooms);
         });
-    }, [rooms, setRooms]);
 
+        return () => io.disconnect();
+    }, [rooms, getRooms, maxNotesCount]);
 
     return (
-        <>
-            <div className="header">
-                {rooms.length > 0 && phase === 0 ?
-                    <p className="title">My rooms (<a target='_blank' href={`/add/${addLink}`}>Invite link</a>)&#160;
-                        <FontAwesomeIcon icon={faCopy} onClick={() => {
-                            const temp = document.createElement('textarea');
-                            document.body.appendChild(temp);
-                            temp.value = `${window.location.origin}/add/${addLink}`;
-                            temp.select();
-                            document.execCommand('copy');
-                            console.log('URL has been succesfully copied!!!');
-                            document.body.removeChild(temp);
-                            setShowCopy(true);
-                            setTimeout(() => setShowCopy(false), 500);
-                        }}
+        <StyledWrapper>
+            <TopBar
+                buttonContent={phase === 0 ? 'Continue' : 'End session'}
+                buttonDisabled={rooms.length <= 1 || rooms.some((room) => !room.ready)}
+                buttonCallback={() => nextPhase()}
+                message={time} />
+            <DashboardWrapper>
+                <MainBarWrapper>
+                    <StyledTitle>People joined</StyledTitle>
+                    <Search onChange={(e) => {
+                        filterCards(e.target.value);
+                    }} />
+                </MainBarWrapper>
+                <CardsWrapper>
+                    {showedRooms.map((room, index) =>
+                        <PersonCard
+                            key={index}
+                            maxNotesCount={maxNotesCount}
+                            name={room.name}
+                            options={phase === 1 ? null : getOptionsForRoom(room)}
+                            isReady={room.ready}
+                            lists={phase === 1 ? [] : room.lists}
+                            optionClickCallback={(index) => {
+                                switch (index) {
+                                    case 1:
+                                        removeRoom(room.id);
+                                        break;
+                                    case 2:
+                                        markRoomAsNotReady(room.id);
+                                        break;
+                                    case 3:
+                                        window.open(`/room/${room.id}`, '_blank');
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }}
                         />
-                        {showCopy && <span className="copyBanner"> copied!</span>}
-                    </p>
-                    :
-                    <p className="title">My rooms</p>
-                }
-                <p className="timer">{time}</p>
-                <button className="button" onClick={nextPhase} disabled={!(rooms.length > 1 && rooms.every(r => r.ready))}>
-                    {phase === 0 ? 'Aggregate notes' : 'End session'}
-                </button>
-            </div>
-            {rooms.length > 0 ?
-                <div className="cardContainer">
-                    {roomsArr}
-                </div>
-                :
-                <div className="emptyHolder">
-                    <img src={addImg} alt="Add room" />
-                    <span className="title">Send <a target='_blank' href={`/add/${addLink}`}>invite link</a> to your team</span>
-                </div>
+                    )}
+                    {phase === 0 &&
+                        <PersonCard isAdder={true} clickCallback={() => setJoinModalShowed(true)} />
+                    }
+                </CardsWrapper>
+            </DashboardWrapper>
+            {joinModalShowed && <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`} />}
+            {endSessionModal &&
+                <Modal
+                    title='Are you sure you want to end this session?'
+                    description='This action cannot be undone. All notes will be discarded.'
+                    onDismissCallback={() => setEndSessionModal()}
+                    isExiting={(endSessionModal || {}).exit}>
+                    <ModalButtonsWrapper>
+                        <Button secondary onClick={() => setEndSessionModal({ exit: true })}>Take me back</Button>
+                        <Button onClick={() => {
+                            setEndSessionModal({ exit: true });
+                            nextPhase(true);
+                        }}>Yes, I'm sure</Button>
+                    </ModalButtonsWrapper>
+                </Modal>
             }
-            {/* {deletedRoomStatus === 200 && <div className="isRoomDeletedBanner"></div>} */}
-            {/* <div className="isRoomDeletedBanner"></div> */}
-        </>
-    )
+            {notifications &&
+                notifications.slice(0, 3).map((notification, index) =>
+                    <Notification
+                        key={notification.id}
+                        icon={notification.success ? successIcon : warningIcon}
+                        index={Math.min(notifications.length, 3) - index - 1}
+                        title={notification.title}
+                        description={notification.description}
+                        callback={() => requeueNotification()}
+                    />
+                )
+            }
+        </StyledWrapper>
+    );
 }
 
-export default Main
+export default Main;
