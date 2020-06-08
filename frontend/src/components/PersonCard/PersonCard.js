@@ -56,7 +56,9 @@ const PersonCard = ({ options, isAdder, lists, isReady, name, maxNotesCount, cli
                 <StyledListItem key={index}>
                     <ListItemFill progress={list.count / maxNotesCount * 100}></ListItemFill>
                     <StyledParagraph>{list.name}</StyledParagraph>
-                    <StyledParagraph>{list.count}/{maxNotesCount}</StyledParagraph>
+                    {list.count &&
+                        <StyledParagraph>{list.count}/{maxNotesCount}</StyledParagraph>
+                    }
                 </StyledListItem>
             )}
         </StyledCard>

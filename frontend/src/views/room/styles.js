@@ -3,9 +3,6 @@ import styled, { css, keyframes } from 'styled-components';
 export const StyledWrapper = styled.div`
     width: 100%;
     height: 100%;
-    dispaly: flex;
-    justify-content: center;
-    align-content: center;
     padding-bottom: 100px;
 `;
 
@@ -28,8 +25,10 @@ export const StyledListsWrapper = styled.div`
 
 export const StyledList = styled.div`
     width: 300px;
-    margin: 10px 32px;
+    margin: 5px 16px;
+    padding: 5px 16px;
     display: flex;
+    flex: 0 0 auto;
     flex-direction: column;
 
     &:first-child {
@@ -188,7 +187,7 @@ export const StyledParagraph = styled.p`
     margin-block-start: 0;
     margin-block-end: 0;
     font-size: 0.75rem;
-    color: #ABABAB;
+    color: ${({ primary }) => primary ? '#515151' : '#ABABAB'};
     font-weight: 300;
 `;
 

@@ -71,6 +71,13 @@ module.exports = {
 	},
 
 	endSession: (_, res) => {
+		if (!main.id || !main.locked) {
+			res.status(423).send({
+				message: 'This action is now locked',
+			});
+			return;
+		}
+
 		main.locked = false;
 		main.id = undefined;
 		main.phase = 0;
@@ -86,26 +93,44 @@ module.exports = {
 	},
 
 	aggregateNotes: (_, res) => {
-		const roomsTemp = [];
-		rooms.forEach((room, index) => {
-			const notes = [];
-			rooms.forEach((room2, index2) => {
-				if (index !== index2) {
-					notes.push(...room2.lists.find((l) => l.id === room.id).notes);
-				}
+		if (!main.id || !main.locked) {
+			res.status(423).send({
+				message: 'This action is now locked',
 			});
-			roomsTemp.push({
+			return;
+		}
+
+		const roomsTemp = rooms.reduce((acc, room, index) => {
+			acc.push({
 				id: room.id,
 				name: room.name,
+				ownNotes: true,
 				lists: [
 					{
-						name: 'Notes',
-						notes,
+						id: generateId(),
+						name: 'Positive',
+						notes: rooms.reduce((acc2, room2, index2) => {
+							if (index !== index2) {
+								acc2.push(...room2.lists.find((list) => list.id === room.id).notes.filter((note) => note.rate === 1));
+							}
+							return acc2;
+						}, []),
+					},
+					{
+						id: generateId(),
+						name: 'Negative',
+						notes: rooms.reduce((acc2, room2, index2) => {
+							if (index !== index2) {
+								acc2.push(...room2.lists.find((list) => list.id === room.id).notes.filter((note) => note.rate === -1));
+							}
+							return acc2;
+						}, []),
 					},
 				],
 				ready: true,
 			});
-		});
+			return acc;
+		}, []);
 
 		rooms.splice(0, rooms.length);
 		rooms.push(...roomsTemp);

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useParams } from "react-router-dom";
 import { StyledOptions, StyledOptionItem } from '../../components/PersonCard/styles';
 import {
@@ -32,14 +32,19 @@ import optionsIcon from '../../assets/images/options.svg';
 import { useForceUpdate } from '../../components/hooks';
 import socketIOClient from 'socket.io-client';
 import Button from '../../components/Button/Button';
-
+import Modal from '../../components/Modal/Modal';
+import html2canvas from 'html2canvas';
+import { table } from 'table';
+import { ModalButtonsWrapper } from '../main/styles';
 
 const Room = ({ history }) => {
     const [notifications, setNotifications] = useState([]);
-    const [room, setRoom] = useState({ lists: [] });
     const [showingOptions, setShowingOptions] = useState();
+    const [exportAsModal, setExportAsModal] = useState();
+    const [room, setRoom] = useState({ lists: [] });
     const [lists, setLists] = useState({});
     const { id } = useParams();
+    const ownNotesRef = useRef();
     const render = useForceUpdate();
 
     const postNotification = (_notification) => {
@@ -208,6 +213,48 @@ const Room = ({ history }) => {
         }));
     };
 
+    const saveAs = (data, name) => {
+        const a = document.createElement('a');
+        a.href = data;
+        a.download = name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
+    const exportAs = (mode) => {
+        switch (mode) {
+            case 1:
+                html2canvas(ownNotesRef.current, { backgroundColor: '#EFEFEF', width: 702, x: 100 }).then((canvas) => {
+                    saveAs(canvas.toDataURL('image/jpeg', 1.0), 'Your notes.jpeg', 'image/jpeg');
+                });
+                break;
+            case 2:
+                const notes = room.lists[0].notes.reduce((acc, note) => {
+                    if (note.rate === 1) {
+                        acc.good.push(note.note);
+                    } else {
+                        acc.bad.push(note.note);
+                    }
+                    return acc;
+                }, { good: [], bad: [] });
+                const maxLength = Math.max(notes.good.length, notes.bad.length);
+                const data = [['           Positive', '           Negative']];
+                for (let i = 0; i < maxLength; i++) {
+                    data.push([notes.good[i], notes.bad[i]]);
+                }
+                const result = table(data, {
+                    columnDefault: {
+                        width: 30,
+                    },
+                });
+                saveAs(URL.createObjectURL(new Blob([result], { type: 'text/plain;charset=utf-8' })), 'Your notes.txt');
+                break;
+            default:
+                break;
+        }
+    };
+
     useEffect(() => { getRoom(); }, [getRoom]);
 
     useEffect(() => {
@@ -240,7 +287,7 @@ const Room = ({ history }) => {
         });
 
         io.on('aggregateNotes', () => {
-            window.location.reload();
+            getRoom();
         });
 
         io.on('endSession', () => {
@@ -252,16 +299,27 @@ const Room = ({ history }) => {
 
     return (
         <StyledWrapper onClick={() => showingOptions && setShowingOptions({ ...showingOptions, exit: true })}>
-            <TopBar buttonContent={room.lists.length > 0 ? 'Ready' : undefined} buttonDisabled={room.ready} buttonCallback={() => markRoomAsReady()} />
+            <TopBar
+                buttonContent={room.ownNotes ? 'Export as' : (room.lists.length > 0 ? 'Ready' : undefined)}
+                buttonDisabled={!room.ownNotes && room.ready}
+                buttonCallback={() => {
+                    if (room.ownNotes) {
+                        setExportAsModal({});
+                    } else {
+                        markRoomAsReady();
+                    }
+                }} />
             <StyledTitle>It's your room, <b>{room.name}</b></StyledTitle>
-            <StyledListsWrapper>
+            <StyledListsWrapper ref={ownNotesRef}>
                 {room.lists.map((list) =>
                     <StyledList key={list.id}>
                         <StyledListTitle>{list.name}</StyledListTitle>
                         {list.notes.map((note) =>
                             <StyledListNote key={note.id} editing={(lists[list.id] || {}).editedNoteId === note.id}>
                                 <StyledNoteIndicator positive={note.rate === 1} editing={(lists[list.id] || {}).editedNoteId === note.id} />
-                                {note.note.replace('\n', '<br/>')}
+                                {note.note.split('\n').map((item, i) =>
+                                    <StyledParagraph primary key={i}>{item}</StyledParagraph>
+                                )}
                                 {!room.ready && (lists[list.id] || {}).editedNoteId !== note.id &&
                                     <StyledOptionsIcon src={optionsIcon} onClick={(e) => {
                                         e.stopPropagation();
@@ -321,6 +379,24 @@ const Room = ({ history }) => {
                     </StyledList>
                 )}
             </StyledListsWrapper>
+            {exportAsModal &&
+                <Modal
+                    title='Do you want to export all your notes?'
+                    description='It is advised to save the notes to not loose your feedback.'
+                    onDismissCallback={() => setExportAsModal()}
+                    isExiting={(exportAsModal || {}).exit}>
+                    <ModalButtonsWrapper>
+                        <Button onClick={() => {
+                            setExportAsModal({ exit: true });
+                            exportAs(1);
+                        }}>Export as image</Button>
+                        <Button onClick={() => {
+                            setExportAsModal({ exit: true });
+                            exportAs(2);
+                        }}>Export as text</Button>
+                    </ModalButtonsWrapper>
+                </Modal>
+            }
             {notifications &&
                 notifications.slice(0, 3).map((notification, index) =>
                     <Notification

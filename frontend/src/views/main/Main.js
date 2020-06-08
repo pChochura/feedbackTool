@@ -148,7 +148,7 @@ const Main = ({ history }) => {
             getRooms();
             setAddLink(mainPage.addLink);
             setPhase(mainPage.phase);
-            setExpirationTimestamp(mainPage.expirationTimestamp)
+            setExpirationTimestamp(mainPage.expirationTimestamp);
         }
 
         prepareMainPage();
@@ -201,9 +201,9 @@ const Main = ({ history }) => {
                             key={index}
                             maxNotesCount={maxNotesCount}
                             name={room.name}
-                            options={room.ready ? ['Remove', 'Mark as not ready'] : ['Remove']}
+                            options={phase === 1 ? null : (room.ready ? ['Remove', 'Mark as not ready'] : ['Remove'])}
                             isReady={room.ready}
-                            lists={room.lists}
+                            lists={phase === 1 ? [] : room.lists}
                             optionClickCallback={(index) => {
                                 switch (index) {
                                     case 0:
@@ -218,7 +218,9 @@ const Main = ({ history }) => {
                             }}
                         />
                     )}
-                    <PersonCard isAdder={true} clickCallback={() => setJoinModalShowed(true)} />
+                    {phase === 0 &&
+                        <PersonCard isAdder={true} clickCallback={() => setJoinModalShowed(true)} />
+                    }
                 </CardsWrapper>
             </DashboardWrapper>
             {joinModalShowed && <Modal onDismissCallback={() => setJoinModalShowed(false)} link={`${window.location.origin}/add/${addLink}`} />}
