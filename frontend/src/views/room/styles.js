@@ -21,6 +21,7 @@ export const StyledTitle = styled.h1`
 `;
 
 export const StyledListsWrapper = styled.div`
+    max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     display: inline-flex;
@@ -81,7 +82,6 @@ export const StyledListNote = styled.div`
     box-sizing: border-box;
     position: relative;
     border-radius: 5px;
-    overflow-x: hidden;
     word-break: break-all;
 
     ${({ editing }) => editing && css`
@@ -107,6 +107,8 @@ export const SubmitNoteWrapper = styled.div`
 export const StyledNoteIndicator = styled.div`
     height: 100%;
     width: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
     background-color: ${({ positive, editing }) => editing ? '#ABABAB' : (positive ? '#81B800' : '#FF5453')};
     position: absolute;
     left: 0px;
@@ -160,7 +162,9 @@ export const StyledAddNoteInput = styled(TextareaAutosize)`
     box-sizing: border-box;
     outline: none;
     border: none;
+    overflow: hidden;
     ${({ readOnly }) => !readOnly && css`
+        overflow: auto;
         max-height: 500px;
         min-height: 150px;
         padding: 15px 30px 15px 15px;

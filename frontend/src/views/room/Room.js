@@ -328,12 +328,18 @@ const Room = ({ history }) => {
                                     <StyledOptionsIcon src={optionsIcon} onClick={(e) => {
                                         e.stopPropagation();
                                         setShowingOptions({
-                                            x: document.body.clientWidth - e.target.x - e.target.width,
-                                            y: e.target.y + e.target.height * 0.5 + window.pageYOffset,
                                             noteId: note.id,
                                             listId: list.id,
                                         });
                                     }} />
+                                }
+                                {showingOptions && showingOptions.noteId === note.id &&
+                                    <StyledOptions
+                                        exit={showingOptions.exit}
+                                        onAnimationEnd={() => showingOptions.exit && setShowingOptions()}>
+                                        <StyledOptionItem onClick={() => editNote(showingOptions.listId, showingOptions.noteId)}>Edit</StyledOptionItem>
+                                        <StyledOptionItem onClick={() => removeNote(showingOptions.listId, showingOptions.noteId)}>Remove</StyledOptionItem>
+                                    </StyledOptions>
                                 }
                             </StyledListNote>
                         )}
@@ -417,15 +423,6 @@ const Room = ({ history }) => {
                         callback={() => requeueNotification()}
                     />
                 )
-            }
-            {showingOptions &&
-                <StyledOptions
-                    pos={{ x: showingOptions.x, y: showingOptions.y }}
-                    exit={showingOptions.exit}
-                    onAnimationEnd={() => showingOptions.exit && setShowingOptions()}>
-                    <StyledOptionItem onClick={() => editNote(showingOptions.listId, showingOptions.noteId)}>Edit</StyledOptionItem>
-                    <StyledOptionItem onClick={() => removeNote(showingOptions.listId, showingOptions.noteId)}>Remove</StyledOptionItem>
-                </StyledOptions>
             }
         </StyledWrapper>
     );
