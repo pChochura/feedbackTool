@@ -15,6 +15,8 @@ export const StyledTitle = styled.h1`
     margin: 100px auto 50px auto;
     width: 100%;
     text-align: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 `;
 
 export const StyledListsWrapper = styled.div`
@@ -25,20 +27,25 @@ export const StyledListsWrapper = styled.div`
 `;
 
 export const StyledList = styled.div`
-    width: 300px;
+    width: 200px;
     margin: 5px 16px;
     padding: 5px 16px;
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
 
-    &:first-child {
-        margin-left: 100px;
+    @media(min-width: 900px) {
+        width: 300px;
+
+        &:first-child {
+            margin-left: 100px;
+        }
+    
+        &:last-child {
+            margin-right: 100px;
+        }
     }
 
-    &:last-child {
-        margin-right: 100px;
-    }
 `;
 
 export const StyledListTitle = styled.p`
