@@ -42,8 +42,8 @@ export const StyledWrapper = styled.div`
 `;
 
 export const StyledCard = styled.div`
-    width: 50%;
-    max-width: 700px;
+    width: 80%;
+    max-width: 600px;
     border-radius: 5px;
     margin: auto;
     background-color: #ffffff;
@@ -53,6 +53,10 @@ export const StyledCard = styled.div`
     flex-direction: column;
     align-items: center;
     padding: 75px 25px;
+
+    @media(min-width: 900px) {
+        width: 50%;
+    }
 `;
 
 export const StyledTitle = styled.p`
@@ -60,12 +64,14 @@ export const StyledTitle = styled.p`
     font-weight: 500;
     margin-block-end: 0;
     margin-block-start: 0;
+    text-align: center;
 `;
 
 export const StyledParagraph = styled.p`
     font-size: 1rem;
     color: #ABABAB;
     font-weight: 300;
+    text-align: center;
 `;
 
 export const StyledBox = styled.div`
@@ -75,19 +81,30 @@ export const StyledBox = styled.div`
     border-color: #ABABAB;
     border-width: 1px;
     height: 50px;
-    width: 80%;
+    width: 95%;
     margin-top: 50px;
     display: flex;
     cursor: pointer;
     
     p {
-        margin: auto;
+        margin: auto 40px auto 10px;
         color: #515151;
         font-weight: 400;
+        font-size: 0.75rem;
+        word-break: break-all;
+        text-align: left;
     }
 
     img {
         align-self: center;
         top: unset;
+    }
+
+    @media(min-width: 900px) {
+        width: 80%;
+
+        p {
+            font-size: 1rem;
+        }
     }
 `;

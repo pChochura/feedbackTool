@@ -8,37 +8,70 @@ export const StyledWrapper = styled.div`
 `;
 
 export const LandingWrapper = styled.div`
-    height: calc(100% - 100px);
-    widht: 100%;
+    box-sizing: border-box;
+    min-height: calc(100% - 100px);
+    width: 100%;
     display: flex;
-    padding: 0 100px;
-    justify-content: space-between;
+    padding: 50px 10px;
+    flex-direction: column-reverse;
+    justify-content: center;
     align-content: center;
     align-items: center;
+    flex: none;
+
+    @media(min-width: 900px) {
+        padding: 0 100px;
+        flex-direction: row;
+        justify-content: space-between;
+    }
 `;
 
 export const LandingLeft = styled.div`
     font-size: 1.5rem;
     align-self: center;
     line-height: 3rem;
+    text-align: center;
+    margin-top: 50px;
+    flex: none;
+
+    @media(min-width: 900px) {
+        text-align: left;
+    }
 `;
 
 export const StyledImg = styled.img`
-    max-width: 40%;
+    width: 50%;
+    align-self: center;
+    flex: none;
+
+    @media(min-width: 900px) {
+        max-width: 40%;
+    }
 `;
 
 export const StyledParagraph = styled.p`
     font-size: 1rem;
     font-weight: 300;
+    line-height: 1.2rem;
 `;
 
 export const ButtonWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: left;
+    flex-direction: column;
     height: 60px;
 
     p {
         margin-left: 10px;
+    }
+
+    button {
+        flex: none;
+    }
+
+    @media(min-width: 900px) {
+        justify-content: left;
+        flex-direction: row;
     }
 `;

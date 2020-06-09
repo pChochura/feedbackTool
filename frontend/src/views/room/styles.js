@@ -5,6 +5,7 @@ export const StyledWrapper = styled.div`
     width: 100%;
     height: 100%;
     padding-bottom: 100px;
+    position: relative;
 `;
 
 export const StyledTitle = styled.h1`
@@ -15,30 +16,37 @@ export const StyledTitle = styled.h1`
     margin: 100px auto 50px auto;
     width: 100%;
     text-align: center;
+    padding: 0 20px;
+    box-sizing: border-box;
 `;
 
 export const StyledListsWrapper = styled.div`
-    width: 100%;
+    max-width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    display: flex;
+    display: inline-flex;
 `;
 
 export const StyledList = styled.div`
-    width: 300px;
+    width: 200px;
     margin: 5px 16px;
     padding: 5px 16px;
     display: flex;
     flex: 0 0 auto;
     flex-direction: column;
 
-    &:first-child {
-        margin-left: 100px;
+    @media(min-width: 900px) {
+        width: 300px;
+
+        &:first-child {
+            margin-left: 100px;
+        }
+    
+        &:last-child {
+            margin-right: 100px;
+        }
     }
 
-    &:last-child {
-        margin-right: 100px;
-    }
 `;
 
 export const StyledListTitle = styled.p`
@@ -74,7 +82,6 @@ export const StyledListNote = styled.div`
     box-sizing: border-box;
     position: relative;
     border-radius: 5px;
-    overflow-x: hidden;
     word-break: break-all;
 
     ${({ editing }) => editing && css`
@@ -100,6 +107,8 @@ export const SubmitNoteWrapper = styled.div`
 export const StyledNoteIndicator = styled.div`
     height: 100%;
     width: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
     background-color: ${({ positive, editing }) => editing ? '#ABABAB' : (positive ? '#81B800' : '#FF5453')};
     position: absolute;
     left: 0px;
@@ -153,7 +162,9 @@ export const StyledAddNoteInput = styled(TextareaAutosize)`
     box-sizing: border-box;
     outline: none;
     border: none;
+    overflow: hidden;
     ${({ readOnly }) => !readOnly && css`
+        overflow: auto;
         max-height: 500px;
         min-height: 150px;
         padding: 15px 30px 15px 15px;
