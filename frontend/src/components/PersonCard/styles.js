@@ -19,8 +19,8 @@ const exitAnimation = keyframes`
 `;
 
 export const StyledCard = styled.div`
-    width: 300px;
-    min-height: 300px;
+    width: 200px;
+    min-height: 200px;
     position: relative;
     background: #ffffff;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
@@ -40,6 +40,11 @@ export const StyledCard = styled.div`
             box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.05);
         }
     `}
+
+    @media(min-width: 900px) {
+        width: 300px;
+        min-height: 300px;
+    }
 `;
 
 export const IconWrapper = styled.div`

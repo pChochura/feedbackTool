@@ -14,7 +14,12 @@ export const StyledTitle = styled.p`
     margin-block-end: 0;
     font-weight: 600;
     font-size: 2rem;
-    margin-top: 100px;
+    text-align: center;
+    margin-top: 30px;
+
+    @media(min-width: 900px) {
+        margin-top: 100px;
+    }
 `;
 
 export const StyledParagraph = styled.p`
@@ -22,14 +27,20 @@ export const StyledParagraph = styled.p`
     margin-block-end: 0;
     margin: 25px 0;
     text-align: center;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     line-height: 2rem;
     font-weight: 300;
+    padding: 0 30px;
+
+    @media(min-width: 900px) {
+        font-size: 1.1rem;
+        padding: 0;
+    }
 `;
 
 export const StyledBox = styled.div`
-    width: 40%;
-    max-width: 700px;
+    width: 80%;
+    max-width: 500px;
     padding: 25px 50px;
     box-sizing: border-box;
     background-color: #ffffff;
@@ -37,6 +48,15 @@ export const StyledBox = styled.div`
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
+
+    p {
+        padding: 0;
+    }
+
+    @media(min-width: 900px) {
+        width: 50%;
+        max-width: 700px;
+    }
 `;
 
 export const StyledInput = styled.input`

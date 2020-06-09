@@ -9,7 +9,8 @@ export const StyledWrapper = styled.div`
 export const StyledSearch = styled.input`
     box-sizing: border-box;
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.05);
-    width: 300px;
+    max-width: 300px;
+    width: unset;
     padding: 10px;
     padding-right: 40px;
     height: 45px;
@@ -28,6 +29,10 @@ export const StyledSearch = styled.input`
 
     &:focus {
         box-shadow: 0 0 10px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    @media(min-width: 900px) {
+        width: 300px;
     }
 `;
 
