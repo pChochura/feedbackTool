@@ -20,10 +20,9 @@ export const StyledTitle = styled.h1`
 `;
 
 export const StyledListsWrapper = styled.div`
-    width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    display: flex;
+    display: inline-flex;
 `;
 
 export const StyledList = styled.div`
