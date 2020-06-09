@@ -1,5 +1,5 @@
 const { generateId } = require('./utils');
-const { main } = require('./data');
+const { sessions } = require('./data');
 
 module.exports = {
 	userAuth: (req, res, next) => {
@@ -14,7 +14,7 @@ module.exports = {
 	},
 
 	adminAuth: (req, res, next) => {
-		if (main.id !== generateId(req.cookies.seed)) {
+		if (!sessions.find((s) => s.id === generateId(req.cookies.seed))) {
 			res.status(403).send({
 				message: 'You cannot do that',
 			});
@@ -25,7 +25,7 @@ module.exports = {
 	},
 
 	adminAuthSoft: (req, _, next) => {
-		req.adminAuth = main.id === generateId(req.cookies.seed);
+		req.adminAuth = sessions.find((s) => s.id === generateId(req.cookies.seed)) !== null;
 
 		next();
 	}

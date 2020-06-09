@@ -64,6 +64,8 @@ const Add = ({ history }) => {
 
     useEffect(() => {
         const checkAddPage = async () => {
+            const session = await (await fetch(`${process.env.REACT_APP_URL}/api/session`, { credentials: 'include' })).json();
+
             const isAddPage = await (await fetch(`${process.env.REACT_APP_URL}/api/checkAdd`, {
                 method: 'POST',
                 credentials: 'include',
@@ -71,7 +73,7 @@ const Add = ({ history }) => {
                 headers: { 'Content-Type': 'application/json' },
             })).json();
 
-            if (!(isAddPage || {}).status) {
+            if (!(isAddPage || {}).status || !session.id) {
                 history.push('/?reasonCode=3');
             }
         }

@@ -1,14 +1,14 @@
 const rooms = [];
-
-const main = {
-	id: undefined,
-	locked: false,
-	addLink: undefined,
-	phase: 0,
-	expirationTimestamp: undefined,
-};
+const sessions = [];
+// const sessions = {
+// 	id: undefined,
+// 	locked: false,
+// 	addLink: undefined,
+// 	phase: 0,
+// 	expirationTimestamp: undefined,
+// };
 
 module.exports = {
-	main,
+	sessions,
 	rooms,
 };

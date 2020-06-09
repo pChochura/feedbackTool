@@ -1,5 +1,5 @@
 const { generateId } = require('./utils');
-const { main, rooms } = require('./data');
+const { sessions, rooms } = require('./data');
 
 module.exports = {
 	getAllRooms: (_, res) => {
@@ -37,12 +37,12 @@ module.exports = {
 			return;
 		}
 
-		if (!main.locked || main.phase !== 0) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
+		// if (!sessions.locked || sessions.phase !== 0) {
+		// 	res.status(423).send({
+		// 		message: 'This action is now locked',
+		// 	});
+		// 	return;
+		// }
 
 		const roomId = generateId(seed);
 
@@ -225,7 +225,7 @@ module.exports = {
 	},
 
 	findMatchingRoom: (req, res) => {
-		if (!main.id) {
+		if (!sessions.id) {
 			res.status(423).send({
 				message: 'This action is now locked',
 			});

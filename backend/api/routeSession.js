@@ -1,8 +1,8 @@
 const { generateId } = require('./utils');
-const { main, rooms } = require('./data');
+const { sessions, rooms } = require('./data');
 
 module.exports = {
-	createMainPage: (req, res) => {
+	createSession: (req, res) => {
 		const seed = req.body.seed;
 
 		if (!seed) {
@@ -12,77 +12,85 @@ module.exports = {
 			return;
 		}
 
-		if (main.locked) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
-
-		main.id = generateId(seed);
-		main.addLink = generateId();
+		const session = {
+			id: generateId(seed),
+			addLink: generateId(),
+			phase: 0,
+		};
+		sessions.push(session);
 
 		require('../socket').mainExpired(req.cookies.io);
 
 		res.json({
-			id: main.id,
+			id: session.id,
 		});
 	},
 
-	lockMainPage: (_, res) => {
-		if (!main.id || main.locked) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
+	lockSession: (req, res) => {
+		const id = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === id);
 
-		main.locked = true;
-		main.expirationTimestamp = Date.now() / 1000 + 3600;
+		session.locked = true;
+		session.expirationTimestamp = Date.now() / 1000 + 3600;
 
-		require('../socket').mainLocked(main.expirationTimestamp);
+		require('../socket').mainLocked(session.expirationTimestamp);
 
 		res.json({
 			message: 'OK',
 		});
 	},
 
-	getMainPage: (req, res) => {
-		if (!req.adminAuth) {
-			res.json({
-				locked: main.locked,
-				expirationTimestamp: main.expirationTimestamp,
+	getSession: (req, res) => {
+		const id = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === id);
+
+		if (!session) {
+			res.status(404).send({
+				message: 'Session not found',
 			});
 			return;
 		}
 
-		if (main.expirationTimestamp <= Date.now() / 1000) {
-			// Session is inactive too long
-			main.locked = false;
-			main.id = undefined;
-			main.phase = 0;
-			main.addLink = undefined;
-			main.expirationTimestamp = undefined;
+		if (!req.adminAuth) {
+			res.json({
+				locked: session.locked,
+				expirationTimestamp: session.expirationTimestamp,
+			});
+			return;
+		}
 
+		if (session.expirationTimestamp <= Date.now() / 1000) {
+			// Session is inactive too long
+			session.locked = false;
+			session.id = undefined;
+			session.phase = 0;
+			session.addLink = undefined;
+			session.expirationTimestamp = undefined;
+
+			// @todo: remove only rooms from the current session
 			rooms.splice(0, rooms.length);
 		}
 
-		res.json(main);
+		res.json(session);
 	},
 
 	endSession: (_, res) => {
-		if (!main.id || !main.locked) {
-			res.status(423).send({
-				message: 'This action is now locked',
+		const id = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === id);
+
+		if (!session) {
+			res.status(404).send({
+				message: 'Session not found',
 			});
 			return;
 		}
 
-		main.locked = false;
-		main.id = undefined;
-		main.phase = 0;
-		main.expirationTimestamp = undefined;
+		session.locked = false;
+		session.id = undefined;
+		session.phase = 0;
+		session.expirationTimestamp = undefined;
 
+		// @todo: remove only rooms from the current session
 		rooms.splice(0, rooms.length);
 
 		require('../socket').endSession();
@@ -93,13 +101,7 @@ module.exports = {
 	},
 
 	aggregateNotes: (_, res) => {
-		if (!main.id || !main.locked) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
-
+		// @todo: aggregate notes only from rooms from the current session
 		const roomsTemp = rooms.reduce((acc, room, index) => {
 			acc.push({
 				id: room.id,
@@ -135,8 +137,18 @@ module.exports = {
 		rooms.splice(0, rooms.length);
 		rooms.push(...roomsTemp);
 
-		main.phase = 1;
-		main.addLink = undefined;
+		const id = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === id);
+
+		if (!session) {
+			res.status(404).send({
+				message: 'Session not found',
+			});
+			return;
+		}
+
+		session.phase = 1;
+		session.addLink = undefined;
 
 		require('../socket').aggregateNotes();
 
@@ -147,31 +159,10 @@ module.exports = {
 
 	checkAddPage: (req, res) => {
 		const id = req.body.id;
+		const sessionId = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === sessionId);
 
-		if (!main.id) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
-
-		res.json({
-			status: id === main.addLink,
-		});
-	},
-
-	findMatchingSession: (req, res) => {
-		if (!main.id) {
-			res.status(423).send({
-				message: 'This action is now locked',
-			});
-			return;
-		}
-
-		const seed = req.cookies.seed;
-		const id = generateId(seed);
-
-		if (main.id !== id) {
+		if (!session) {
 			res.status(404).send({
 				message: 'Session not found',
 			});
@@ -179,7 +170,30 @@ module.exports = {
 		}
 
 		res.json({
-			id: main.id,
+			status: id === session.addLink,
+		});
+	},
+
+	findMatchingSession: (req, res) => {
+		const id = generateId(req.cookies.seed);
+		const session = sessions.find((s) => s.id === id);
+
+		if (!session) {
+			res.status(404).send({
+				message: 'Session not found',
+			});
+			return;
+		}
+
+		if (!session) {
+			res.status(404).send({
+				message: 'Session not found',
+			});
+			return;
+		}
+
+		res.json({
+			id: session.id,
 		});
 	},
 };

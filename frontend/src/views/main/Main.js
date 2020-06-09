@@ -49,7 +49,7 @@ const Main = ({ history }) => {
         const millis = moment.duration(expirationTimestamp * 1000 - Date.now()).asMilliseconds();
         setTime(moment.utc(millis).format('HH:mm:ss'));
         if (millis <= 0) {
-            await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
+            await fetch(`${process.env.REACT_APP_URL}/api/session/end`, { method: 'POST', credentials: 'include' });
             history.push('/?reasonCode=1');
         }
     }, [expirationTimestamp, history, setTime]);
@@ -92,7 +92,7 @@ const Main = ({ history }) => {
     const nextPhase = async (agreed) => {
         if (phase === 1) {
             if (agreed) {
-                await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { method: 'POST', credentials: 'include' });
+                await fetch(`${process.env.REACT_APP_URL}/api/session/end`, { method: 'POST', credentials: 'include' });
                 history.push('/?reasonCode=1');
             } else {
                 setEndSessionModal({});
@@ -101,7 +101,7 @@ const Main = ({ history }) => {
             if (rooms.length <= 1 || rooms.some((room) => !room.ready)) {
                 return;
             }
-            await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, { method: 'POST', credentials: 'include' });
+            await fetch(`${process.env.REACT_APP_URL}/api/session/aggregate`, { method: 'POST', credentials: 'include' });
             getRooms();
             setPhase(1);
             postNotification({
@@ -159,14 +159,14 @@ const Main = ({ history }) => {
 
     useEffect(() => {
         const prepareMainPage = async () => {
-            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
+            let mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/session`, { credentials: 'include' })).json();
             if (mainPage.id !== id) {
                 history.push('/?reasonCode=3');
                 return;
             }
             if (!mainPage.locked) {
-                await fetch(`${process.env.REACT_APP_URL}/api/main`, { method: 'PATCH', credentials: 'include' });
-                mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
+                await fetch(`${process.env.REACT_APP_URL}/api/session`, { method: 'PATCH', credentials: 'include' });
+                mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/session`, { credentials: 'include' })).json();
             }
             getRooms();
             setAddLink(mainPage.addLink);

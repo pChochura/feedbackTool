@@ -51,17 +51,13 @@ const Root = ({ history, location }) => {
         
         const seed = Math.random().toString(36).slice(2);
         setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
-        fetch(`${process.env.REACT_APP_URL}/api/main`, {
+        fetch(`${process.env.REACT_APP_URL}/api/session`, {
             method: 'POST',
-            body: JSON.stringify({
-                seed,
-            }),
+            body: JSON.stringify({ seed }),
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-        }).then((res) => {
-            return res.json();
-        }).then((json) => {
-            history.push(`/${json.id}`);
+        }).then(async (data) => {
+            history.push(`/${(await data.json()).id}`);
         }).catch(() => {
             postNotification({
                 title: 'Error',
@@ -104,14 +100,14 @@ const Root = ({ history, location }) => {
 
     useEffect(() => {
         const getData = async () => {
-            const mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/main`, { credentials: 'include' })).json();
+            const mainPage = await (await fetch(`${process.env.REACT_APP_URL}/api/session`, { credentials: 'include' })).json();
 
             if (mainPage.locked) {
                 setLocked(true);
                 setDate(moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss'));
 
                 const matchingRoom = await (await fetch(`${process.env.REACT_APP_URL}/api/rooms/find`, { credentials: 'include' })).json();
-                const matchingSession = await (await fetch(`${process.env.REACT_APP_URL}/api/main/find`, { credentials: 'include' })).json();
+                const matchingSession = await (await fetch(`${process.env.REACT_APP_URL}/api/session/find`, { credentials: 'include' })).json();
                 if (matchingRoom.id || matchingSession.id) {
                     setMatching({
                         room: matchingRoom.id ? { id: matchingRoom.id } : undefined,

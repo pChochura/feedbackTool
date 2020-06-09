@@ -37,18 +37,18 @@ app.patch('/api/rooms/:id/submitNote', API.userAuth, API.submitNoteToRoom);
 app.patch('/api/rooms/:id/removeNote', API.userAuth, API.removeNoteFromRoom);
 
 // Create session (all)
-app.post('/api/main', API.createMainPage);
+app.post('/api/session', API.createSession);
 // Lock session (only admin)
-app.patch('/api/main', API.adminAuth, API.lockMainPage);
-// Return session (only admin)
-app.get('/api/main', API.adminAuthSoft, API.getMainPage);
+app.patch('/api/session', API.adminAuth, API.lockSession);
+// Return session (all restricted / only admin)
+app.get('/api/session', API.adminAuthSoft, API.getSession);
 // End session (only admin)
-app.post('/api/main/end', API.adminAuth, API.endSession);
+app.post('/api/session/end', API.adminAuth, API.endSession);
 // Aggregate all notes (only admin)
-app.post('/api/main/aggregate', API.adminAuth, API.aggregateNotes);
+app.post('/api/session/aggregate', API.adminAuth, API.aggregateNotes);
 // Check if the given id is from add link (all)
 app.post('/api/checkAdd', API.checkAddPage);
 // Check if the session based on the given seed exists (all)
-app.get('/api/main/find', API.findMatchingSession);
+app.get('/api/session/find', API.findMatchingSession);
 
 server.listen(process.env.PORT);
