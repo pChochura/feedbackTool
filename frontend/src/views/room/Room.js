@@ -225,18 +225,24 @@ const Room = ({ history }) => {
     const exportAs = (mode) => {
         switch (mode) {
             case 1:
-                html2canvas(ownNotesRef.current, { backgroundColor: '#EFEFEF', width: 702, x: 100 }).then((canvas) => {
+                html2canvas(ownNotesRef.current, { backgroundColor: '#EFEFEF' }).then((canvas) => {
                     saveAs(canvas.toDataURL('image/jpeg', 1.0), 'Your notes.jpeg', 'image/jpeg');
                 });
                 break;
             case 2:
-                const notes = room.lists[0].notes.reduce((acc, note) => {
-                    if (note.rate === 1) {
-                        acc.good.push(note.note);
-                    } else {
-                        acc.bad.push(note.note);
-                    }
-                    return acc;
+                const notes = room.lists.reduce((notes, list) => {
+                    const result = list.notes.reduce((acc, note) => {
+                        console.log(note);
+                        if (note.rate === 1) {
+                            acc.good.push(note.note);
+                        } else {
+                            acc.bad.push(note.note);
+                        }
+                        return acc;
+                    }, { good: [], bad: [] });
+                    notes.good.push(...result.good);
+                    notes.bad.push(...result.bad);
+                    return notes;
                 }, { good: [], bad: [] });
                 const maxLength = Math.max(notes.good.length, notes.bad.length);
                 const data = [['           Positive', '           Negative']];
@@ -317,7 +323,7 @@ const Room = ({ history }) => {
                         {list.notes.map((note) =>
                             <StyledListNote key={note.id} editing={(lists[list.id] || {}).editedNoteId === note.id}>
                                 <StyledNoteIndicator positive={note.rate === 1} editing={(lists[list.id] || {}).editedNoteId === note.id} />
-                                <StyledAddNoteInput readOnly value={note.note}/>
+                                <StyledAddNoteInput readOnly value={note.note} />
                                 {!room.ready && (lists[list.id] || {}).editedNoteId !== note.id &&
                                     <StyledOptionsIcon src={optionsIcon} onClick={(e) => {
                                         e.stopPropagation();

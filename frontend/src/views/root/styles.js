@@ -9,7 +9,7 @@ export const StyledWrapper = styled.div`
 
 export const LandingWrapper = styled.div`
     box-sizing: border-box;
-    height: calc(100% - 100px);
+    min-height: calc(100% - 100px);
     width: 100%;
     display: flex;
     padding: 50px 10px;
@@ -18,8 +18,6 @@ export const LandingWrapper = styled.div`
     align-content: center;
     align-items: center;
     flex: none;
-    margin-top: 5%;
-    margin-bottom: 100px;
 
     @media(min-width: 900px) {
         padding: 0 100px;
@@ -34,6 +32,7 @@ export const LandingLeft = styled.div`
     line-height: 3rem;
     text-align: center;
     margin-top: 50px;
+    flex: none;
 
     @media(min-width: 900px) {
         text-align: left;
@@ -43,6 +42,7 @@ export const LandingLeft = styled.div`
 export const StyledImg = styled.img`
     width: 50%;
     align-self: center;
+    flex: none;
 
     @media(min-width: 900px) {
         max-width: 40%;

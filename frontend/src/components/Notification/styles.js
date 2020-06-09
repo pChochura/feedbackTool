@@ -88,12 +88,22 @@ export const StyledTitle = styled.p`
     display: inline-block;
     margin-block-end: 0;
     margin-block-start: 0;
-    font-size: 1.2rem;
+    font-size: 0.9em;
     justify-self: center;
     margin-left: 5px;
     font-weight: 600;
+    margin: auto 5px;
+    
+    @media(min-width: 900px) {
+        font-size: 1.2rem;
+    }
 `;
 
 export const StyledDescription = styled.p`
     font-weight: 300;
+    font-size: 0.8rem;
+    
+    @media(min-width: 900px) {
+        font-size: 1rem;
+    }
 `;
