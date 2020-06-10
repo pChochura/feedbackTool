@@ -75,3 +75,9 @@ export const ButtonWrapper = styled.div`
         flex-direction: row;
     }
 `;
+
+export const StyledLink = styled.a`
+    color: #3750DB;
+    font-weight: 400;
+    cursor: pointer;
+`;
