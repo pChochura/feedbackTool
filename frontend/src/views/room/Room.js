@@ -34,7 +34,7 @@ import socketIOClient from 'socket.io-client';
 import Button from '../../components/Button/Button';
 import Modal from '../../components/Modal/Modal';
 import html2canvas from 'html2canvas';
-import { table } from 'table';
+import { table, getBorderCharacters } from 'table';
 import { ModalButtonsWrapper } from '../main/styles';
 
 const Room = ({ history }) => {
@@ -225,14 +225,21 @@ const Room = ({ history }) => {
     const exportAs = (mode) => {
         switch (mode) {
             case 1:
-                html2canvas(ownNotesRef.current, { backgroundColor: '#EFEFEF' }).then((canvas) => {
+                ownNotesRef.current.style.width = 'auto';
+                ownNotesRef.current.style.maxWidth = 'unset';
+                html2canvas(ownNotesRef.current, { backgroundColor: '#EFEFEF', width: ownNotesRef.current.offsetWidth, onclone: (document) => {
+                    document.querySelectorAll('textarea').forEach((textarea) => {
+                        textarea.outerHTML = '<div>' + textarea.value.replace(/\n/g, '<br/>') + '<div/>';
+                    })
+                }}).then((canvas) => {
+                    ownNotesRef.current.style.width = 'unset';
+                    ownNotesRef.current.style.maxWidth = '100%';
                     saveAs(canvas.toDataURL('image/jpeg', 1.0), 'Your notes.jpeg', 'image/jpeg');
                 });
                 break;
             case 2:
                 const notes = room.lists.reduce((notes, list) => {
                     const result = list.notes.reduce((acc, note) => {
-                        console.log(note);
                         if (note.rate === 1) {
                             acc.good.push(note.note);
                         } else {
@@ -250,6 +257,7 @@ const Room = ({ history }) => {
                     data.push([notes.good[i], notes.bad[i]]);
                 }
                 const result = table(data, {
+                    border: getBorderCharacters('ramac'),
                     columnDefault: {
                         width: 30,
                     },

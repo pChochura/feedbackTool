@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import socketIOClient from "socket.io-client";
 import { useCookies } from 'react-cookie';
-import { StyledWrapper, LandingWrapper, LandingLeft, StyledImg, StyledParagraph, ButtonWrapper } from './styles';
+import { StyledWrapper, LandingWrapper, LandingLeft, StyledImg, StyledParagraph, ButtonWrapper, StyledLink } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import landing from '../../assets/images/landing.svg';
 import Button from '../../components/Button/Button';
@@ -31,7 +31,7 @@ const Root = ({ history, location }) => {
     };
 
     const requeueNotification = () => {
-        setNotifications((n) => { 
+        setNotifications((n) => {
             n.shift();
             return notifications;
         });
@@ -48,7 +48,7 @@ const Root = ({ history, location }) => {
             history.push(`/room/${matching.room.id}`);
             return;
         }
-        
+
         const seed = Math.random().toString(36).slice(2);
         setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
         fetch(`${process.env.REACT_APP_URL}/api/main`, {
@@ -69,6 +69,20 @@ const Root = ({ history, location }) => {
             });
         });
     };
+
+    const cancelSession = async () => {
+        if (!matching.session) {
+            postNotification({
+                title: 'Error',
+                description: 'We encountered some problems while canceling the session.',
+            });
+            return;
+        }
+
+        await fetch(`${process.env.REACT_APP_URL}/api/main/end`, { credentials: 'include', method: 'POST' });
+        setMatching({});
+        history.push('/?reasonCode=1');
+    }
 
     useEffect(() => {
         const reasonCode = queryParser.parse(location.search).reasonCode;
@@ -153,11 +167,12 @@ const Root = ({ history, location }) => {
                     <StyledParagraph>Share your thoughts with your team <b>anonymously</b></StyledParagraph>
                     <ButtonWrapper>
                         <Button onClick={() => startSession()} disabled={locked && !matching.session && !matching.room}>{matching.session || matching.room ? 'Continue' : 'Start'}</Button>
-                        {locked &&
-                            <StyledParagraph>{
-                                matching.session ? 'You have an opened session' : (matching.room ? 'You have a room' : `Locked up to ${date}`)
-                            }</StyledParagraph>
-                        }
+                        {locked && (
+                            matching.session ?
+                            <StyledParagraph>Or <StyledLink onClick={() => cancelSession()}>cancel</StyledLink> the session</StyledParagraph>
+                            :
+                            <StyledParagraph>{matching.room ? 'You have a room' : `Locked up to ${date}`}</StyledParagraph>
+                        )}
                     </ButtonWrapper>
                 </LandingLeft>
                 <StyledImg src={landing} />
