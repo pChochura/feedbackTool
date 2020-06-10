@@ -52,26 +52,35 @@ export const StyledCard = styled.div`
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 75px 25px;
+	padding: 25px;
 
 	@media (min-width: 900px) {
 		width: 50%;
+		padding: 75px 25px;
 	}
 `;
 
 export const StyledTitle = styled.p`
-	font-size: 1.75rem;
+	font-size: 1.2rem;
 	font-weight: 500;
 	margin-block-end: 0;
 	margin-block-start: 0;
 	text-align: center;
+
+	@media (min-width: 900px) {
+		font-size: 1.75rem;
+	}
 `;
 
 export const StyledParagraph = styled.p`
-	font-size: 1rem;
+	font-size: 0.8rem;
 	color: #ababab;
 	font-weight: 300;
 	text-align: center;
+
+	@media (min-width: 900px) {
+		font-size: 1rem;
+	}
 `;
 
 export const StyledBox = styled.div`

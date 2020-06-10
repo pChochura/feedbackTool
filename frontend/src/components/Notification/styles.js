@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 const enterAnimation = (wide) =>
 	wide
@@ -85,13 +85,40 @@ export const StyledNotification = styled.div`
 
 export const TitleWrapper = styled.div`
 	display: flex;
-	justify-contnet: center;
+	width: 100%;
+`;
+
+export const StyledAction = styled.a`
+	color: #3750db;
+	font-weight: 400;
+	cursor: pointer;
+`;
+
+export const StyledIcon = styled.img`
+	width: 24px;
+	height: 24px;
+	color: #ff0000;
 `;
 
 export const StyledImg = styled.img`
 	width: 24px;
 	height: 24px;
-	color: #ff0000;
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	border-radius: 50%;
+	padding: 5px;
+	background-color: ${({ background }) => background || 'unset'};
+	transition: 0.5s background-color;
+
+	${({ clickable }) =>
+		clickable &&
+		css`
+			&:hover {
+				background-color: #efefef;
+				cursor: pointer;
+			}
+		`}
 `;
 
 export const StyledTitle = styled.p`
