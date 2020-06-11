@@ -291,7 +291,7 @@ const Root = ({ history, location }) => {
 							}}
 						/>
 						<FeedbackSendButtonWrapper>
-							<Button disabled={feedbackSent} onClick={() => sendFeedback()}>Send</Button>
+							<Button disabled={feedbackSent} loading={feedbackSent} onClick={() => sendFeedback()}>Send</Button>
 						</FeedbackSendButtonWrapper>
 					</Modal>
 				)}

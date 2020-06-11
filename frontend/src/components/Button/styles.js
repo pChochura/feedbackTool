@@ -1,4 +1,13 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+
+const rotation = keyframes`
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+`;
 
 export const StyledButton = styled.button`
 	background: ${({ secondary }) => (secondary ? '#ffffff' : '#3750DB')};
@@ -11,6 +20,7 @@ export const StyledButton = styled.button`
 	font-size: ${({ small }) => (small ? '0.8rem' : '1.1rem')};
 	font-weight: ${({ secondary }) => (secondary ? '300' : '400')};
 	transition: 0.5s all;
+
 	${({ disabled }) =>
 		disabled
 			? css`
@@ -28,4 +38,19 @@ export const StyledButton = styled.button`
 				cursor: not-allowed;
 			`}
 	}
+`;
+
+export const StyledButtonText = styled.p`
+	margin-block-start: 0;
+	margin-block-end: 0;
+	${({ loading }) => loading && css`
+		animation-name: ${rotation};
+		animation-duration: 0.5s;
+		animation-timing-function: ease;
+		animation-delay: 0s;
+		animation-iteration-count: infinite;
+		animation-direction: normal;
+		animation-fill-mode: forwards;
+		animation-play-state: running;
+	`}
 `;
