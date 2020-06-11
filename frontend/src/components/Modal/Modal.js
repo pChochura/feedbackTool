@@ -9,10 +9,7 @@ import {
 import { StyledImg } from '../PersonCard/styles';
 import closeIcon from '../../assets/images/close.svg';
 import copyIcon from '../../assets/images/copy.svg';
-import successIcon from '../../assets/images/success.svg';
-import warningIcon from '../../assets/images/warning.svg';
-import Notification from '../Notification/Notification';
-import { useForceUpdate } from '../hooks';
+import NotificationSystem from '../NotificationSystem/NotificationSystem';
 
 const Modal = ({
 	title = 'Invite someone to your team!',
@@ -22,9 +19,8 @@ const Modal = ({
 	link,
 	isExiting,
 }) => {
+	const [notificationSystem, setNotificationSystem] = useState();
 	const [exit, setExit] = useState(isExiting);
-	const [notifications, setNotifications] = useState([]);
-	const render = useForceUpdate();
 
 	const copyLink = () => {
 		const dummyElement = document.createElement('input');
@@ -34,36 +30,18 @@ const Modal = ({
 		const successful = document.execCommand('copy');
 		document.body.removeChild(dummyElement);
 		if (successful) {
-			postNotification({
+			notificationSystem.postNotification({
 				title: 'Success!',
 				description: 'The link has been copied to the clipboard.',
 				success: true,
 			});
 		} else {
-			postNotification({
+			notificationSystem.postNotification({
 				title: 'Error!',
 				description:
 					"We couldn't copy the link to the clipboard. Try again later.",
 			});
 		}
-	};
-
-	const postNotification = (_notification) => {
-		setNotifications((n) => [
-			...n,
-			{
-				..._notification,
-				id: Math.random(),
-			},
-		]);
-	};
-
-	const requeueNotification = () => {
-		setNotifications((n) => {
-			n.shift();
-			return notifications;
-		});
-		render();
 	};
 
 	useEffect(() => {
@@ -97,19 +75,7 @@ const Modal = ({
 					</StyledBox>
 				)}
 			</StyledCard>
-			{notifications &&
-				notifications
-					.slice(0, 3)
-					.map((notification, index) => (
-						<Notification
-							key={notification.id}
-							icon={notification.success ? successIcon : warningIcon}
-							index={Math.min(notifications.length, 3) - index - 1}
-							title={notification.title}
-							description={notification.description}
-							callback={() => requeueNotification()}
-						/>
-					))}
+			<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 		</StyledWrapper>
 	);
 };
