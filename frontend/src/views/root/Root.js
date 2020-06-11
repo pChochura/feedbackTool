@@ -21,10 +21,10 @@ import Button from '../../components/Button/Button';
 import queryParser from 'query-string';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
 import Modal from '../../components/Modal/Modal';
-import * as emailjs from 'emailjs-com';
 
 const Root = ({ history, location }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
+	const [feedbackSent, setFeedbackSent] = useState(false);
 	const [feedbackModal, setFeedbackModal] = useState();
 	const [matching, setMatching] = useState({});
 	const [locked, setLocked] = useState(false);
@@ -97,34 +97,28 @@ const Root = ({ history, location }) => {
 			return;
 		}
 
+		setFeedbackSent(true);
+
 		notificationSystem.postNotification({
 			title: 'Success',
 			description: 'Thank your for your feedback!',
 			success: true,
 		});
 
-		const result = await emailjs.send(
-			'gmail',
-			'template_LLgYyXYg',
-			{
-				message_html: feedback,
-				from_name: email || 'anonymous@ft.tech',
-				to_name: process.env.REACT_APP_EMAIL,
-				subject: "Feedback - FeedbackTool",
-			},
-			'user_lVldiioPeWMRIBMou8hCP'
-		);
-
-		if (result.status !== 200) {
-			notificationSystem.postNotification({
-				title: 'Error',
-				description: 'We encountered some problems while sending a feedback.',
-			});
-
-			return;
-		}
+		await fetch(`${process.env.REACT_APP_URL}/api/feedback`, {
+			method: 'POST',
+			credentials: 'include',
+			body: JSON.stringify({
+				from: email,
+				content: feedback,
+			}),
+			headers: { 'Content-Type': 'application/json' },
+		});
 
 		setFeedbackModal({ exit: true });
+		setFeedbackSent();
+		setEmail();
+		setFeedback()
 	};
 
 	useEffect(() => {
@@ -277,6 +271,7 @@ const Root = ({ history, location }) => {
 						<StyledLabel>Your feedback<b>*</b></StyledLabel>
 						<StyledInput
 							minRows={5}
+							maxRows={5}
 							autoFocus
 							onChange={(e) => setFeedback(e.target.value)}
 							value={feedback}
@@ -296,7 +291,7 @@ const Root = ({ history, location }) => {
 							}}
 						/>
 						<FeedbackSendButtonWrapper>
-							<Button onClick={() => sendFeedback()}>Send</Button>
+							<Button disabled={feedbackSent} onClick={() => sendFeedback()}>Send</Button>
 						</FeedbackSendButtonWrapper>
 					</Modal>
 				)}
