@@ -50,5 +50,7 @@ app.post('/api/main/aggregate', API.adminAuth, API.aggregateNotes);
 app.post('/api/checkAdd', API.checkAddPage);
 // Check if the session based on the given seed exists (all)
 app.get('/api/main/find', API.findMatchingSession);
+// Sends email with a feedback (all)
+app.post('/api/feedback', API.sendEmail);
 
 server.listen(process.env.PORT);

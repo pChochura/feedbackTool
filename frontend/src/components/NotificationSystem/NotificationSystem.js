@@ -27,9 +27,12 @@ export default class NotificationSystem extends Component {
         });
     };
 
-    requeueNotification = () => {
-        this.state.notifications.shift();
-        this.forceUpdate();
+    requeueNotification = (id) => {
+        const notificationIndex = this.state.notifications.findIndex((notification) => notification.id === id);
+        if (notificationIndex !== -1) {
+            this.state.notifications.splice(notificationIndex, 1);
+            this.forceUpdate();
+        }
     };
 
     render() {
@@ -38,12 +41,20 @@ export default class NotificationSystem extends Component {
                 .slice(0, this.props.maxNotificationsCount)
                 .map((notification, index) =>
                     <Notification
+                        id={notification.id}
                         key={notification.id}
                         icon={notification.success ? successIcon : warningIcon}
                         index={Math.min(this.state.notifications.length, this.props.maxNotificationsCount) - index - 1}
                         title={notification.title}
                         description={notification.description}
-                        callback={() => this.requeueNotification()}
+                        action={notification.action}
+                        callback={(id, actionClicked) => {
+                            if (actionClicked) {
+                                notification.callback && notification.callback();
+                            } else {
+                                this.requeueNotification(id);
+                            }
+                        }}
                     />
                 )}
         </>;

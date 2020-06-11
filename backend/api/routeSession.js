@@ -1,4 +1,5 @@
-const { generateId } = require('./utils');
+const nodemailer = require('nodemailer');
+const { generateId, composeEmail } = require('./utils');
 const { main, rooms } = require('./data');
 
 module.exports = {
@@ -182,4 +183,36 @@ module.exports = {
 			id: main.id,
 		});
 	},
+
+	sendEmail: async (req, res) => {
+		const { from, content } = req.body;
+
+		if (!content) {
+			res.status(400).send({
+				message: 'You have to pass a content of the email to send feedback',
+			});
+			return;
+		}
+
+		const transporter = nodemailer.createTransport({
+			host: process.env.SMTP_HOST,
+			port: process.env.SMTP_PORT,
+			auth: {
+				user: process.env.SMTP_USER,
+				pass: process.env.SMTP_PASS,
+			},
+		});
+
+		const info = await transporter.sendMail({
+			from: from || 'anonymous@ft.tech',
+			to: process.env.EMAIL,
+			subject: `Feedback - FeedbackTool from ${from || 'anonymous@ft.tech'}`,
+			text: content,
+			html: composeEmail(from || 'anonymous@ft.tech', content),
+		});
+
+		res.status(200).json({
+			status: 'OK',
+		});
+	}
 };

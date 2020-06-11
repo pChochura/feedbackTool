@@ -53,7 +53,7 @@ export const StyledListTitle = styled.p`
     margin-block-start: 0;
     margin-block-end: 0;
     font-weight: 400;
-    font-size 1.2rem;
+    font-size: 1.2rem;
     width: 100%;
     text-align: center;
     padding: 10px;
@@ -179,7 +179,7 @@ export const StyledAddNoteInput = styled(TextareaAutosize)`
 	font-weight: 300;
 	font-family: 'Montserrat';
 
-	&:placeholder {
+	&::placeholder {
 		color: #ababab;
 	}
 `;
