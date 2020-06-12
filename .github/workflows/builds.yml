@@ -16,10 +16,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install dependencies (frontend)
-      run: cd frontend && npm install
+      run: cd frontend && npm run install
     - name: Run format check (frontend)
-      run: cd frontend && npm format:check
+      run: cd frontend && npm run format:check
     - name: Install dependencies (backend)
-      run: cd backend && npm install
+      run: cd backend && npm run install
     - name: Run format check (backend)
-      run: cd backend && npm format:check
+      run: cd backend && npm run format:check
