@@ -1,5 +1,5 @@
 const cookieParser = require('cookie-parser');
-const socket = require("socket.io");
+const socket = require('socket.io');
 const express = require('express');
 const API = require('./api');
 const cors = require('cors');
@@ -10,10 +10,12 @@ const server = require('http').createServer(app);
 const io = socket(server);
 socket.io = io;
 
-app.use(cors({
-    credentials: true,
-    origin: process.env.CLIENT_URL,
-}));
+app.use(
+	cors({
+		credentials: true,
+		origin: process.env.CLIENT_URL,
+	})
+);
 app.use(express.json());
 app.use(cookieParser());
 

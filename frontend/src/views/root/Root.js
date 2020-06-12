@@ -118,7 +118,7 @@ const Root = ({ history, location }) => {
 		setFeedbackModal({ exit: true });
 		setFeedbackSent();
 		setEmail();
-		setFeedback()
+		setFeedback();
 	};
 
 	useEffect(() => {
@@ -131,7 +131,8 @@ const Root = ({ history, location }) => {
 			case '1':
 				notificationSystem.postNotification({
 					title: 'Error',
-					description: "Your session has ended. Now we ask you to tell us how can we ",
+					description:
+						'Your session has ended. Now we ask you to tell us how can we ',
 					action: 'improve',
 					callback: () => setFeedbackModal(true),
 				});
@@ -189,11 +190,13 @@ const Root = ({ history, location }) => {
 							? { id: matchingSession.id }
 							: undefined,
 					});
-					notificationSystem.postNotification({
-						title: 'Success',
-						description: 'We found an opened session or room waiting for you!',
-						success: true,
-					});
+					notificationSystem &&
+						notificationSystem.postNotification({
+							title: 'Success',
+							description:
+								'We found an opened session or room waiting for you!',
+							success: true,
+						});
 				}
 			}
 		};
@@ -252,10 +255,10 @@ const Root = ({ history, location }) => {
 									the session
 								</StyledParagraph>
 							) : (
-									<StyledParagraph>
-										{matching.room ? 'You have a room' : `Locked up to ${date}`}
-									</StyledParagraph>
-								))}
+								<StyledParagraph>
+									{matching.room ? 'You have a room' : `Locked up to ${date}`}
+								</StyledParagraph>
+							))}
 					</ButtonWrapper>
 				</LandingLeft>
 				<StyledImg src={landing} />
@@ -264,11 +267,15 @@ const Root = ({ history, location }) => {
 						title="How can we improve?"
 						description="Please describe things you liked and disliked about FeedbackTool."
 						onDismissCallback={() => setFeedbackModal()}
-						isExiting={(feedbackModal || {}).exit}>
+						isExiting={(feedbackModal || {}).exit}
+					>
 						<FeedbackDescription>
-							If you want to hear about improvements you suggested, please give us a way to contact you.
+							If you want to hear about improvements you suggested, please give
+							us a way to contact you.
 						</FeedbackDescription>
-						<StyledLabel>Your feedback<b>*</b></StyledLabel>
+						<StyledLabel>
+							Your feedback<b>*</b>
+						</StyledLabel>
 						<StyledInput
 							minRows={5}
 							maxRows={5}
@@ -291,7 +298,13 @@ const Root = ({ history, location }) => {
 							}}
 						/>
 						<FeedbackSendButtonWrapper>
-							<Button disabled={feedbackSent} loading={feedbackSent} onClick={() => sendFeedback()}>Send</Button>
+							<Button
+								disabled={feedbackSent}
+								loading={feedbackSent}
+								onClick={() => sendFeedback()}
+							>
+								Send
+							</Button>
 						</FeedbackSendButtonWrapper>
 					</Modal>
 				)}

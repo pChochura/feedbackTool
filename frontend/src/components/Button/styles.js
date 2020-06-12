@@ -43,14 +43,16 @@ export const StyledButton = styled.button`
 export const StyledButtonText = styled.p`
 	margin-block-start: 0;
 	margin-block-end: 0;
-	${({ loading }) => loading && css`
-		animation-name: ${rotation};
-		animation-duration: 0.5s;
-		animation-timing-function: ease;
-		animation-delay: 0s;
-		animation-iteration-count: infinite;
-		animation-direction: normal;
-		animation-fill-mode: forwards;
-		animation-play-state: running;
-	`}
+	${({ loading }) =>
+		loading === 'true' &&
+		css`
+			animation-name: ${rotation};
+			animation-duration: 0.5s;
+			animation-timing-function: ease;
+			animation-delay: 0s;
+			animation-iteration-count: infinite;
+			animation-direction: normal;
+			animation-fill-mode: forwards;
+			animation-play-state: running;
+		`}
 `;

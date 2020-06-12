@@ -7,8 +7,9 @@ const Button = ({ children, onClick, disabled, small, secondary, loading }) => {
 			secondary={secondary}
 			onClick={onClick}
 			disabled={disabled}
-			small={small}>
-			<StyledButtonText loading={loading}>
+			small={small}
+		>
+			<StyledButtonText loading={loading ? 'true' : 'false'}>
 				{loading ? '◓' : children}
 			</StyledButtonText>
 		</StyledButton>

@@ -9,7 +9,9 @@ module.exports = {
 	},
 
 	composeEmail: (from, content) => {
-		const emailTemplate = fs.readFileSync('./public/mailTemplate.html').toLocaleString();
+		const emailTemplate = fs
+			.readFileSync('./public/mailTemplate.html')
+			.toLocaleString();
 		return mustache.render(emailTemplate, {
 			from,
 			content,
