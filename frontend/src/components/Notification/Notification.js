@@ -39,22 +39,31 @@ const Notification = ({
 			exit={exit}
 			index={index}
 			offset={window.pageYOffset}
-			onAnimationEnd={() => exit && callback && callback(id)}>
+			onAnimationEnd={() => exit && callback && callback(id)}
+		>
 			<TitleWrapper>
 				<StyledIcon src={icon || warningIcon} />
 				<StyledTitle>{title}</StyledTitle>
-				{action &&
-					<StyledImg clickable={true} src={closeIcon} onClick={() => setExit(true)} />
-				}
+				{action && (
+					<StyledImg
+						clickable={true}
+						src={closeIcon}
+						onClick={() => setExit(true)}
+					/>
+				)}
 			</TitleWrapper>
 			<StyledDescription ref={descriptionRef}>
 				{description}
-				{action &&
-					<StyledAction onClick={() => {
-						setExit(true);
-						callback && callback(id, true);
-					}}>{action}</StyledAction>
-				}
+				{action && (
+					<StyledAction
+						onClick={() => {
+							setExit(true);
+							callback && callback(id, true);
+						}}
+					>
+						{action}
+					</StyledAction>
+				)}
 			</StyledDescription>
 		</StyledNotification>
 	);

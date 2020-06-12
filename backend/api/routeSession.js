@@ -112,7 +112,11 @@ module.exports = {
 						name: 'Positive',
 						notes: rooms.reduce((acc2, room2, index2) => {
 							if (index !== index2) {
-								acc2.push(...room2.lists.find((list) => list.id === room.id).notes.filter((note) => note.rate === 1));
+								acc2.push(
+									...room2.lists
+										.find((list) => list.id === room.id)
+										.notes.filter((note) => note.rate === 1)
+								);
 							}
 							return acc2;
 						}, []),
@@ -122,7 +126,11 @@ module.exports = {
 						name: 'Negative',
 						notes: rooms.reduce((acc2, room2, index2) => {
 							if (index !== index2) {
-								acc2.push(...room2.lists.find((list) => list.id === room.id).notes.filter((note) => note.rate === -1));
+								acc2.push(
+									...room2.lists
+										.find((list) => list.id === room.id)
+										.notes.filter((note) => note.rate === -1)
+								);
 							}
 							return acc2;
 						}, []),
@@ -214,5 +222,5 @@ module.exports = {
 		res.status(200).json({
 			status: 'OK',
 		});
-	}
+	},
 };

@@ -84,7 +84,7 @@ export const StyledLink = styled.a`
 `;
 
 export const FeedbackDescription = styled.p`
-	color: #ABABAB;
+	color: #ababab;
 	font-weight: 300;
 	text-align: center;
 	font-size: 0.8rem;
@@ -102,7 +102,7 @@ export const StyledLabel = styled.label`
 	align-self: flex-start;
 
 	b {
-		color: #FF5453;
+		color: #ff5453;
 	}
 
 	@media (min-width: 900px) {

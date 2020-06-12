@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyledButton } from './styles';
+import { StyledButton, StyledButtonText } from './styles';
 
-const Button = ({ children, onClick, disabled, small, secondary }) => {
+const Button = ({ children, onClick, disabled, small, secondary, loading }) => {
 	return (
 		<StyledButton
 			secondary={secondary}
@@ -9,7 +9,9 @@ const Button = ({ children, onClick, disabled, small, secondary }) => {
 			disabled={disabled}
 			small={small}
 		>
-			{children}
+			<StyledButtonText loading={loading ? 'true' : 'false'}>
+				{loading ? '◓' : children}
+			</StyledButtonText>
 		</StyledButton>
 	);
 };

@@ -47,7 +47,7 @@ const exitAnimation = (wide) =>
 `;
 
 export const StyledNotification = styled.div`
-	position: absolute;
+	position: fixed;
 	right: 5px;
 	max-width: 300px;
 	width: 90%;

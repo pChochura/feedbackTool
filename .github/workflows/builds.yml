@@ -1,0 +1,25 @@
+name: Builds
+
+on:
+  pull_request:
+    branches: [ master ]
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [12.x]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install dependencies (frontend)
+      run: cd frontend && npm install
+    - name: Run format check (frontend)
+      run: cd frontend && npm run format:check
+    - name: Install dependencies (backend)
+      run: cd backend && npm install
+    - name: Run format check (backend)
+      run: cd backend && npm run format:check

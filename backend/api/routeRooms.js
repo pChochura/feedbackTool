@@ -12,7 +12,7 @@ module.exports = {
 					count: list.notes.length,
 				})),
 				ready: room.ready,
-			})),
+			}))
 		);
 	},
 

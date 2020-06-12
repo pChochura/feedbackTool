@@ -49,14 +49,14 @@ export const StyledList = styled.div`
 `;
 
 export const StyledListTitle = styled.p`
-    box-sizing: border-box;
-    margin-block-start: 0;
-    margin-block-end: 0;
-    font-weight: 400;
-    font-size: 1.2rem;
-    width: 100%;
-    text-align: center;
-    padding: 10px;
+	box-sizing: border-box;
+	margin-block-start: 0;
+	margin-block-end: 0;
+	font-weight: 400;
+	font-size: 1.2rem;
+	width: 100%;
+	text-align: center;
+	padding: 10px;
 `;
 
 const jiggleAnimation = keyframes`

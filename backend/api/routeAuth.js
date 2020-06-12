@@ -28,5 +28,5 @@ module.exports = {
 		req.adminAuth = main.id === generateId(req.cookies.seed);
 
 		next();
-	}
+	},
 };

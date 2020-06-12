@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"format": "prettier --write .",
-		"start": "nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"format:check": "prettier --check .",
+		"start": "nodemon index.js"
 	},
 	"repository": {
 		"type": "git",
@@ -38,9 +38,10 @@
 		"prettier": "^2.0.5"
 	},
 	"prettier": {
-		"trailingComma": "all",
-		"singleQuote": true,
+		"trailingComma": "es5",
 		"tabWidth": 2,
+		"semi": true,
+		"singleQuote": true,
 		"useTabs": true
 	}
 }
