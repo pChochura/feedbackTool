@@ -32,7 +32,7 @@ const Main = ({ history }) => {
 
 	const getRooms = useCallback(async () => {
 		const rooms = await (
-			await fetch(`${process.env.REACT_APP_URL}/api/rooms`, {
+			await fetch(`${process.env.REACT_APP_URL}/api/v1/rooms`, {
 				credentials: 'include',
 			})
 		).json();
@@ -63,7 +63,7 @@ const Main = ({ history }) => {
 			.asMilliseconds();
 		setTime(moment.utc(millis).format('HH:mm:ss'));
 		if (millis <= 0) {
-			await fetch(`${process.env.REACT_APP_URL}/api/main/end`, {
+			await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions/end`, {
 				method: 'POST',
 				credentials: 'include',
 			});
@@ -72,7 +72,7 @@ const Main = ({ history }) => {
 	}, [expirationTimestamp, history, setTime]);
 
 	const removeRoom = async (id) => {
-		fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, {
+		fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/${id}`, {
 			method: 'DELETE',
 			credentials: 'include',
 		})
@@ -94,9 +94,13 @@ const Main = ({ history }) => {
 	};
 
 	const markRoomAsNotReady = async (id) => {
-		fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}/notReady`, {
+		fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/${id}/ready`, {
 			method: 'PATCH',
 			credentials: 'include',
+			body: JSON.stringify({
+				ready: false,
+			}),
+			headers: { 'Content-Type': 'application/json' },
 		})
 			.then(() => {
 				getRooms();
@@ -118,7 +122,7 @@ const Main = ({ history }) => {
 	const nextPhase = async (agreed) => {
 		if (phase === 1) {
 			if (agreed) {
-				await fetch(`${process.env.REACT_APP_URL}/api/main/end`, {
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions/end`, {
 					method: 'POST',
 					credentials: 'include',
 				});
@@ -130,8 +134,8 @@ const Main = ({ history }) => {
 			if (rooms.length <= 1 || rooms.some((room) => !room.ready)) {
 				return;
 			}
-			await fetch(`${process.env.REACT_APP_URL}/api/main/aggregate`, {
-				method: 'POST',
+			await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions/aggregate`, {
+				method: 'PATCH',
 				credentials: 'include',
 			});
 			getRooms();
@@ -180,24 +184,13 @@ const Main = ({ history }) => {
 	useEffect(() => {
 		const prepareMainPage = async () => {
 			let mainPage = await (
-				await fetch(`${process.env.REACT_APP_URL}/api/main`, {
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 					credentials: 'include',
 				})
 			).json();
 			if (mainPage.id !== id) {
 				history.push('/?reasonCode=3');
 				return;
-			}
-			if (!mainPage.locked) {
-				await fetch(`${process.env.REACT_APP_URL}/api/main`, {
-					method: 'PATCH',
-					credentials: 'include',
-				});
-				mainPage = await (
-					await fetch(`${process.env.REACT_APP_URL}/api/main`, {
-						credentials: 'include',
-					})
-				).json();
 			}
 			getRooms();
 			setAddLink(mainPage.addLink);
@@ -211,7 +204,7 @@ const Main = ({ history }) => {
 	useEffect(() => {
 		const checkMatchingRoom = async () => {
 			const matchingRoom = await (
-				await fetch(`${process.env.REACT_APP_URL}/api/rooms/find`, {
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/find`, {
 					credentials: 'include',
 				})
 			).json();
@@ -230,32 +223,32 @@ const Main = ({ history }) => {
 		return () => clearTimeout(timerInterval);
 	}, [refreshTimer]);
 
-	useEffect(() => {
-		const io = socketIOClient(process.env.REACT_APP_URL);
-		io.on('roomJoined', (_) => {
-			getRooms();
-		});
+	// useEffect(() => {
+	// 	const io = socketIOClient(process.env.REACT_APP_URL);
+	// 	io.on('roomJoined', (_) => {
+	// 		getRooms();
+	// 	});
 
-		io.on('roomChanged', (data) => {
-			Object.assign(
-				rooms.find((room) => room.id === data.room.id) || {},
-				data.room
-			);
-			setMaxNotesCount((max) =>
-				Math.max(
-					max,
-					(data.room.lists || []).reduce(
-						(acc, list) => (acc = Math.max(acc, list.count)),
-						0
-					)
-				)
-			);
-			setRooms(rooms);
-			setShowedRooms(rooms);
-		});
+	// 	io.on('roomChanged', (data) => {
+	// 		Object.assign(
+	// 			rooms.find((room) => room.id === data.room.id) || {},
+	// 			data.room
+	// 		);
+	// 		setMaxNotesCount((max) =>
+	// 			Math.max(
+	// 				max,
+	// 				(data.room.lists || []).reduce(
+	// 					(acc, list) => (acc = Math.max(acc, list.count)),
+	// 					0
+	// 				)
+	// 			)
+	// 		);
+	// 		setRooms(rooms);
+	// 		setShowedRooms(rooms);
+	// 	});
 
-		return () => io.disconnect();
-	}, [rooms, getRooms, maxNotesCount]);
+	// 	return () => io.disconnect();
+	// }, [rooms, getRooms, maxNotesCount]);
 
 	return (
 		<StyledWrapper>

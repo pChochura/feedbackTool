@@ -48,7 +48,7 @@ const Room = ({ history }) => {
 
 	const getRoom = useCallback(async () => {
 		const room = await (
-			await fetch(`${process.env.REACT_APP_URL}/api/rooms/${id}`, {
+			await fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/${id}`, {
 				credentials: 'include',
 			})
 		).json();
@@ -61,8 +61,15 @@ const Room = ({ history }) => {
 
 	const markRoomAsReady = async () => {
 		const response = await fetch(
-			`${process.env.REACT_APP_URL}/api/rooms/${id}/ready`,
-			{ method: 'PATCH', credentials: 'include' }
+			`${process.env.REACT_APP_URL}/api/v1/rooms/${id}/ready`,
+			{
+				method: 'PATCH',
+				credentials: 'include',
+				body: JSON.stringify({
+					ready: true,
+				}),
+				headers: { 'Content-Type': 'application/json' },
+			}
 		);
 		if (response.status !== 200) {
 			notificationSystem.postNotification({
@@ -87,13 +94,12 @@ const Room = ({ history }) => {
 
 	const submitNote = async (listId, noteId) => {
 		const note = lists[listId].note;
-		const rate = lists[listId].negative ? -1 : 1;
 
 		if (!note) {
 			return;
 		}
 		const response = await fetch(
-			`${process.env.REACT_APP_URL}/api/rooms/${id}/submitNote`,
+			`${process.env.REACT_APP_URL}/api/v1/rooms/${id}/note`,
 			{
 				method: 'PATCH',
 				credentials: 'include',
@@ -101,7 +107,7 @@ const Room = ({ history }) => {
 					id: noteId,
 					listId: listId,
 					note,
-					rate,
+					positive: !lists[listId].negative,
 				}),
 				headers: { 'Content-Type': 'application/json' },
 			}
@@ -146,17 +152,17 @@ const Room = ({ history }) => {
 				...lists[listId],
 				adding: true,
 				editedNoteId: noteId,
-				negative: note.rate === -1,
-				note: note.note,
+				negative: !note.positive,
+				note: note.content,
 			},
 		}));
 	};
 
 	const removeNote = async (listId, noteId) => {
 		const response = await fetch(
-			`${process.env.REACT_APP_URL}/api/rooms/${id}/removeNote`,
+			`${process.env.REACT_APP_URL}/api/v1/rooms/${id}/note`,
 			{
-				method: 'PATCH',
+				method: 'DELETE',
 				credentials: 'include',
 				body: JSON.stringify({
 					id: noteId,
@@ -290,44 +296,44 @@ const Room = ({ history }) => {
 		getRoom();
 	}, [getRoom]);
 
-	useEffect(() => {
-		const io = socketIOClient(process.env.REACT_APP_URL);
-		io.on('roomJoined', () => {
-			getRoom();
-		});
+	// useEffect(() => {
+	// 	const io = socketIOClient(process.env.REACT_APP_URL);
+	// 	io.on('roomJoined', () => {
+	// 		getRoom();
+	// 	});
 
-		io.on('roomRemoved', (room) => {
-			if (id === room.id) {
-				history.push('/?reasonCode=2');
-			} else {
-				setRoom((_room) => ({
-					..._room,
-					lists: _room.lists.filter((list) => list.id !== room.id),
-				}));
-			}
-		});
+	// 	io.on('roomRemoved', (room) => {
+	// 		if (id === room.id) {
+	// 			history.push('/?reasonCode=2');
+	// 		} else {
+	// 			setRoom((_room) => ({
+	// 				..._room,
+	// 				lists: _room.lists.filter((list) => list.id !== room.id),
+	// 			}));
+	// 		}
+	// 	});
 
-		io.on('roomChanged', (data) => {
-			if (id === data.room.id) {
-				setRoom((_room) => {
-					return {
-						..._room,
-						ready: data.room.ready,
-					};
-				});
-			}
-		});
+	// 	io.on('roomChanged', (data) => {
+	// 		if (id === data.room.id) {
+	// 			setRoom((_room) => {
+	// 				return {
+	// 					..._room,
+	// 					ready: data.room.ready,
+	// 				};
+	// 			});
+	// 		}
+	// 	});
 
-		io.on('aggregateNotes', () => {
-			getRoom();
-		});
+	// 	io.on('aggregateNotes', () => {
+	// 		getRoom();
+	// 	});
 
-		io.on('endSession', () => {
-			history.push('/?reasonCode=1');
-		});
+	// 	io.on('endSession', () => {
+	// 		history.push('/?reasonCode=1');
+	// 	});
 
-		return () => io.disconnect();
-	}, [getRoom, history, id]);
+	// 	return () => io.disconnect();
+	// }, [getRoom, history, id]);
 
 	return (
 		<StyledWrapper
@@ -340,8 +346,8 @@ const Room = ({ history }) => {
 					room.ownNotes
 						? 'Export as'
 						: room.lists.length > 0
-						? 'Ready'
-						: undefined
+							? 'Ready'
+							: undefined
 				}
 				buttonDisabled={!room.ownNotes && room.ready}
 				buttonCallback={() => {
@@ -365,10 +371,10 @@ const Room = ({ history }) => {
 								editing={(lists[list.id] || {}).editedNoteId === note.id}
 							>
 								<StyledNoteIndicator
-									positive={note.rate === 1}
+									positive={note.positive}
 									editing={(lists[list.id] || {}).editedNoteId === note.id}
 								/>
-								<StyledAddNoteInput readOnly value={note.note} />
+								<StyledAddNoteInput readOnly value={note.content} />
 								{!room.ready &&
 									(lists[list.id] || {}).editedNoteId !== note.id && (
 										<StyledOptionsIcon
@@ -476,20 +482,20 @@ const Room = ({ history }) => {
 										</SubmitNoteWrapper>
 									</>
 								) : (
-									<StyledAddNoteButton
-										onClick={() =>
-											setLists((lists) => ({
-												...lists,
-												[list.id]: {
-													...lists[list.id],
-													adding: true,
-												},
-											}))
-										}
-									>
-										Add note
-									</StyledAddNoteButton>
-								)}
+										<StyledAddNoteButton
+											onClick={() =>
+												setLists((lists) => ({
+													...lists,
+													[list.id]: {
+														...lists[list.id],
+														adding: true,
+													},
+												}))
+											}
+										>
+											Add note
+										</StyledAddNoteButton>
+									)}
 							</>
 						)}
 					</StyledList>
