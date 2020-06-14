@@ -1,5 +1,12 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, UpdateDateColumn, CreateDateColumn } from "typeorm";
-import { ApiProperty } from "@nestjs/swagger";
+import {
+	BaseEntity,
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	UpdateDateColumn,
+	CreateDateColumn,
+} from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ name: 'Feedback' })
 export class Feedback extends BaseEntity {
@@ -10,7 +17,7 @@ export class Feedback extends BaseEntity {
 		description: 'Increment id of the feedback',
 		readOnly: true,
 	})
-    id: number;
+	id: number;
 
 	@Column({ type: 'varchar', length: 512, readonly: true })
 	@ApiProperty({

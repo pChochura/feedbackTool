@@ -56,8 +56,14 @@ const Room = ({ history }) => {
 			history.push('/?reasonCode=3');
 		}
 
-		room.lists.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt));
-		room.lists.forEach((list) => list.notes.sort((a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)));
+		room.lists.sort(
+			(a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)
+		);
+		room.lists.forEach((list) =>
+			list.notes.sort(
+				(a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)
+			)
+		);
 
 		setRoom(room);
 	}, [history, id]);

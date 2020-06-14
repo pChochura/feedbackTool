@@ -1,5 +1,5 @@
-import { IsString, Length, IsOptional, IsEmail } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { IsString, Length, IsOptional, IsEmail } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateFeedbackDto {
 	@IsString()
@@ -9,10 +9,10 @@ export class CreateFeedbackDto {
 		description: 'Content of the feedback',
 		example: 'Content of the feedback',
 	})
-    readonly content: string;
+	readonly content: string;
 
-    @IsString()
-    @IsEmail()
+	@IsString()
+	@IsEmail()
 	@IsOptional()
 	@Length(1, 32)
 	@ApiProperty({
