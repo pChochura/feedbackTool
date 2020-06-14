@@ -1,2 +1,1 @@
-export declare class ListModule {
-}
+export declare class ListModule {}

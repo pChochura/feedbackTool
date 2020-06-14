@@ -1,2 +1,1 @@
-export declare class SessionModule {
-}
+export declare class SessionModule {}

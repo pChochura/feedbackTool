@@ -21,7 +21,7 @@ export class SessionService {
 		@InjectRepository(Session) private sessionRepository: Repository<Session>,
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway
-	) { }
+	) {}
 
 	async create(createSessionDto: CreateSessionDto): Promise<Session> {
 		const id = generateId(createSessionDto.seed);
@@ -56,7 +56,9 @@ export class SessionService {
 		}
 
 		if (user.sessionId !== user.id) {
-			throw new ForbiddenException('Only the creator of the session can access it');
+			throw new ForbiddenException(
+				'Only the creator of the session can access it'
+			);
 		}
 
 		return session;
@@ -94,12 +96,14 @@ export class SessionService {
 			relations: ['lists', 'lists.notes'],
 		});
 
-		await Promise.all(rooms.map((room) =>
-			Promise.all([
-				Promise.all(room.lists.map((list) => Note.remove(list.notes))),
-				List.remove(room.lists),
-			])
-		));
+		await Promise.all(
+			rooms.map((room) =>
+				Promise.all([
+					Promise.all(room.lists.map((list) => Note.remove(list.notes))),
+					List.remove(room.lists),
+				])
+			)
+		);
 		await Room.remove(rooms);
 
 		await this.sessionRepository.remove(session);
@@ -153,23 +157,27 @@ export class SessionService {
 				id: generateId(),
 				associatedRoomId: generateId(),
 				name: 'Positive',
-				notes: notesByRoom[room.id].filter((note) => note.positive).map((note) =>
-					Note.create({
-						...note,
-						id: generateId(),
-					})
-				),
+				notes: notesByRoom[room.id]
+					.filter((note) => note.positive)
+					.map((note) =>
+						Note.create({
+							...note,
+							id: generateId(),
+						})
+					),
 			});
 			const negativeList = List.create({
 				id: generateId(),
 				associatedRoomId: generateId(),
 				name: 'Negative',
-				notes: notesByRoom[room.id].filter((note) => !note.positive).map((note) =>
-					Note.create({
-						...note,
-						id: generateId(),
-					})
-				),
+				notes: notesByRoom[room.id]
+					.filter((note) => !note.positive)
+					.map((note) =>
+						Note.create({
+							...note,
+							id: generateId(),
+						})
+					),
 			});
 			listsToRemove.push(...room.lists);
 			notesToRemove.push(...room.lists.flatMap((list) => list.notes));

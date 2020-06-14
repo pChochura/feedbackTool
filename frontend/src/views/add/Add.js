@@ -16,7 +16,11 @@ import NotificationSystem from '../../components/NotificationSystem/Notification
 
 const Add = ({ history }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [seed] = useState(`${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16));
+	const [seed] = useState(
+		`${Math.random().toString(36).slice(2)}${Math.random()
+			.toString(36)
+			.slice(2)}`.slice(0, 16)
+	);
 	const [cookies, setCookie] = useCookies(['seed']);
 	const [name, setName] = useState('');
 	const { id } = useParams();

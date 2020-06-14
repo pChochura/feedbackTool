@@ -1,4 +1,10 @@
-import { Entity, BaseEntity, PrimaryColumn, Column, UpdateDateColumn } from 'typeorm';
+import {
+	Entity,
+	BaseEntity,
+	PrimaryColumn,
+	Column,
+	UpdateDateColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum SessionPhase {

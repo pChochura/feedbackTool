@@ -34,7 +34,7 @@ import { CustomResponseSchema } from '../../common/custom-response.schema';
 @ApiTags('Rooms')
 @Controller('api/v1/rooms')
 export class RoomController {
-	constructor(private readonly roomService: RoomService) { }
+	constructor(private readonly roomService: RoomService) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Creates a room' })
@@ -70,18 +70,20 @@ export class RoomController {
 	@ApiOperation({ summary: 'Returns matching rooms' })
 	@ApiOkResponse({
 		description: 'Returned matching rooms',
-		schema: new CustomResponseSchema([{
-			id: 'l1fcqka1nm3fvw7j',
-			sessionId: 'l1fcqka1nm3fvw7j',
-			name: 'Anonymous',
-			lists: [
-				{
-					id: 'l1fcqka1nm3fvw7j',
-					name: 'Anonymous',
-					count: 1,
-				},
-			],
-		}]),
+		schema: new CustomResponseSchema([
+			{
+				id: 'l1fcqka1nm3fvw7j',
+				sessionId: 'l1fcqka1nm3fvw7j',
+				name: 'Anonymous',
+				lists: [
+					{
+						id: 'l1fcqka1nm3fvw7j',
+						name: 'Anonymous',
+						count: 1,
+					},
+				],
+			},
+		]),
 	})
 	@ApiNotFoundResponse({
 		description: 'Item not found',
@@ -96,7 +98,10 @@ export class RoomController {
 			'Only the creator of the session can access it'
 		),
 	})
-	async findAllMatching(@Cookies('seed') seed: string, @Res() response: Response) {
+	async findAllMatching(
+		@Cookies('seed') seed: string,
+		@Res() response: Response
+	) {
 		try {
 			const rooms = await this.roomService.findAllMatching(seed);
 			sendResponse(
@@ -131,7 +136,10 @@ export class RoomController {
 			new BasicResponseSchema('Room not found'),
 		]),
 	})
-	async findOneMatching(@Cookies('seed') seed: string, @Res() response: Response) {
+	async findOneMatching(
+		@Cookies('seed') seed: string,
+		@Res() response: Response
+	) {
 		try {
 			const room = await this.roomService.findOneMatching(seed);
 			sendResponse(response, room);
@@ -159,7 +167,11 @@ export class RoomController {
 			'Only the creator of the session can access it'
 		),
 	})
-	async findOne(@Cookies('seed') seed: string, @Param('id') id: string, @Res() response: Response) {
+	async findOne(
+		@Cookies('seed') seed: string,
+		@Param('id') id: string,
+		@Res() response: Response
+	) {
 		try {
 			const room = await this.roomService.findOne(seed, id);
 			sendResponse(response, room);

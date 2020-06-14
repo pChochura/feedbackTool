@@ -1,4 +1,4 @@
 export declare class RemoveNoteDto {
-    readonly id: string;
-    readonly listId: string;
+	readonly id: string;
+	readonly listId: string;
 }

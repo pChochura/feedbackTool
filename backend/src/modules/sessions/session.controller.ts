@@ -73,7 +73,9 @@ export class SessionController {
 	})
 	@ApiForbiddenResponse({
 		description: 'Authorization error',
-		schema: new BasicResponseSchema('Only the creator of the session can access it'),
+		schema: new BasicResponseSchema(
+			'Only the creator of the session can access it'
+		),
 	})
 	async find(@Cookies('seed') seed: string, @Res() response: Response) {
 		try {
@@ -156,7 +158,10 @@ export class SessionController {
 		description: 'Session not found',
 		schema: new BasicResponseSchema('Session not found'),
 	})
-	async matchAddPage(@Body() body: { addLink: string }, @Res() response: Response) {
+	async matchAddPage(
+		@Body() body: { addLink: string },
+		@Res() response: Response
+	) {
 		try {
 			await this.sessionService.findByAddLink(body.addLink);
 			sendResponse(response, { status: 'OK' });

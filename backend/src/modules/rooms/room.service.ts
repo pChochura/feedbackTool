@@ -24,7 +24,7 @@ export class RoomService {
 	constructor(
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway
-	) { }
+	) {}
 
 	async create(createRoomDto: CreateRoomDto): Promise<Room> {
 		const id = generateId(createRoomDto.seed);
@@ -156,10 +156,14 @@ export class RoomService {
 		}
 
 		if (id !== roomId) {
-			throw new ForbiddenException('Only the creator of the room can access it');
+			throw new ForbiddenException(
+				'Only the creator of the room can access it'
+			);
 		}
 
-		const room = await this.roomRepository.findOne(roomId, { relations: ['lists', 'lists.notes'] });
+		const room = await this.roomRepository.findOne(roomId, {
+			relations: ['lists', 'lists.notes'],
+		});
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}
@@ -185,7 +189,9 @@ export class RoomService {
 			throw new BadRequestException('This action is now locked');
 		}
 
-		const room = await Room.findOne(roomId, { relations: ['lists', 'lists.notes'] });
+		const room = await Room.findOne(roomId, {
+			relations: ['lists', 'lists.notes'],
+		});
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}
@@ -197,13 +203,15 @@ export class RoomService {
 			relations: ['lists', 'lists.notes'],
 		});
 		const listsToRemove = [
-			...rooms.flatMap((_room) => _room.lists.filter((list) => list.associatedRoomId === room.id)),
+			...rooms.flatMap((_room) =>
+				_room.lists.filter((list) => list.associatedRoomId === room.id)
+			),
 			...room.lists,
 		];
 		const notesToRemove = [
 			...listsToRemove.flatMap((list) => list.notes),
 			...room.lists.flatMap((list) => list.notes),
-		]
+		];
 
 		await Note.remove(notesToRemove);
 		await List.remove(listsToRemove);
@@ -237,7 +245,9 @@ export class RoomService {
 			throw new BadRequestException('This action is now locked');
 		}
 
-		const room = await this.roomRepository.findOne(roomId, { relations: ['lists', 'lists.notes'] });
+		const room = await this.roomRepository.findOne(roomId, {
+			relations: ['lists', 'lists.notes'],
+		});
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}
@@ -271,7 +281,9 @@ export class RoomService {
 			throw new BadRequestException('This action is now locked');
 		}
 
-		const room = await this.roomRepository.findOne(roomId, { relations: ['lists', 'lists.notes'] });
+		const room = await this.roomRepository.findOne(roomId, {
+			relations: ['lists', 'lists.notes'],
+		});
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}
@@ -327,7 +339,9 @@ export class RoomService {
 			throw new BadRequestException('This action is now locked');
 		}
 
-		const room = await this.roomRepository.findOne(roomId, { relations: ['lists', 'lists.notes'] });
+		const room = await this.roomRepository.findOne(roomId, {
+			relations: ['lists', 'lists.notes'],
+		});
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}

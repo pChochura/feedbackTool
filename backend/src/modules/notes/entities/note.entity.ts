@@ -1,4 +1,11 @@
-import { BaseEntity, Entity, PrimaryColumn, Column, ManyToOne, UpdateDateColumn } from 'typeorm';
+import {
+	BaseEntity,
+	Entity,
+	PrimaryColumn,
+	Column,
+	ManyToOne,
+	UpdateDateColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { List } from '../../lists/entities/list.entity';
 
@@ -38,7 +45,7 @@ export class Note extends BaseEntity {
 	})
 	updatedAt: Date;
 
-	@ManyToOne(() => List, list => list.notes, { onDelete: 'CASCADE' })
+	@ManyToOne(() => List, (list) => list.notes, { onDelete: 'CASCADE' })
 	@ApiProperty({
 		required: true,
 		description: 'Associated list',

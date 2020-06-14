@@ -18,7 +18,7 @@ export class List extends BaseEntity {
 	@ApiProperty({
 		required: true,
 		example: 'l1fcqka1nm3fvw7j',
-		description: "Id of the list",
+		description: 'Id of the list',
 		readOnly: true,
 	})
 	id: string;
@@ -27,7 +27,7 @@ export class List extends BaseEntity {
 	@ApiProperty({
 		required: true,
 		example: 'l1fcqka1nm3fvw7j',
-		description: "Id of the room",
+		description: 'Id of the room',
 		readOnly: true,
 	})
 	associatedRoomId: string;
@@ -50,7 +50,7 @@ export class List extends BaseEntity {
 	})
 	updatedAt: Date;
 
-	@OneToMany(() => Note, note => note.list, { cascade: ['insert', 'remove'] })
+	@OneToMany(() => Note, (note) => note.list, { cascade: ['insert', 'remove'] })
 	@JoinColumn()
 	@ApiProperty({
 		required: true,
@@ -59,7 +59,7 @@ export class List extends BaseEntity {
 	})
 	notes: Note[];
 
-	@ManyToOne(() => Room, room => room.lists, { onDelete: 'CASCADE' })
+	@ManyToOne(() => Room, (room) => room.lists, { onDelete: 'CASCADE' })
 	@ApiProperty({
 		required: true,
 		description: 'Associated room',

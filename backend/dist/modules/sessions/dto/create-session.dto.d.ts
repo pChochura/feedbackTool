@@ -1,3 +1,3 @@
 export declare class CreateSessionDto {
-    readonly seed: string;
+	readonly seed: string;
 }

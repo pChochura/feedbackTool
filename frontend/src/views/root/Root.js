@@ -35,14 +35,16 @@ const Root = ({ history, location }) => {
 				history.push(`/${matching.session.id}`);
 				return;
 			}
-	
+
 			if (matching.room) {
 				history.push(`/room/${matching.room.id}`);
 				return;
 			}
 		}
 
-		const seed = `${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
+		const seed = `${Math.random()
+			.toString(36)
+			.slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
 		setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
 		fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 			method: 'POST',
@@ -172,14 +174,11 @@ const Root = ({ history, location }) => {
 			if (room.id || session.id) {
 				setMatching({
 					room: room.id ? { id: room.id } : undefined,
-					session: session.id
-						? { id: session.id }
-						: undefined,
+					session: session.id ? { id: session.id } : undefined,
 				});
 				notificationSystem.postNotification({
 					title: 'Success',
-					description:
-						'We found an opened session or room waiting for you!',
+					description: 'We found an opened session or room waiting for you!',
 					success: true,
 				});
 			}
@@ -215,8 +214,9 @@ const Root = ({ history, location }) => {
 									</StyledLink>{' '}
 									the session
 								</StyledParagraph>
-							) : <StyledParagraph>You have a room</StyledParagraph>
-							)}
+							) : (
+								<StyledParagraph>You have a room</StyledParagraph>
+							))}
 					</ButtonWrapper>
 				</LandingLeft>
 				<StyledImg src={landing} />

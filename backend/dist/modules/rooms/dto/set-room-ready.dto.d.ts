@@ -1,3 +1,3 @@
 export declare class SetRoomReadyDto {
-    readonly ready: boolean;
+	readonly ready: boolean;
 }
