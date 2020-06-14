@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import moment from 'moment';
-import socketIOClient from 'socket.io-client';
 import { useCookies } from 'react-cookie';
 import {
 	StyledWrapper,
@@ -26,27 +24,29 @@ const Root = ({ history, location }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
 	const [feedbackSent, setFeedbackSent] = useState(false);
 	const [feedbackModal, setFeedbackModal] = useState();
-	const [matching, setMatching] = useState({});
-	const [locked, setLocked] = useState(false);
+	const [matching, setMatching] = useState();
 	const [, setCookie] = useCookies(['seed']);
 	const [feedback, setFeedback] = useState();
-	const [date, setDate] = useState('');
 	const [email, setEmail] = useState();
 
 	const startSession = async () => {
-		if (matching.session) {
-			history.push(`/${matching.session.id}`);
-			return;
+		if (matching) {
+			if (matching.session) {
+				history.push(`/${matching.session.id}`);
+				return;
+			}
+
+			if (matching.room) {
+				history.push(`/room/${matching.room.id}`);
+				return;
+			}
 		}
 
-		if (matching.room) {
-			history.push(`/room/${matching.room.id}`);
-			return;
-		}
-
-		const seed = Math.random().toString(36).slice(2);
+		const seed = `${Math.random()
+			.toString(36)
+			.slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
 		setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
-		fetch(`${process.env.REACT_APP_URL}/api/main`, {
+		fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 			method: 'POST',
 			body: JSON.stringify({
 				seed,
@@ -54,11 +54,8 @@ const Root = ({ history, location }) => {
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include',
 		})
-			.then((res) => {
-				return res.json();
-			})
-			.then((json) => {
-				history.push(`/${json.id}`);
+			.then(async (res) => {
+				history.push(`/${(await res.json()).id}`);
 			})
 			.catch(() => {
 				notificationSystem.postNotification({
@@ -70,7 +67,7 @@ const Root = ({ history, location }) => {
 	};
 
 	const cancelSession = async () => {
-		if (!matching.session) {
+		if (!matching || !matching.session) {
 			notificationSystem.postNotification({
 				title: 'Error',
 				description:
@@ -79,11 +76,11 @@ const Root = ({ history, location }) => {
 			return;
 		}
 
-		await fetch(`${process.env.REACT_APP_URL}/api/main/end`, {
+		await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions/end`, {
 			credentials: 'include',
 			method: 'POST',
 		});
-		setMatching({});
+		setMatching();
 		history.push('/?reasonCode=1');
 	};
 
@@ -163,71 +160,37 @@ const Root = ({ history, location }) => {
 
 	useEffect(() => {
 		const getData = async () => {
-			const mainPage = await (
-				await fetch(`${process.env.REACT_APP_URL}/api/main`, {
+			const session = await (
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 					credentials: 'include',
 				})
 			).json();
 
-			if (mainPage.locked) {
-				setLocked(true);
-				setDate(moment.unix(mainPage.expirationTimestamp).format('HH:mm:ss'));
-
-				const matchingRoom = await (
-					await fetch(`${process.env.REACT_APP_URL}/api/rooms/find`, {
-						credentials: 'include',
-					})
-				).json();
-				const matchingSession = await (
-					await fetch(`${process.env.REACT_APP_URL}/api/main/find`, {
-						credentials: 'include',
-					})
-				).json();
-				if (matchingRoom.id || matchingSession.id) {
-					setMatching({
-						room: matchingRoom.id ? { id: matchingRoom.id } : undefined,
-						session: matchingSession.id
-							? { id: matchingSession.id }
-							: undefined,
-					});
-					notificationSystem &&
-						notificationSystem.postNotification({
-							title: 'Success',
-							description:
-								'We found an opened session or room waiting for you!',
-							success: true,
-						});
-				}
+			const room = await (
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/find`, {
+					credentials: 'include',
+				})
+			).json();
+			if (room.id || session.id) {
+				setMatching({
+					room: room.id ? { id: room.id } : undefined,
+					session: session.id ? { id: session.id } : undefined,
+				});
+				notificationSystem.postNotification({
+					title: 'Success',
+					description: 'We found an opened session or room waiting for you!',
+					success: true,
+				});
 			}
 		};
 
-		getData();
+		notificationSystem && getData();
 	}, [notificationSystem]);
-
-	useEffect(() => {
-		const io = socketIOClient(process.env.REACT_APP_URL);
-		io.on('mainLocked', (data) => {
-			setLocked(true);
-			setDate(moment.unix(data.until).format('HH:mm:ss'));
-		});
-
-		io.on('endSession', () => {
-			setLocked(false);
-		});
-
-		return () => io.disconnect();
-	}, [setLocked, setDate]);
 
 	return (
 		<StyledWrapper>
 			<TopBar
-				buttonContent={
-					locked
-						? matching.session || matching.room
-							? 'Continue'
-							: ''
-						: 'Start'
-				}
+				buttonContent={matching ? 'Continue' : 'Start'}
 				buttonCallback={() => startSession()}
 			/>
 			<LandingWrapper>
@@ -239,13 +202,10 @@ const Root = ({ history, location }) => {
 						Share your thoughts with your team <b>anonymously</b>
 					</StyledParagraph>
 					<ButtonWrapper>
-						<Button
-							onClick={() => startSession()}
-							disabled={locked && !matching.session && !matching.room}
-						>
-							{matching.session || matching.room ? 'Continue' : 'Start'}
+						<Button onClick={() => startSession()}>
+							{matching ? 'Continue' : 'Start'}
 						</Button>
-						{locked &&
+						{matching &&
 							(matching.session ? (
 								<StyledParagraph>
 									Or{' '}
@@ -255,9 +215,7 @@ const Root = ({ history, location }) => {
 									the session
 								</StyledParagraph>
 							) : (
-								<StyledParagraph>
-									{matching.room ? 'You have a room' : `Locked up to ${date}`}
-								</StyledParagraph>
+								<StyledParagraph>You have a room</StyledParagraph>
 							))}
 					</ButtonWrapper>
 				</LandingLeft>

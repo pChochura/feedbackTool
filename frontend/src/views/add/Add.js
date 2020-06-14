@@ -16,18 +16,23 @@ import NotificationSystem from '../../components/NotificationSystem/Notification
 
 const Add = ({ history }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [seed] = useState(Math.random().toString(36).slice(2));
+	const [seed] = useState(
+		`${Math.random().toString(36).slice(2)}${Math.random()
+			.toString(36)
+			.slice(2)}`.slice(0, 16)
+	);
 	const [cookies, setCookie] = useCookies(['seed']);
 	const [name, setName] = useState('');
 	const { id } = useParams();
 
 	const join = useCallback(async () => {
-		fetch(`${process.env.REACT_APP_URL}/api/rooms`, {
+		fetch(`${process.env.REACT_APP_URL}/api/v1/rooms`, {
 			method: 'POST',
 			credentials: 'include',
 			body: JSON.stringify({
 				seed: cookies.seed || seed,
 				name,
+				addLink: id,
 			}),
 			headers: { 'Content-Type': 'application/json' },
 		})
@@ -51,15 +56,15 @@ const Add = ({ history }) => {
 						'We encountered some problems while joining you with your team.',
 				});
 			});
-	}, [history, seed, cookies, setCookie, name, notificationSystem]);
+	}, [history, seed, cookies, setCookie, name, notificationSystem, id]);
 
 	useEffect(() => {
 		const checkAddPage = async () => {
 			const isAddPage = await (
-				await fetch(`${process.env.REACT_APP_URL}/api/checkAdd`, {
+				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions/checkAdd`, {
 					method: 'POST',
 					credentials: 'include',
-					body: JSON.stringify({ id }),
+					body: JSON.stringify({ addLink: id }),
 					headers: { 'Content-Type': 'application/json' },
 				})
 			).json();

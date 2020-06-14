@@ -1,3 +1,4 @@
 node_modules/
-**/*.css.map
 .env
+ormconfig.json
+migration
