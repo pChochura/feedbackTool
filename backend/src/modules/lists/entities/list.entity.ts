@@ -29,7 +29,7 @@ export class List extends BaseEntity {
 		description: "Id of the room",
 		readOnly: true,
 	})
-	roomId: string;
+	associatedRoomId: string;
 
 	@Column({ type: 'varchar', length: 64, readonly: true })
 	@ApiProperty({
@@ -40,7 +40,7 @@ export class List extends BaseEntity {
 	})
 	name: string;
 
-	@OneToMany(() => Note, note => note.list, { cascade: true })
+	@OneToMany(() => Note, note => note.list, { cascade: ['insert', 'remove'] })
 	@JoinColumn()
 	@ApiProperty({
 		required: true,

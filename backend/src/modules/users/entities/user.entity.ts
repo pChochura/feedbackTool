@@ -12,7 +12,7 @@ export class User extends BaseEntity {
 	})
 	id: string;
 
-	@Column({ name: 'sessionId', length: 16, readonly: true })
+	@Column({ length: 16, readonly: true })
 	@ApiProperty({
 		required: true,
 		example: 'l1fcqka1nm3fvw7j',

@@ -17,7 +17,8 @@ import { Note } from '../notes/entities/note.entity';
 @Injectable()
 export class SessionService {
 	constructor(
-		@InjectRepository(Session) private sessionRepository: Repository<Session>
+		@InjectRepository(Session) private sessionRepository: Repository<Session>,
+		@InjectRepository(Room) private roomRepository: Repository<Room>
 	) { }
 
 	async create(createSessionDto: CreateSessionDto): Promise<Session> {
@@ -94,7 +95,7 @@ export class SessionService {
 		await Promise.all(rooms.map((room) =>
 			Promise.all([
 				Promise.all(room.lists.map((list) => Note.remove(list.notes))),
-				List.remove(room.lists)
+				List.remove(room.lists),
 			])
 		));
 		await Room.remove(rooms);
@@ -116,7 +117,7 @@ export class SessionService {
 		}
 
 		const session = await this.sessionRepository.findOne(user.sessionId);
-		// session.phase = SessionPhase.AGGREGATION;
+		session.phase = SessionPhase.AGGREGATION;
 
 		const rooms = await Room.find({
 			where: {
@@ -130,30 +131,50 @@ export class SessionService {
 		const temp: { [k: string]: Note[] } = {};
 
 		const notesByRoom = lists.reduce((acc, list) => {
-			if (acc[list.roomId]) {
-				acc[list.roomId].push(...list.notes);
+			if (acc[list.associatedRoomId]) {
+				acc[list.associatedRoomId].push(...list.notes);
 			} else {
-				acc[list.roomId] = list.notes;
+				acc[list.associatedRoomId] = list.notes;
 			}
 			return acc;
 		}, temp);
 
-		await Promise.all(rooms.map(async (room) => {
-			const positiveList = await List.create({
+		const listsToRemove = [];
+		const notesToRemove = [];
+
+		rooms.map((room) => {
+			const positiveList = List.create({
 				id: generateId(),
-				roomId: generateId(),
+				associatedRoomId: generateId(),
 				name: 'Positive',
-				notes: [],
-			}).save();
-			const negativeList = await List.create({
+				notes: notesByRoom[room.id].filter((note) => note.positive).map((note) =>
+					Note.create({
+						...note,
+						id: generateId(),
+					})
+				),
+			});
+			const negativeList = List.create({
 				id: generateId(),
-				roomId: generateId(),
+				associatedRoomId: generateId(),
 				name: 'Negative',
-				notes: [],
-			}).save();
-			room.lists.splice(0, room.lists.length, positiveList, negativeList);
-			return room.save();
-		}));
+				notes: notesByRoom[room.id].filter((note) => !note.positive).map((note) =>
+					Note.create({
+						...note,
+						id: generateId(),
+					})
+				),
+			});
+			listsToRemove.push(...room.lists);
+			notesToRemove.push(...room.lists.flatMap((list) => list.notes));
+			room.lists.splice(0, room.lists.length);
+			room.lists.push(positiveList);
+			room.lists.push(negativeList);
+		});
+
+		await Note.remove(notesToRemove);
+		await List.remove(listsToRemove);
+		await this.roomRepository.save(rooms);
 
 		return session.save();
 	}

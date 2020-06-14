@@ -39,7 +39,7 @@ export class Room extends BaseEntity {
 	})
 	name: string;
 
-	@OneToMany(() => List, (list) => list.room, { cascade: true })
+	@OneToMany(() => List, (list) => list.room, { cascade: ['insert', 'remove'] })
 	@JoinColumn()
 	@ApiProperty({
 		required: true,

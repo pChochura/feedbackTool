@@ -54,15 +54,17 @@ export class RoomService {
 			},
 			relations: ['lists'],
 		});
+		const listsToSave: List[] = [];
+
 		rooms.forEach((room) => {
-			room.lists.push(
-				List.create({
-					id: generateId(),
-					roomId: id,
-					name: createRoomDto.name,
-					notes: [],
-				})
-			);
+			const list = List.create({
+				id: generateId(),
+				associatedRoomId: id,
+				name: createRoomDto.name,
+				notes: [],
+			});
+			listsToSave.push(list);
+			room.lists.push(list);
 			room.ready = false;
 		});
 		await this.roomRepository.save(rooms);
@@ -72,17 +74,22 @@ export class RoomService {
 			name: createRoomDto.name,
 			sessionId: session.id,
 			ready: false,
-			lists: rooms.map((room) =>
-				List.create({
+			lists: rooms.map((room) => {
+				const list = List.create({
 					id: generateId(),
-					roomId: room.id,
+					associatedRoomId: room.id,
 					name: room.name,
 					notes: [],
-				})
-			),
+				});
+				listsToSave.push(list);
+				return list;
+			}),
 		});
 
-		return room.save();
+		await this.roomRepository.save(room);
+		await List.save(listsToSave);
+
+		return room;
 	}
 
 	async findAllMatching(seed: string): Promise<Room[]> {
@@ -186,7 +193,7 @@ export class RoomService {
 			relations: ['lists', 'lists.notes'],
 		});
 		const listsToRemove = [
-			...rooms.flatMap((_room) => _room.lists.filter((list) => list.roomId === room.id)),
+			...rooms.flatMap((_room) => _room.lists.filter((list) => list.associatedRoomId === room.id)),
 			...room.lists,
 		];
 		const notesToRemove = [
@@ -270,6 +277,7 @@ export class RoomService {
 		if (submitNoteDto.id && note) {
 			note.content = submitNoteDto.note;
 			note.positive = submitNoteDto.positive;
+			await note.save();
 		} else {
 			list.notes.push(
 				Note.create({
