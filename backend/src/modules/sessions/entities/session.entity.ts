@@ -4,6 +4,7 @@ import {
 	PrimaryColumn,
 	Column,
 	UpdateDateColumn,
+	CreateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -58,4 +59,13 @@ export class Session extends BaseEntity {
 		readOnly: true,
 	})
 	updatedAt: Date;
+
+	@CreateDateColumn({ readonly: true })
+	@ApiProperty({
+		required: true,
+		example: '1590320753',
+		description: 'Time indicating when the entity was created',
+		readOnly: true,
+	})
+	createdAt: Date;
 }

@@ -6,7 +6,6 @@ import {
 	Body,
 	Get,
 	Patch,
-	Param,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -18,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import { SessionService } from './session.service';
 import { sendResponse, sendError } from '../../common';
-import { Response, response } from 'express';
+import { Response } from 'express';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { CreatedResponseSchema } from '../../common/created-response.schema';
 import { BasicResponseSchema } from '../../common/basic-response.schema';

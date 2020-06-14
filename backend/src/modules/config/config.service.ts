@@ -5,6 +5,7 @@ import { Room } from '../rooms/entities/room.entity';
 import { List } from '../lists/entities/list.entity';
 import { Note } from '../notes/entities/note.entity';
 import { User } from '../users/entities/user.entity';
+import { Feedback } from '../feedback/entities/feedback.entity';
 
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 
@@ -19,7 +20,7 @@ class PostgresConfig {
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DATABASE,
-			entities: entities || [Session, Room, List, Note, User],
+			entities: entities || [Session, Room, List, Note, User, Feedback],
 			migrationsTableName: 'migration',
 			migrations: ['migration/*.ts'],
 			cli: {

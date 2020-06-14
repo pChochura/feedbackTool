@@ -5,6 +5,7 @@ import {
 	Column,
 	ManyToOne,
 	UpdateDateColumn,
+	CreateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { List } from '../../lists/entities/list.entity';
@@ -44,6 +45,15 @@ export class Note extends BaseEntity {
 		readOnly: true,
 	})
 	updatedAt: Date;
+
+	@CreateDateColumn({ readonly: true })
+	@ApiProperty({
+		required: true,
+		example: '1590320753',
+		description: 'Time indicating when the entity was created',
+		readOnly: true,
+	})
+	createdAt: Date;
 
 	@ManyToOne(() => List, (list) => list.notes, { onDelete: 'CASCADE' })
 	@ApiProperty({
