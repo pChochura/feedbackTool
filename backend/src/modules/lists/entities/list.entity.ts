@@ -6,6 +6,7 @@ import {
 	ManyToOne,
 	OneToMany,
 	JoinColumn,
+	UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Note } from '../../notes/entities/note.entity';
@@ -39,6 +40,15 @@ export class List extends BaseEntity {
 		readOnly: true,
 	})
 	name: string;
+
+	@UpdateDateColumn({ readonly: true })
+	@ApiProperty({
+		required: true,
+		example: '1590320753',
+		description: 'Time indicating when the last update occured',
+		readOnly: true,
+	})
+	updatedAt: Date;
 
 	@OneToMany(() => Note, note => note.list, { cascade: ['insert', 'remove'] })
 	@JoinColumn()

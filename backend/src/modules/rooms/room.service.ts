@@ -17,11 +17,13 @@ import { SetRoomReadyDto } from './dto/set-room-ready.dto';
 import { SubmitNoteDto } from './dto/submit-note.dto';
 import { Note } from '../notes/entities/note.entity';
 import { RemoveNoteDto } from './dto/remove-note.dto';
+import { SocketGateway } from '../sockets/socket.gateway';
 
 @Injectable()
 export class RoomService {
 	constructor(
-		@InjectRepository(Room) private roomRepository: Repository<Room>
+		@InjectRepository(Room) private roomRepository: Repository<Room>,
+		private readonly socketGateway: SocketGateway
 	) { }
 
 	async create(createRoomDto: CreateRoomDto): Promise<Room> {
@@ -88,6 +90,8 @@ export class RoomService {
 
 		await this.roomRepository.save(room);
 		await List.save(listsToSave);
+
+		this.socketGateway.roomCreated(session.id, room);
 
 		return room;
 	}
@@ -204,7 +208,11 @@ export class RoomService {
 		await Note.remove(notesToRemove);
 		await List.remove(listsToRemove);
 
-		return room.remove();
+		await room.remove();
+
+		this.socketGateway.roomRemoved(session.id, roomId);
+
+		return room;
 	}
 
 	async setReady(
@@ -229,14 +237,18 @@ export class RoomService {
 			throw new BadRequestException('This action is now locked');
 		}
 
-		const room = await this.roomRepository.findOne(roomId);
+		const room = await this.roomRepository.findOne(roomId, { relations: ['lists', 'lists.notes'] });
 		if (!room) {
 			throw new NotFoundException('Room not found');
 		}
 
 		room.ready = setRoomReadyDto.ready;
 
-		return room.save();
+		await room.save();
+
+		this.socketGateway.roomChanged(session.id, room);
+
+		return room;
 	}
 
 	async sumbitNote(
@@ -288,7 +300,11 @@ export class RoomService {
 			);
 		}
 
-		return room.save();
+		await room.save();
+
+		this.socketGateway.roomChanged(session.id, room);
+
+		return room;
 	}
 
 	async removeNote(
@@ -334,6 +350,8 @@ export class RoomService {
 
 		list.notes.splice(noteIndex, 1);
 		await list.save();
+
+		this.socketGateway.roomChanged(session.id, room);
 
 		return room;
 	}

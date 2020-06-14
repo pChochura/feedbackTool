@@ -1,4 +1,4 @@
-import { Entity, BaseEntity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, BaseEntity, PrimaryColumn, Column, UpdateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum SessionPhase {
@@ -43,4 +43,13 @@ export class Session extends BaseEntity {
 		default: 0,
 	})
 	phase: SessionPhase;
+
+	@UpdateDateColumn({ readonly: true })
+	@ApiProperty({
+		required: true,
+		example: '1590320753',
+		description: 'Time indicating when the last update occured',
+		readOnly: true,
+	})
+	updatedAt: Date;
 }

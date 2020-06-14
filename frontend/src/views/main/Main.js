@@ -223,32 +223,40 @@ const Main = ({ history }) => {
 		return () => clearTimeout(timerInterval);
 	}, [refreshTimer]);
 
-	// useEffect(() => {
-	// 	const io = socketIOClient(process.env.REACT_APP_URL);
-	// 	io.on('roomJoined', (_) => {
-	// 		getRooms();
-	// 	});
+	useEffect(() => {
+		const io = socketIOClient(process.env.REACT_APP_URL, {
+			query: {
+				sessionId: id,
+			},
+		});
+		io.on('roomCreated', (_) => {
+			getRooms();
+		});
 
-	// 	io.on('roomChanged', (data) => {
-	// 		Object.assign(
-	// 			rooms.find((room) => room.id === data.room.id) || {},
-	// 			data.room
-	// 		);
-	// 		setMaxNotesCount((max) =>
-	// 			Math.max(
-	// 				max,
-	// 				(data.room.lists || []).reduce(
-	// 					(acc, list) => (acc = Math.max(acc, list.count)),
-	// 					0
-	// 				)
-	// 			)
-	// 		);
-	// 		setRooms(rooms);
-	// 		setShowedRooms(rooms);
-	// 	});
+		io.on('roomChanged', (data) => {
+			Object.assign(
+				rooms.find((room) => room.id === data.room.id) || {},
+				data.room
+			);
+			setMaxNotesCount((max) =>
+				Math.max(
+					max,
+					(data.room.lists || []).reduce(
+						(acc, list) => (acc = Math.max(acc, list.count)),
+						0
+					)
+				)
+			);
+			setRooms(rooms);
+			setShowedRooms(rooms);
+		});
 
-	// 	return () => io.disconnect();
-	// }, [rooms, getRooms, maxNotesCount]);
+		io.on('endSession', () => {
+			history.push('/?reasonCode=1');
+		});
+
+		return () => io.disconnect();
+	}, [rooms, getRooms, maxNotesCount, id, history]);
 
 	return (
 		<StyledWrapper>

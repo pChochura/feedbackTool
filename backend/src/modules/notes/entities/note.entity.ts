@@ -1,4 +1,4 @@
-import { BaseEntity, Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
+import { BaseEntity, Entity, PrimaryColumn, Column, ManyToOne, UpdateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { List } from '../../lists/entities/list.entity';
 
@@ -28,6 +28,15 @@ export class Note extends BaseEntity {
 		description: 'Indicates if the rating is positive or negative',
 	})
 	positive: boolean;
+
+	@UpdateDateColumn({ readonly: true })
+	@ApiProperty({
+		required: true,
+		example: '1590320753',
+		description: 'Time indicating when the last update occured',
+		readOnly: true,
+	})
+	updatedAt: Date;
 
 	@ManyToOne(() => List, list => list.notes, { onDelete: 'CASCADE' })
 	@ApiProperty({

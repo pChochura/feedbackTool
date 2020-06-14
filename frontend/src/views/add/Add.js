@@ -52,7 +52,7 @@ const Add = ({ history }) => {
 						'We encountered some problems while joining you with your team.',
 				});
 			});
-	}, [history, seed, cookies, setCookie, name, notificationSystem]);
+	}, [history, seed, cookies, setCookie, name, notificationSystem, id]);
 
 	useEffect(() => {
 		const checkAddPage = async () => {

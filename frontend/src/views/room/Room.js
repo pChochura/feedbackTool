@@ -254,10 +254,10 @@ const Room = ({ history }) => {
 					(notes, list) => {
 						const result = list.notes.reduce(
 							(acc, note) => {
-								if (note.rate === 1) {
-									acc.good.push(note.note);
+								if (note.positive) {
+									acc.good.push(note.content);
 								} else {
-									acc.bad.push(note.note);
+									acc.bad.push(note.content);
 								}
 								return acc;
 							},
@@ -296,44 +296,50 @@ const Room = ({ history }) => {
 		getRoom();
 	}, [getRoom]);
 
-	// useEffect(() => {
-	// 	const io = socketIOClient(process.env.REACT_APP_URL);
-	// 	io.on('roomJoined', () => {
-	// 		getRoom();
-	// 	});
+	useEffect(() => {
+		const io = socketIOClient(process.env.REACT_APP_URL, {
+			query: {
+				sessionId: room.sessionId,
+			},
+		});
 
-	// 	io.on('roomRemoved', (room) => {
-	// 		if (id === room.id) {
-	// 			history.push('/?reasonCode=2');
-	// 		} else {
-	// 			setRoom((_room) => ({
-	// 				..._room,
-	// 				lists: _room.lists.filter((list) => list.id !== room.id),
-	// 			}));
-	// 		}
-	// 	});
+		io.on('roomCreated', () => {
+			getRoom();
+		});
 
-	// 	io.on('roomChanged', (data) => {
-	// 		if (id === data.room.id) {
-	// 			setRoom((_room) => {
-	// 				return {
-	// 					..._room,
-	// 					ready: data.room.ready,
-	// 				};
-	// 			});
-	// 		}
-	// 	});
+		io.on('roomRemoved', (room) => {
+			console.log(room);
+			if (id === room.id) {
+				history.push('/?reasonCode=2');
+			} else {
+				setRoom((_room) => ({
+					..._room,
+					lists: _room.lists.filter((list) => list.associatedRoomId !== room.id),
+				}));
+			}
+		});
 
-	// 	io.on('aggregateNotes', () => {
-	// 		getRoom();
-	// 	});
+		io.on('roomChanged', (data) => {
+			if (id === data.room.id) {
+				setRoom((_room) => {
+					return {
+						..._room,
+						ready: data.room.ready,
+					};
+				});
+			}
+		});
 
-	// 	io.on('endSession', () => {
-	// 		history.push('/?reasonCode=1');
-	// 	});
+		io.on('aggregateNotes', () => {
+			getRoom();
+		});
 
-	// 	return () => io.disconnect();
-	// }, [getRoom, history, id]);
+		io.on('endSession', () => {
+			history.push('/?reasonCode=1');
+		});
+
+		return () => io.disconnect();
+	}, [getRoom, history, id, room]);
 
 	return (
 		<StyledWrapper

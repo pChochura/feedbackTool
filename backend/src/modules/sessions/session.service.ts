@@ -6,19 +6,21 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session, SessionPhase } from './entities/session.entity';
-import { Repository, In } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { generateId } from '../../common';
 import { User } from '../users/entities/user.entity';
 import { Room } from '../rooms/entities/room.entity';
 import { List } from '../lists/entities/list.entity';
 import { Note } from '../notes/entities/note.entity';
+import { SocketGateway } from '../sockets/socket.gateway';
 
 @Injectable()
 export class SessionService {
 	constructor(
 		@InjectRepository(Session) private sessionRepository: Repository<Session>,
-		@InjectRepository(Room) private roomRepository: Repository<Room>
+		@InjectRepository(Room) private roomRepository: Repository<Room>,
+		private readonly socketGateway: SocketGateway
 	) { }
 
 	async create(createSessionDto: CreateSessionDto): Promise<Session> {
@@ -100,7 +102,11 @@ export class SessionService {
 		));
 		await Room.remove(rooms);
 
-		return this.sessionRepository.remove(session);
+		await this.sessionRepository.remove(session);
+
+		this.socketGateway.endSession(id);
+
+		return session;
 	}
 
 	async aggregateMatching(seed: string): Promise<Session> {
@@ -176,7 +182,11 @@ export class SessionService {
 		await List.remove(listsToRemove);
 		await this.roomRepository.save(rooms);
 
-		return session.save();
+		await session.save();
+
+		this.socketGateway.aggregateNotes(session.id);
+
+		return session;
 	}
 
 	async findByAddLink(addLink: string): Promise<Session> {

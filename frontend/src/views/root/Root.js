@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import socketIOClient from 'socket.io-client';
 import { useCookies } from 'react-cookie';
 import {
 	StyledWrapper,
@@ -188,20 +187,6 @@ const Root = ({ history, location }) => {
 
 		notificationSystem && getData();
 	}, [notificationSystem]);
-
-	// useEffect(() => {
-	// 	const io = socketIOClient(process.env.REACT_APP_URL);
-	// 	io.on('mainLocked', (data) => {
-	// 		setLocked(true);
-	// 		setDate(moment.unix(data.until).format('HH:mm:ss'));
-	// 	});
-
-	// 	io.on('endSession', () => {
-	// 		setLocked(false);
-	// 	});
-
-	// 	return () => io.disconnect();
-	// }, [setLocked, setDate]);
 
 	return (
 		<StyledWrapper>
