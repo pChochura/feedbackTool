@@ -102,18 +102,28 @@ const Root = ({ history, location }) => {
 			success: true,
 		});
 
-		await fetch(`${process.env.REACT_APP_URL}/api/feedback`, {
+		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/feedback`, {
 			method: 'POST',
 			credentials: 'include',
 			body: JSON.stringify({
-				from: email,
+				email,
 				content: feedback,
 			}),
 			headers: { 'Content-Type': 'application/json' },
 		});
 
-		setFeedbackModal({ exit: true });
 		setFeedbackSent();
+
+		if (result.status !== 200) {
+			notificationSystem.postNotification({
+				title: 'Error',
+				description: 'We encountered some problems while sending an email.',
+			});
+
+			return;
+		}
+
+		setFeedbackModal({ exit: true });
 		setEmail();
 		setFeedback();
 	};

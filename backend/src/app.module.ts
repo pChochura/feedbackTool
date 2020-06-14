@@ -8,6 +8,7 @@ import { ListModule } from './modules/lists/list.module';
 import { NoteModule } from './modules/notes/note.module';
 import { RoomModule } from './modules/rooms/room.module';
 import { SocketModule } from './modules/sockets/socket.module';
+import { FeedbackModule } from './modules/feedback/feedback.module';
 
 @Module({
 	imports: [
@@ -17,6 +18,7 @@ import { SocketModule } from './modules/sockets/socket.module';
 		NoteModule,
 		RoomModule,
 		SocketModule,
+		FeedbackModule,
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRootAsync({
 			useFactory: () => postgresConfig.getConfig(),

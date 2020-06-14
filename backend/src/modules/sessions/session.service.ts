@@ -179,6 +179,7 @@ export class SessionService {
 						})
 					),
 			});
+			room.ownNotes = true;
 			listsToRemove.push(...room.lists);
 			notesToRemove.push(...room.lists.flatMap((list) => list.notes));
 			room.lists.splice(0, room.lists.length);

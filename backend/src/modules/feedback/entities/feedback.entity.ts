@@ -1,32 +1,41 @@
 import {
 	BaseEntity,
 	Entity,
-	PrimaryColumn,
+	PrimaryGeneratedColumn,
 	Column,
 	UpdateDateColumn,
 	CreateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
-@Entity({ name: 'User' })
-export class User extends BaseEntity {
-	@PrimaryColumn({ type: 'varchar', length: 16, readonly: true })
+@Entity({ name: 'Feedback' })
+export class Feedback extends BaseEntity {
+	@PrimaryGeneratedColumn('increment')
 	@ApiProperty({
 		required: true,
-		example: 'l1fcqka1nm3fvw7j',
-		description: 'Id of the user',
+		example: 2,
+		description: 'Increment id of the feedback',
 		readOnly: true,
 	})
-	id: string;
+	id: number;
 
-	@Column({ length: 16, readonly: true })
+	@Column({ type: 'varchar', length: 512, readonly: true })
 	@ApiProperty({
 		required: true,
-		example: 'l1fcqka1nm3fvw7j',
-		description: 'Id of the associated session',
+		example: 'Content of the feedback',
+		description: 'Content of the feedback',
 		readOnly: true,
 	})
-	sessionId: string;
+	content: string;
+
+	@Column({ type: 'varchar', length: 32, readonly: true })
+	@ApiProperty({
+		required: false,
+		example: 'anonymous@ft.tech',
+		description: 'Email to the person who send the feedback',
+		readOnly: true,
+	})
+	email: string;
 
 	@UpdateDateColumn({ readonly: true })
 	@ApiProperty({
