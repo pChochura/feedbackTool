@@ -38,7 +38,6 @@ const Notification = ({
 		<StyledNotification
 			exit={exit}
 			index={index}
-			offset={window.pageYOffset}
 			onAnimationEnd={() => exit && callback && callback(id)}
 		>
 			<TitleWrapper>

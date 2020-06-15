@@ -28,7 +28,7 @@ export class Feedback extends BaseEntity {
 	})
 	content: string;
 
-	@Column({ type: 'varchar', length: 32, readonly: true })
+	@Column({ type: 'varchar', nullable: true, length: 32, readonly: true })
 	@ApiProperty({
 		required: false,
 		example: 'anonymous@ft.tech',

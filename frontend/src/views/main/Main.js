@@ -15,6 +15,7 @@ import PersonCard from '../../components/PersonCard/PersonCard';
 import Modal from '../../components/Modal/Modal';
 import moment from 'moment';
 import Button from '../../components/Button/Button';
+import Footer from '../../components/Footer/Footer';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
 
 const Main = ({ history }) => {
@@ -309,6 +310,7 @@ const Main = ({ history }) => {
 					)}
 				</CardsWrapper>
 			</DashboardWrapper>
+			<Footer />
 			{joinModalShowed && (
 				<Modal
 					onDismissCallback={() => setJoinModalShowed(false)}

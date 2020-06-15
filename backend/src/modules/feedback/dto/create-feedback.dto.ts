@@ -20,5 +20,5 @@ export class CreateFeedbackDto {
 		description: 'Email to the person who send the feedback',
 		example: 'anonymous@ft.tech',
 	})
-	readonly email: string;
+	readonly email?: string;
 }

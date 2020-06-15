@@ -5,8 +5,11 @@ export const StyledWrapper = styled.div`
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
-	height: 100%;
-	padding-bottom: 100px;
+	min-height: 100vh;
+
+	footer {
+		margin-top: auto;
+	}
 `;
 
 export const StyledTitle = styled.p`
@@ -41,13 +44,14 @@ export const StyledParagraph = styled.p`
 export const StyledBox = styled.div`
 	width: 80%;
 	max-width: 500px;
-	padding: 25px 50px;
 	box-sizing: border-box;
 	background-color: #ffffff;
 	border-radius: 5px;
 	box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.05);
 	display: flex;
 	flex-direction: column;
+	margin-bottom: 50px;
+	padding: 15px 30px;
 
 	p {
 		padding: 0;
@@ -56,6 +60,7 @@ export const StyledBox = styled.div`
 	@media (min-width: 900px) {
 		width: 50%;
 		max-width: 700px;
+		padding: 25px 50px;
 	}
 `;
 

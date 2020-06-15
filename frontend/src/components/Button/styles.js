@@ -10,15 +10,17 @@ const rotation = keyframes`
 `;
 
 export const StyledButton = styled.button`
-	background: ${({ secondary }) => (secondary ? '#ffffff' : '#3750DB')};
-	color: ${({ secondary }) => (secondary ? '#3750DB' : '#ffffff')};
+	background: ${({ secondary, color }) => (secondary ? '#ffffff' : color)};
+	color: ${({ secondary, color }) => (secondary ? color : '#ffffff')};
 	outline: none;
-	border: ${({ secondary }) => (secondary ? '#3750DB 1px solid' : 'none')};
+	border: ${({ secondary, color }) =>
+		secondary ? color + ' 1px solid' : 'none'};
 	width: ${({ small }) => (small ? '100px' : '150px')};
 	height: ${({ small }) => (small ? '30px' : '40px')};
 	border-radius: 5px;
 	font-size: ${({ small }) => (small ? '0.8rem' : '1.1rem')};
 	font-weight: ${({ secondary }) => (secondary ? '300' : '400')};
+	font-family: 'Montserrat';
 	transition: 0.5s all;
 
 	${({ disabled }) =>

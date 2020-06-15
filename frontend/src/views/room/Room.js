@@ -31,6 +31,7 @@ import closeIcon from '../../assets/images/close.svg';
 import optionsIcon from '../../assets/images/options.svg';
 import socketIOClient from 'socket.io-client';
 import Button from '../../components/Button/Button';
+import Footer from '../../components/Footer/Footer';
 import Modal from '../../components/Modal/Modal';
 import html2canvas from 'html2canvas';
 import { table, getBorderCharacters } from 'table';
@@ -105,6 +106,11 @@ const Room = ({ history }) => {
 		const note = lists[listId].note;
 
 		if (!note) {
+			notificationSystem.postNotification({
+				title: 'Error',
+				description: 'You cannot add an empty note',
+			});
+
 			return;
 		}
 		const response = await fetch(
@@ -432,7 +438,7 @@ const Room = ({ history }) => {
 						{list.notes.length === 0 && (
 							<StyledParagraph centered>
 								{room.ready
-									? "You didn't write anything here"
+									? "There's nothing here!"
 									: 'Please describe things that you like and dislike about me.'}
 							</StyledParagraph>
 						)}
@@ -517,6 +523,7 @@ const Room = ({ history }) => {
 					</StyledList>
 				))}
 			</StyledListsWrapper>
+			<Footer />
 			{exportAsModal && (
 				<Modal
 					title="Do you want to export all your notes?"
