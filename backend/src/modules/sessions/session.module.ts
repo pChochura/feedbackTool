@@ -5,10 +5,13 @@ import { SessionController } from './session.controller';
 import { Session } from './entities/session.entity';
 import { Room } from '../rooms/entities/room.entity';
 import { SocketGateway } from '../sockets/socket.gateway';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { UserService } from '../users/user.service';
+import { User } from '../users/entities/user.entity';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Session, Room])],
-	providers: [SessionService, SocketGateway],
+	imports: [TypeOrmModule.forFeature([Session, Room, User])],
+	providers: [SessionService, SocketGateway, SchedulerRegistry, UserService],
 	controllers: [SessionController],
 })
-export class SessionModule {}
+export class SessionModule { }

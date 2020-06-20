@@ -14,14 +14,27 @@ import { Room } from '../rooms/entities/room.entity';
 import { List } from '../lists/entities/list.entity';
 import { Note } from '../notes/entities/note.entity';
 import { SocketGateway } from '../sockets/socket.gateway';
+import { SchedulerRegistry } from '@nestjs/schedule';
+import { setTimeout } from 'timers';
 
 @Injectable()
 export class SessionService {
 	constructor(
 		@InjectRepository(Session) private sessionRepository: Repository<Session>,
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
-		private readonly socketGateway: SocketGateway
-	) {}
+		private readonly socketGateway: SocketGateway,
+		private readonly schedulerRegistry: SchedulerRegistry,
+	) { }
+
+	private addExpirationTimeout(session: Session, timeToExpire: number) {
+		const sessionExpirationTimeout = setTimeout(() => {
+			if (Date.now() <= session.expirationTimestamp * 1000) {
+				this.socketGateway.endSession(session.id);
+			}
+		}, timeToExpire * 1000);
+
+		this.schedulerRegistry.addTimeout(`sessionExpiration`, sessionExpirationTimeout);
+	}
 
 	async create(createSessionDto: CreateSessionDto): Promise<Session> {
 		const id = generateId(createSessionDto.seed);
@@ -34,13 +47,19 @@ export class SessionService {
 			await User.create({ id, sessionId: id }).save();
 		}
 
+		const timeToExpire = 3600;
+
 		const session = this.sessionRepository.create({
 			id,
 			addLink: generateId(),
-			expirationTimestamp: Math.floor(Date.now() / 1000 + 3600),
+			expirationTimestamp: Math.floor(Date.now() / 1000 + timeToExpire),
 		});
 
-		return session.save();
+		await session.save();
+
+		this.addExpirationTimeout(session, timeToExpire);
+
+		return session;
 	}
 
 	async findMatching(seed: string): Promise<Session> {
@@ -138,7 +157,7 @@ export class SessionService {
 
 		const lists = rooms.flatMap((room) => room.lists);
 
-		const temp: { [k: string]: Note[] } = {};
+		const temp: { [k: string]: Note[]; } = {};
 
 		const notesByRoom = lists.reduce((acc, list) => {
 			if (acc[list.associatedRoomId]) {

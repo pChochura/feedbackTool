@@ -19,21 +19,49 @@ export class User extends BaseEntity {
 	})
 	id: string;
 
-	@Column({ length: 16, readonly: true })
+	@Column({ length: 16, nullable: true })
 	@ApiProperty({
-		required: true,
+		required: false,
 		example: 'l1fcqka1nm3fvw7j',
 		description: 'Id of the associated session',
-		readOnly: true,
+		nullable: true,
 	})
-	sessionId: string;
+	sessionId?: string;
 
-	@UpdateDateColumn({ readonly: true })
+	@Column({ length: 64, readonly: true, nullable: true })
+	@ApiProperty({
+		required: false,
+		example: 'anonymous@pointlessapps.tech',
+		description: 'Email of the user',
+		readOnly: true,
+		nullable: true,
+	})
+	email?: string;
+
+	@Column({ length: 256, readonly: true, nullable: true })
+	@ApiProperty({
+		required: false,
+		example: 'af9bb7f9a757f8d13ea63852f254c1227b48b9dbb308eae585b3612b61d85ce0',
+		description: 'Hashed secret',
+		readOnly: true,
+		nullable: true,
+	})
+	secret?: string;
+
+	@Column({ type: 'varchar', nullable: true })
+	@ApiProperty({
+		required: false,
+		example: 7,
+		description: 'Number of premium sessions left',
+		nullable: true,
+	})
+	premiumSessionsLeft?: number;
+
+	@UpdateDateColumn()
 	@ApiProperty({
 		required: true,
 		example: '1590320753',
 		description: 'Time indicating when the last update occured',
-		readOnly: true,
 	})
 	updatedAt: Date;
 

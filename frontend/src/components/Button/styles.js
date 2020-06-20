@@ -35,8 +35,8 @@ export const StyledButton = styled.button`
 	&:hover {
 		filter: grayscale(0.75);
 		${({ disabled }) =>
-			disabled &&
-			css`
+		disabled &&
+		css`
 				cursor: not-allowed;
 			`}
 	}
@@ -45,6 +45,7 @@ export const StyledButton = styled.button`
 export const StyledButtonText = styled.p`
 	margin-block-start: 0;
 	margin-block-end: 0;
+	font-weight: 300;
 	${({ loading }) =>
 		loading === 'true' &&
 		css`

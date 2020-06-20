@@ -24,9 +24,13 @@ import scrollIcon from '../../assets/images/scroll.svg';
 import backgroundImg from '../../assets/images/background.png';
 import PlanCard from '../../components/PlanCard/PlanCard';
 import Footer from '../../components/Footer/Footer';
+import LoginModal from '../../components/LoginModal/LoginModal';
+import RegisterModal from '../../components/RegisterModal/RegisterModal';
 
 const Root = ({ history, location }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
+	const [registerModal, setRegisterModal] = useState({});
+	const [loginModal, setLoginModal] = useState();
 	const [matching, setMatching] = useState();
 	const [, setCookie] = useCookies(['seed']);
 	const [footer, setFooter] = useState();
@@ -163,8 +167,9 @@ const Root = ({ history, location }) => {
 	return (
 		<StyledWrapper background={backgroundImg}>
 			<TopBar
-				buttonContent={matching ? 'Continue' : 'Start'}
-				buttonCallback={() => startSession()}
+				buttonContent={'Log in'}
+				buttonSecondary={true}
+				buttonCallback={() => setLoginModal({})}
 			/>
 			<LandingWrapper>
 				<LandingTop>
@@ -189,8 +194,8 @@ const Root = ({ history, location }) => {
 										the session
 									</StyledParagraph>
 								) : (
-									<StyledParagraph>You have a room</StyledParagraph>
-								))}
+										<StyledParagraph>You have a room</StyledParagraph>
+									))}
 						</ButtonWrapper>
 					</LandingLeft>
 					<StyledImg src={landing} />
@@ -256,6 +261,18 @@ const Root = ({ history, location }) => {
 				<ScrollIndicator onClick={() => scrollBottom()}>
 					<ScrollImg src={scrollIcon} /> Scroll down
 				</ScrollIndicator>
+				{loginModal && <LoginModal input={{ email: loginModal.email, password: loginModal.password }} callback={(data) => {
+					setLoginModal();
+					if (data.createAccount) {
+						setRegisterModal({ email: data.email, password: data.password });
+					}
+				}} />}
+				{registerModal && <RegisterModal input={{ email: registerModal.email, password: registerModal.password }} callback={(data) => {
+					setRegisterModal();
+					if (data.login) {
+						setLoginModal({ email: data.email, password: data.password });
+					}
+				}} />}
 				<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 			</LandingWrapper>
 		</StyledWrapper>

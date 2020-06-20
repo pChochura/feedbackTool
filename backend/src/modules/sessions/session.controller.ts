@@ -6,6 +6,7 @@ import {
 	Body,
 	Get,
 	Patch,
+	UseGuards,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -24,13 +25,15 @@ import { BasicResponseSchema } from '../../common/basic-response.schema';
 import { Cookies } from '@nestjsplus/cookies';
 import { Session } from './entities/session.entity';
 import { OneOfResponseSchema } from '../../common/one-of-response.schema';
+import { AuthSoftGuard } from '../guards/auth-soft.guard';
 
 @ApiTags('Sessions')
 @Controller('api/v1/sessions')
 export class SessionController {
-	constructor(private readonly sessionService: SessionService) {}
+	constructor(private readonly sessionService: SessionService) { }
 
 	@Post()
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Creates a new session' })
 	@ApiOkResponse({
 		description: 'Created a new session',
@@ -158,7 +161,7 @@ export class SessionController {
 		schema: new BasicResponseSchema('Session not found'),
 	})
 	async matchAddPage(
-		@Body() body: { addLink: string },
+		@Body() body: { addLink: string; },
 		@Res() response: Response
 	) {
 		try {

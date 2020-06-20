@@ -91,7 +91,7 @@ const Add = ({ history }) => {
 			</StyledParagraph>
 			<StyledBox>
 				<StyledParagraph>
-					To help identify you by your friends,
+					To help identify who your friends are writing about,
 					<br />
 					please enter a name
 				</StyledParagraph>

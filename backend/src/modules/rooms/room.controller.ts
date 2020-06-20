@@ -8,6 +8,7 @@ import {
 	Patch,
 	Delete,
 	Param,
+	UseGuards,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -22,7 +23,7 @@ import { RoomService } from './room.service';
 import { Room } from './entities/room.entity';
 import { BasicResponseSchema } from '../../common/basic-response.schema';
 import { sendError, sendResponse } from '../../common';
-import { Response, response } from 'express';
+import { Response } from 'express';
 import { Cookies } from '@nestjsplus/cookies';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { OneOfResponseSchema } from '../../common/one-of-response.schema';
@@ -30,13 +31,15 @@ import { SetRoomReadyDto } from './dto/set-room-ready.dto';
 import { SubmitNoteDto } from './dto/submit-note.dto';
 import { RemoveNoteDto } from './dto/remove-note.dto';
 import { CustomResponseSchema } from '../../common/custom-response.schema';
+import { AuthSoftGuard } from '../guards/auth-soft.guard';
 
 @ApiTags('Rooms')
 @Controller('api/v1/rooms')
 export class RoomController {
-	constructor(private readonly roomService: RoomService) {}
+	constructor(private readonly roomService: RoomService) { }
 
 	@Post()
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Creates a room' })
 	@ApiOkResponse({
 		description: 'Created a room',

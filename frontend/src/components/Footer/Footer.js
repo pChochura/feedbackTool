@@ -7,7 +7,8 @@ import {
 	StyledLabel,
 	StyledInput,
 	FeedbackSendButtonWrapper,
-} from '../../views/root/styles';
+	StyledTextArea,
+} from '../Modal/styles';
 import NotificationSystem from '../NotificationSystem/NotificationSystem';
 
 export default class Footer extends Component {
@@ -107,7 +108,7 @@ export default class Footer extends Component {
 						<StyledLabel>
 							Your feedback<b>*</b>
 						</StyledLabel>
-						<StyledInput
+						<StyledTextArea
 							minRows={5}
 							maxRows={5}
 							autoFocus
@@ -116,7 +117,7 @@ export default class Footer extends Component {
 						/>
 						<StyledLabel>Your email</StyledLabel>
 						<StyledInput
-							maxRows={1}
+							type='email'
 							onChange={(e) => this.setState({ email: e.target.value })}
 							value={this.state.email}
 							onKeyPress={(e) => {

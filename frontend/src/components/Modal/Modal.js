@@ -60,20 +60,20 @@ const Modal = ({
 				{children ? (
 					children
 				) : (
-					<StyledBox onClick={() => window.open(link, '_blank')}>
-						<StyledParagraph>{link}</StyledParagraph>
-						<StyledImg
-							src={copyIcon}
-							clickable
-							onClick={(e) => {
-								e.nativeEvent.stopImmediatePropagation();
-								e.stopPropagation();
-								e.preventDefault();
-								copyLink();
-							}}
-						/>
-					</StyledBox>
-				)}
+						<StyledBox onClick={() => window.open(link, '_blank')}>
+							<StyledParagraph>{link}</StyledParagraph>
+							<StyledImg
+								src={copyIcon}
+								clickable
+								onClick={(e) => {
+									e.nativeEvent.stopImmediatePropagation();
+									e.stopPropagation();
+									e.preventDefault();
+									copyLink();
+								}}
+							/>
+						</StyledBox>
+					)}
 			</StyledCard>
 			<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 		</StyledWrapper>

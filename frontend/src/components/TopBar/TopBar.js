@@ -8,7 +8,7 @@ import {
 import logo from '../../assets/images/logo.svg';
 import Button from '../Button/Button';
 
-const TopBar = ({ buttonDisabled, buttonContent, buttonCallback, message }) => {
+const TopBar = ({ buttonDisabled, buttonContent, buttonCallback, buttonSecondary, message }) => {
 	return (
 		<StyledWrapper onlyLogo={!message && !buttonContent}>
 			<LogoWrapper
@@ -20,7 +20,7 @@ const TopBar = ({ buttonDisabled, buttonContent, buttonCallback, message }) => {
 			</LogoWrapper>
 			{message && <StyledParagraph>{message}</StyledParagraph>}
 			{buttonContent && (
-				<Button onClick={buttonCallback} disabled={buttonDisabled}>
+				<Button onClick={buttonCallback} disabled={buttonDisabled} secondary={buttonSecondary}>
 					{buttonContent}
 				</Button>
 			)}

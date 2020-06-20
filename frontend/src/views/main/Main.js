@@ -21,10 +21,10 @@ import NotificationSystem from '../../components/NotificationSystem/Notification
 const Main = ({ history }) => {
 	const [expirationTimestamp, setExpirationTimestamp] = useState(0);
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [joinModalShowed, setJoinModalShowed] = useState(false);
 	const [endSessionModal, setEndSessionModal] = useState();
 	const [maxNotesCount, setMaxNotesCount] = useState(0);
 	const [showedRooms, setShowedRooms] = useState([]);
+	const [joinModal, setJoinModal] = useState(false);
 	const [time, setTime] = useState('01:00:00');
 	const [addLink, setAddLink] = useState('');
 	const [phase, setPhase] = useState(0);
@@ -305,15 +305,15 @@ const Main = ({ history }) => {
 					{phase === 0 && (
 						<PersonCard
 							isAdder={true}
-							clickCallback={() => setJoinModalShowed(true)}
+							clickCallback={() => setJoinModal(true)}
 						/>
 					)}
 				</CardsWrapper>
 			</DashboardWrapper>
 			<Footer />
-			{joinModalShowed && (
+			{joinModal && (
 				<Modal
-					onDismissCallback={() => setJoinModalShowed(false)}
+					onDismissCallback={() => setJoinModal(false)}
 					link={`${window.location.origin}/add/${addLink}`}
 				/>
 			)}

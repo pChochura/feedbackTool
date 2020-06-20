@@ -25,4 +25,4 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 		}),
 	],
 })
-export class AppModule {}
+export class AppModule { }

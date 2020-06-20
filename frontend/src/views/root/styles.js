@@ -1,5 +1,4 @@
 import styled, { keyframes } from 'styled-components';
-import TextareaAutosize from 'react-textarea-autosize';
 
 export const StyledWrapper = styled.div`
 	width: 100%;
@@ -90,51 +89,6 @@ export const StyledLink = styled.a`
 	color: #3750db;
 	font-weight: 400;
 	cursor: pointer;
-`;
-
-export const FeedbackDescription = styled.p`
-	color: #ababab;
-	font-weight: 300;
-	text-align: center;
-	font-size: 0.8rem;
-
-	@media (min-width: 900px) {
-		font-size: 1rem;
-	}
-`;
-
-export const StyledLabel = styled.label`
-	font-weight: 300;
-	font-size: 0.8rem;
-	color: #ababab;
-	margin: 10px;
-	align-self: flex-start;
-
-	b {
-		color: #ff5453;
-	}
-
-	@media (min-width: 900px) {
-		font-size: 1rem;
-	}
-`;
-
-export const StyledInput = styled(TextareaAutosize)`
-	background-color: #efefef;
-	border: none;
-	width: 100%;
-	align-self: center;
-	padding: 10px;
-	outline-color: #3750db;
-	outline-width: 1px;
-	box-sizing: border-box;
-	font-family: 'Montserrat';
-	color: #515151;
-	resize: none;
-`;
-
-export const FeedbackSendButtonWrapper = styled.div`
-	margin-top: 50px;
 `;
 
 export const ScrollIndicator = styled.div`
