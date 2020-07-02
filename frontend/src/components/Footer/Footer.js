@@ -39,7 +39,7 @@ export default class Footer extends Component {
 			method: 'POST',
 			credentials: 'include',
 			body: JSON.stringify({
-				email: this.state.email,
+				email: this.state.email || null,
 				content: this.state.feedback,
 			}),
 			headers: { 'Content-Type': 'application/json' },

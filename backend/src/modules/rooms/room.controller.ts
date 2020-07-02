@@ -22,7 +22,7 @@ import {
 import { RoomService } from './room.service';
 import { Room } from './entities/room.entity';
 import { BasicResponseSchema } from '../../common/basic-response.schema';
-import { sendError, sendResponse } from '../../common';
+import { sendResponse } from '../../common';
 import { Response } from 'express';
 import { Cookies } from '@nestjsplus/cookies';
 import { CreateRoomDto } from './dto/create-room.dto';
@@ -39,7 +39,6 @@ export class RoomController {
 	constructor(private readonly roomService: RoomService) { }
 
 	@Post()
-	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Creates a room' })
 	@ApiOkResponse({
 		description: 'Created a room',
@@ -61,15 +60,12 @@ export class RoomController {
 		@Body() createRoomDto: CreateRoomDto,
 		@Res() response: Response
 	) {
-		try {
-			const room = await this.roomService.create(createRoomDto);
-			sendResponse(response, room, HttpStatus.CREATED);
-		} catch (error) {
-			sendError(response, error);
-		}
+		const room = await this.roomService.create(createRoomDto);
+		sendResponse(response, room, HttpStatus.CREATED);
 	}
 
 	@Get()
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Returns matching rooms' })
 	@ApiOkResponse({
 		description: 'Returned matching rooms',
@@ -95,37 +91,30 @@ export class RoomController {
 			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session can access it'
-		),
-	})
 	async findAllMatching(
 		@Cookies('seed') seed: string,
 		@Res() response: Response
 	) {
-		try {
-			const rooms = await this.roomService.findAllMatching(seed);
-			sendResponse(
-				response,
-				rooms.map((room) => ({
-					id: room.id,
-					name: room.name,
-					lists: room.lists.map((list) => ({
-						id: list.id,
-						name: list.name,
-						count: list.notes.length,
-					})),
-					ready: room.ready,
-				}))
-			);
-		} catch (error) {
-			sendError(response, error);
-		}
+		// @ts-ignore
+		const rooms = await this.roomService.findAllMatching(response.user, seed);
+		sendResponse(
+			response,
+			rooms.map((room) => ({
+				id: room.id,
+				name: room.name,
+				lists: room.lists.map((list) => ({
+					id: list.id,
+					name: list.name,
+					count: list.notes.length,
+				})),
+				ready: room.ready,
+				own: room.own,
+			}))
+		);
 	}
 
 	@Get('/find')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Returns a matching room' })
 	@ApiOkResponse({
 		description: 'Returned a matching room',
@@ -134,7 +123,6 @@ export class RoomController {
 	@ApiNotFoundResponse({
 		description: 'Item not found',
 		schema: new OneOfResponseSchema([
-			new BasicResponseSchema('User not found'),
 			new BasicResponseSchema('Session not found'),
 			new BasicResponseSchema('Room not found'),
 		]),
@@ -143,12 +131,9 @@ export class RoomController {
 		@Cookies('seed') seed: string,
 		@Res() response: Response
 	) {
-		try {
-			const room = await this.roomService.findOneMatching(seed);
-			sendResponse(response, room);
-		} catch (error) {
-			sendError(response, error);
-		}
+		// @ts-ignore
+		const room = await this.roomService.findOneMatching(response.user, seed);
+		sendResponse(response, room);
 	}
 
 	@Get('/:id')
@@ -167,7 +152,7 @@ export class RoomController {
 	@ApiForbiddenResponse({
 		description: 'Authorization error',
 		schema: new BasicResponseSchema(
-			'Only the creator of the session can access it'
+			'Only the creator of the room can access it'
 		),
 	})
 	async findOne(
@@ -175,15 +160,12 @@ export class RoomController {
 		@Param('id') id: string,
 		@Res() response: Response
 	) {
-		try {
-			const room = await this.roomService.findOne(seed, id);
-			sendResponse(response, room);
-		} catch (error) {
-			sendError(response, error);
-		}
+		const room = await this.roomService.findOne(seed, id);
+		sendResponse(response, room);
 	}
 
 	@Delete('/:id')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Removes the given room' })
 	@ApiOkResponse({
 		description: 'Removed the given room',
@@ -194,28 +176,25 @@ export class RoomController {
 		schema: new OneOfResponseSchema([
 			new BasicResponseSchema('User not found'),
 			new BasicResponseSchema('Room not found'),
+			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session can modify it'
-		),
+	@ApiBadRequestResponse({
+		description: 'This action is now locked',
+		schema: new BasicResponseSchema('This action is now locked'),
 	})
 	async remove(
 		@Cookies('seed') seed: string,
 		@Param('id') id: string,
 		@Res() response: Response
 	) {
-		try {
-			await this.roomService.remove(seed, id);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+		// @ts-ignore
+		await this.roomService.remove(response.user, seed, id);
+		sendResponse(response, { status: 'OK' });
 	}
 
 	@Patch('/:id/ready')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({
 		summary: 'Marks the given room as ready or not (depending on the input)',
 	})
@@ -247,12 +226,9 @@ export class RoomController {
 		@Body() setRoomReadyDto: SetRoomReadyDto,
 		@Res() response: Response
 	) {
-		try {
-			await this.roomService.setReady(seed, id, setRoomReadyDto);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+		// @ts-ignore
+		await this.roomService.setReady(response.user, seed, id, setRoomReadyDto);
+		sendResponse(response, { status: 'OK' });
 	}
 
 	@Patch('/:id/note')
@@ -285,12 +261,8 @@ export class RoomController {
 		@Body() submitNoteDto: SubmitNoteDto,
 		@Res() response: Response
 	) {
-		try {
-			await this.roomService.sumbitNote(seed, id, submitNoteDto);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+		await this.roomService.sumbitNote(seed, id, submitNoteDto);
+		sendResponse(response, { status: 'OK' });
 	}
 
 	@Delete('/:id/note')
@@ -322,11 +294,7 @@ export class RoomController {
 		@Body() removeNoteDto: RemoveNoteDto,
 		@Res() response: Response
 	) {
-		try {
-			await this.roomService.removeNote(seed, id, removeNoteDto);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+		await this.roomService.removeNote(seed, id, removeNoteDto);
+		sendResponse(response, { status: 'OK' });
 	}
 }

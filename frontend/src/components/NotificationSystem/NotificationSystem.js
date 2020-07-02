@@ -57,6 +57,7 @@ export default class NotificationSystem extends Component {
 							}
 							title={notification.title}
 							description={notification.description}
+							persistent={notification.persistent}
 							action={notification.action}
 							callback={(id, actionClicked) => {
 								if (actionClicked) {

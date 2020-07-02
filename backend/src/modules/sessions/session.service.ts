@@ -2,7 +2,6 @@ import {
 	Injectable,
 	BadRequestException,
 	NotFoundException,
-	ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Session, SessionPhase } from './entities/session.entity';
@@ -23,94 +22,121 @@ export class SessionService {
 		@InjectRepository(Session) private sessionRepository: Repository<Session>,
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway,
-		private readonly schedulerRegistry: SchedulerRegistry,
+		private readonly schedulerRegistry: SchedulerRegistry
 	) { }
 
-	private addExpirationTimeout(session: Session, timeToExpire: number) {
+	private addExpirationTimeout(
+		session: Session,
+		timeToExpire: number,
+		seed: string
+	) {
 		const sessionExpirationTimeout = setTimeout(() => {
-			if (Date.now() <= session.expirationTimestamp * 1000) {
-				this.socketGateway.endSession(session.id);
-			}
+			this.endMatching(null, seed);
 		}, timeToExpire * 1000);
 
-		this.schedulerRegistry.addTimeout(`sessionExpiration`, sessionExpirationTimeout);
+		this.schedulerRegistry.addTimeout(
+			`sessionExpiration_${session.id}`,
+			sessionExpirationTimeout
+		);
 	}
 
-	async create(createSessionDto: CreateSessionDto): Promise<Session> {
+	async create(
+		createSessionDto: CreateSessionDto,
+		loggedInUser?: User
+	): Promise<Session> {
 		const id = generateId(createSessionDto.seed);
 		if (await this.sessionRepository.findOne(id)) {
 			throw new BadRequestException('Session for this user already exist');
 		}
 
-		const user = await User.findOne(id);
+		let user = loggedInUser || (await User.findOne(id));
 		if (!user) {
-			await User.create({ id, sessionId: id }).save();
+			user = await User.create({ id, sessionId: id }).save();
 		}
 
-		const timeToExpire = 3600;
+		const timeToExpire =
+			((loggedInUser || {}).premiumSessionsLeft || 0) > 0 ? null : 1800;
 
-		const session = this.sessionRepository.create({
-			id,
-			addLink: generateId(),
-			expirationTimestamp: Math.floor(Date.now() / 1000 + timeToExpire),
-		});
+		const session = await this.sessionRepository
+			.create({
+				id,
+				creatorId: user.id,
+				addLink: generateId(),
+				expirationTimestamp: timeToExpire
+					? Math.floor(Date.now() / 1000 + timeToExpire)
+					: null,
+			})
+			.save();
 
-		await session.save();
+		if (timeToExpire) {
+			this.addExpirationTimeout(session, timeToExpire, createSessionDto.seed);
+		}
 
-		this.addExpirationTimeout(session, timeToExpire);
+		user.sessionId = id;
+		user.premiumSessionsLeft = Math.max(0, (user.premiumSessionsLeft || 0) - 1);
+		await user.save();
 
 		return session;
 	}
 
-	async findMatching(seed: string): Promise<Session> {
-		const id = generateId(seed);
-		const user = await User.findOne(id);
-		if (!user) {
-			throw new NotFoundException('User not found');
+	async findMatching(user: User, seed: string): Promise<Session> {
+		if (user) {
+			const session = await this.sessionRepository.findOne(user.sessionId);
+			if (session) {
+				return session;
+			}
 		}
 
-		const session = await this.sessionRepository.findOne(user.sessionId);
+		const id = generateId(seed);
+		const session = await this.sessionRepository.findOne(id);
 		if (!session) {
 			throw new NotFoundException('Session not found');
 		}
 
-		if (user.sessionId !== user.id) {
-			throw new ForbiddenException(
-				'Only the creator of the session can access it'
-			);
+		if (!(await User.findOne(session.creatorId))) {
+			throw new NotFoundException('User not found');
 		}
 
 		return session;
 	}
 
-	async endMatching(seed: string): Promise<Session> {
+	async endMatching(user: User, seed: string): Promise<Session> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
-		if (!user) {
-			throw new NotFoundException('User not found');
+
+		let session = await this.sessionRepository.findOne(id);
+		if (session) {
+			user = await User.findOne(session.creatorId);
+			if (!user) {
+				throw new NotFoundException('User not found');
+			}
+		} else {
+			session = await this.sessionRepository.findOne({
+				where: {
+					creatorId: user.id,
+				},
+			});
 		}
 
-		if (user.id !== user.sessionId) {
-			throw new ForbiddenException(
-				'Only the creator of the session can modify it'
-			);
-		}
-
-		const session = await this.sessionRepository.findOne(user.sessionId);
 		if (!session) {
 			throw new NotFoundException('Session not found');
+		}
+
+		if (!user.temporary) {
+			user.sessionId = null;
+			await user.save();
 		}
 
 		const users = await User.find({
 			where: {
-				sessionId: id,
+				sessionId: session.id,
+				temporary: true,
 			},
 		});
 		await User.remove(users);
 
 		const rooms = await Room.find({
 			where: {
-				sessionId: id,
+				sessionId: session.id,
 			},
 			relations: ['lists', 'lists.notes'],
 		});
@@ -125,27 +151,38 @@ export class SessionService {
 		);
 		await Room.remove(rooms);
 
-		await this.sessionRepository.remove(session);
+		if (session.expirationTimestamp) {
+			this.schedulerRegistry.deleteTimeout(`sessionExpiration_${session.id}`);
+		}
 
-		this.socketGateway.endSession(id);
+		this.socketGateway.sessionEnded(session.id);
+
+		await this.sessionRepository.remove(session);
 
 		return session;
 	}
 
-	async aggregateMatching(seed: string): Promise<Session> {
+	async aggregateMatching(user: User, seed: string): Promise<Session> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
+		let session: Session;
 		if (!user) {
-			throw new NotFoundException('User not found');
+			session = await this.sessionRepository.findOne(id);
+			if (!session) {
+				throw new NotFoundException('Session not found');
+			}
+
+			user = await User.findOne(session.creatorId);
+			if (!user) {
+				throw new NotFoundException('User not found');
+			}
+		} else {
+			session = await this.sessionRepository.findOne({
+				where: {
+					creatorId: user.id,
+				},
+			});
 		}
 
-		if (user.id !== user.sessionId) {
-			throw new ForbiddenException(
-				'Only the creator of the session can modify it'
-			);
-		}
-
-		const session = await this.sessionRepository.findOne(user.sessionId);
 		session.phase = SessionPhase.AGGREGATION;
 
 		const rooms = await Room.find({

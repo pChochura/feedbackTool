@@ -3,12 +3,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
+import { AnyExceptionFilter } from './common/any-exception.filter';
 require('dotenv').config();
 
 declare const module: any;
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
+	app.useGlobalFilters(new AnyExceptionFilter());
 	app.useGlobalPipes(new ValidationPipe());
 	app.use(CookieParser('secret'));
 	app.enableCors({

@@ -4,6 +4,7 @@ import {
 	ConflictException,
 	BadRequestException,
 	ForbiddenException,
+	HttpException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -24,7 +25,7 @@ export class RoomService {
 	constructor(
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway
-	) {}
+	) { }
 
 	async create(createRoomDto: CreateRoomDto): Promise<Room> {
 		const id = generateId(createRoomDto.seed);
@@ -43,6 +44,23 @@ export class RoomService {
 
 		if (session.phase !== SessionPhase.CREATION) {
 			throw new BadRequestException('This action is now locked');
+		}
+
+		const creator = await User.findOne(session.creatorId);
+		if (!creator) {
+			throw new NotFoundException('User not found');
+		}
+
+		const [, existingRoomsCount] = await Room.findAndCount({
+			where: { sessionId: session.id },
+		});
+		if ((creator.premiumSessionsLeft || 0) <= 0 && existingRoomsCount >= 5) {
+			// @todo: Add possibility to extend plan while in a session
+			// this.socketGateway.roomLimit(session.id, createRoomDto.name);
+			throw new HttpException(
+				'You have reached the basic plan limit. Wait for the creator to approve',
+				423
+			);
 		}
 
 		const user = await User.findOne(id);
@@ -96,17 +114,16 @@ export class RoomService {
 		return room;
 	}
 
-	async findAllMatching(seed: string): Promise<Room[]> {
+	async findAllMatching(user: User, seed: string): Promise<Partial<Room & { own: boolean; }>[]> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
+		const session = await Session.findOne(id);
+		const loggedIn = user !== null;
+
+		user = !session && user || await User.findOne({
+			where: [{ id: session.creatorId }, { id }],
+		});
 		if (!user) {
 			throw new NotFoundException('User not found');
-		}
-
-		if (user.sessionId !== user.id) {
-			throw new ForbiddenException(
-				'Only the creator of the session can access it'
-			);
 		}
 
 		if (!(await Session.findOne(user.sessionId))) {
@@ -115,34 +132,32 @@ export class RoomService {
 
 		const rooms = await this.roomRepository.find({
 			where: {
-				sessionId: id,
+				sessionId: user.sessionId,
 			},
 			relations: ['lists', 'lists.notes'],
 		});
 
-		return rooms;
+		return rooms.map((room) => (
+			{
+				...room,
+				own: room.id === (loggedIn ? user.sessionId : user.id),
+			}
+		));;
 	}
 
-	async findOneMatching(seed: string): Promise<Room> {
+	async findOneMatching(user: User, seed: string): Promise<Room> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
-		if (!user) {
-			throw new NotFoundException('User not found');
-		}
-
-		if (!(await Session.findOne(user.sessionId))) {
-			throw new NotFoundException('Session not found');
-		}
-
 		const room = await this.roomRepository.findOne({
-			where: {
-				id,
-				sessionId: user.sessionId,
-			},
+			where: { id: user ? user.sessionId : id },
 			relations: ['lists'],
 		});
+
 		if (!room) {
 			throw new NotFoundException('Room not found');
+		}
+
+		if (!(await Session.findOne(room.sessionId))) {
+			throw new NotFoundException('Session not found');
 		}
 
 		return room;
@@ -150,41 +165,40 @@ export class RoomService {
 
 	async findOne(seed: string, roomId: string): Promise<Room> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
-		if (!user) {
-			throw new NotFoundException('User not found');
+		const room = await this.roomRepository.findOne({
+			where: { id: roomId },
+			relations: ['lists', 'lists.notes'],
+		});
+
+		if (!room) {
+			throw new NotFoundException('Room not found');
 		}
 
-		if (id !== roomId) {
+		if (room.id !== id) {
 			throw new ForbiddenException(
 				'Only the creator of the room can access it'
 			);
 		}
 
-		const room = await this.roomRepository.findOne(roomId, {
-			relations: ['lists', 'lists.notes'],
-		});
-		if (!room) {
-			throw new NotFoundException('Room not found');
+		if (!(await Session.findOne(room.sessionId))) {
+			throw new NotFoundException('Session not found');
 		}
 
 		return room;
 	}
 
-	async remove(seed: string, roomId: string): Promise<Room> {
+	async remove(user: User, seed: string, roomId: string): Promise<Room> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
+		const session = await Session.findOne(id);
+		if (!session) {
+			throw new NotFoundException('Session not found');
+		}
+
+		user = user || await User.findOne(session.creatorId);
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
 
-		if (user.sessionId !== user.id) {
-			throw new ForbiddenException(
-				'Only the creator of the session can modify it'
-			);
-		}
-
-		const session = await Session.findOne(user.sessionId);
 		if (session.phase !== SessionPhase.CREATION) {
 			throw new BadRequestException('This action is now locked');
 		}
@@ -215,6 +229,7 @@ export class RoomService {
 
 		await Note.remove(notesToRemove);
 		await List.remove(listsToRemove);
+		await (await User.findOne(room.id)).remove();
 
 		await room.remove();
 
@@ -224,12 +239,13 @@ export class RoomService {
 	}
 
 	async setReady(
+		user: User,
 		seed: string,
 		roomId: string,
 		setRoomReadyDto: SetRoomReadyDto
 	): Promise<Room> {
 		const id = generateId(seed);
-		const user = await User.findOne(id);
+		user = user || await User.findOne(id);
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}

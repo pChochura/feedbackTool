@@ -37,17 +37,46 @@ const LoginModal = ({ input, callback }) => {
 
         response = await fetch(`${process.env.REACT_APP_URL}/api/v1/users`, {
             method: 'POST',
-            headers: {
-                'Authorization': digest.raw,
-            },
+            credentials: 'include',
+            headers: { 'Authorization': digest.raw },
         });
+        setLoading(false);
 
-        if (response.status !== 200) {
+        if (response.status === 401) {
             notificationSystem.postNotification({
                 title: 'Error',
                 description: 'Email or password is incorrect or the account does not exist',
             });
-            setLoading(false);
+
+            return;
+        } else if (response.status === 403) {
+            notificationSystem.postNotification({
+                title: 'Error',
+                description: 'You have to confirm your email address first. ',
+                action: 'Resend confirmation',
+                persistent: true,
+                callback: async () => {
+                    const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/email`, {
+                        method: 'PATCH',
+                        headers: { 'Authorization': digest.raw },
+                    });
+
+                    if (result.status !== 200) {
+                        notificationSystem.postNotification({
+                            title: 'Error',
+                            description: 'We encountered some problems while resending confirmation email',
+                        });
+
+                        return;
+                    }
+
+                    notificationSystem.postNotification({
+                        title: 'Success',
+                        description: 'Confirmation email has been sent successfully',
+                        success: true,
+                    });
+                },
+            });
 
             return;
         }

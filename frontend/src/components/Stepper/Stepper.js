@@ -6,7 +6,7 @@ const Stepper = ({ steps, currentStep }) => {
         <StyledWrapper>
             <RowWrapper key='losowystring'>
                 {steps.map((step, index) =>
-                    <StyledStep key={index} finished={currentStep >= index}>{step}</StyledStep>
+                    <StyledStep key={index * 123414} finished={currentStep >= index}>{step}</StyledStep>
                 )}
             </RowWrapper>
             <RowWrapper key='innyString'>

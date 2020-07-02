@@ -24,6 +24,15 @@ export class Session extends BaseEntity {
 	})
 	id: string;
 
+	@Column({ type: 'varchar', length: 16, readonly: true })
+	@ApiProperty({
+		required: true,
+		example: 'l1fcqka1nm3fvw7j',
+		description: 'Id of the user who created the session',
+		readOnly: true,
+	})
+	creatorId: string;
+
 	@Column({ length: 16, readonly: true })
 	@ApiProperty({
 		required: true,
@@ -33,14 +42,15 @@ export class Session extends BaseEntity {
 	})
 	addLink: string;
 
-	@Column({ type: 'integer', readonly: true })
+	@Column({ type: 'integer', readonly: true, nullable: true })
 	@ApiProperty({
 		required: true,
 		example: '1590320753',
 		description: 'Timestamp indicating expiration time',
+		nullable: true,
 		readOnly: true,
 	})
-	expirationTimestamp: number;
+	expirationTimestamp?: number;
 
 	@Column({ type: 'smallint', default: 0 })
 	@ApiProperty({

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCookies } from 'react-cookie';
+import socketIOClient from 'socket.io-client';
 import {
 	StyledWrapper,
 	LandingWrapper,
@@ -26,13 +27,18 @@ import PlanCard from '../../components/PlanCard/PlanCard';
 import Footer from '../../components/Footer/Footer';
 import LoginModal from '../../components/LoginModal/LoginModal';
 import RegisterModal from '../../components/RegisterModal/RegisterModal';
+import { ModalButtonsWrapper } from '../main/styles';
+import Modal from '../../components/Modal/Modal';
 
 const Root = ({ history, location }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [registerModal, setRegisterModal] = useState({});
+	const [registerModal, setRegisterModal] = useState();
+	const [confirmModal, setConfirmModal] = useState();
 	const [loginModal, setLoginModal] = useState();
+	const [loggedIn, setLoggedIn] = useState();
 	const [matching, setMatching] = useState();
 	const [, setCookie] = useCookies(['seed']);
+	const [loading, setLoading] = useState();
 	const [footer, setFooter] = useState();
 	const landingBottomRef = useRef();
 
@@ -52,7 +58,7 @@ const Root = ({ history, location }) => {
 		const seed = `${Math.random()
 			.toString(36)
 			.slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
-		setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
+		setCookie('seed', seed, { path: '/' });
 		fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -95,6 +101,138 @@ const Root = ({ history, location }) => {
 		window.scrollTo(0, landingBottomRef.current.offsetTop);
 	};
 
+	const downloadUser = async () => {
+		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users`, { credentials: 'include' });
+
+		if (result.status === 200) {
+			setLoggedIn(await result.json());
+		}
+	};
+
+	const tryForFree = () => {
+		startSession();
+	};
+
+
+	const purchase = async () => {
+		setLoading(true);
+
+		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/order`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			credentials: 'include',
+		});
+		setLoading(false);
+
+		if (result.status !== 200) {
+			notificationSystem.postNotification({
+				title: 'Error',
+				description: 'We encoutered some problems while creating your order',
+			});
+
+			return;
+		}
+
+		const { link } = await result.json();
+		window.open(link, '_self');
+
+		setConfirmModal({ exit: true });
+	};
+
+	const buyNow = () => {
+		if (loggedIn) {
+			setConfirmModal({
+				description: 'Do you want to purchase a bundle consisting of 10 premium sessions?',
+				confirmMessage: 'Purchase',
+				callback: () => purchase(),
+			});
+
+			return;
+		}
+
+		setRegisterModal({});
+	};
+
+	useEffect(() => {
+		if (!notificationSystem || location.pathname !== '/order') {
+			return;
+		}
+
+		const query = queryParser.parse(location.search);
+		// eslint-disable-next-line
+		const cancel = query.cancel == 'true';
+		const token = decodeURIComponent(query.id);
+		if (token) {
+			const finalizePurchase = async () => {
+				const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/order`, {
+					method: 'PATCH',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						token,
+						cancel,
+					}),
+				});
+
+				if (result.status !== 200) {
+					notificationSystem.postNotification({
+						title: 'Error',
+						description: 'We encountered some problems while finalizing your order',
+					});
+
+					return;
+				}
+
+				notificationSystem.postNotification({
+					title: 'Success',
+					description: `Your order has been ${cancel === 'true' ? 'canceled' : 'completed'} succesfully`,
+					success: true,
+				});
+
+				downloadUser();
+			};
+			finalizePurchase();
+		}
+
+		window.history.replaceState({}, document.title, '/');
+	}, [location, notificationSystem]);
+
+	useEffect(() => {
+		if (!notificationSystem || location.pathname !== '/email') {
+			return;
+		}
+
+		const query = queryParser.parse(location.search);
+		const token = decodeURIComponent(query.id);
+		if (token) {
+			const confirmEmail = async () => {
+				const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/email/confirm`, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ token }),
+				});
+
+				if (result.status !== 200) {
+					notificationSystem.postNotification({
+						title: 'Error',
+						description: 'We encountered some problems while confirming your email address',
+					});
+
+					return;
+				}
+
+				notificationSystem.postNotification({
+					title: 'Success',
+					description: 'Your email address has been confirmed successfully',
+					success: true,
+					persistent: true,
+				});
+			};
+			confirmEmail();
+		}
+
+		window.history.replaceState({}, document.title, '/');
+	}, [location, notificationSystem]);
+
 	useEffect(() => {
 		const reasonCode = queryParser.parse(location.search).reasonCode;
 		if (!notificationSystem || !reasonCode) {
@@ -104,10 +242,12 @@ const Root = ({ history, location }) => {
 		switch (reasonCode) {
 			case '1':
 				notificationSystem.postNotification({
-					title: 'Error',
+					title: 'Warning',
+					success: true,
 					description:
 						'Your session has ended. Now we ask you to tell us how can we ',
 					action: 'improve',
+					persistent: true,
 					callback: () => footer.showFeedbackModal(),
 				});
 				break;
@@ -136,7 +276,7 @@ const Root = ({ history, location }) => {
 	}, [location, notificationSystem, footer]);
 
 	useEffect(() => {
-		const getData = async () => {
+		const getSession = async () => {
 			const session = await (
 				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 					credentials: 'include',
@@ -150,7 +290,7 @@ const Root = ({ history, location }) => {
 			).json();
 			if (room.id || session.id) {
 				setMatching({
-					room: room.id ? { id: room.id } : undefined,
+					room: room.id ? { id: room.id, sessionId: room.sessionId } : undefined,
 					session: session.id ? { id: session.id } : undefined,
 				});
 				notificationSystem.postNotification({
@@ -161,8 +301,29 @@ const Root = ({ history, location }) => {
 			}
 		};
 
-		notificationSystem && getData();
+		notificationSystem && getSession();
 	}, [notificationSystem]);
+
+	useEffect(() => {
+		downloadUser();
+	}, []);
+
+	useEffect(() => {
+		if (!matching || (!matching.session && !matching.room)) {
+			return;
+		}
+		const id = matching.session ? matching.session.id : matching.room.sessionId;
+
+		const io = socketIOClient(process.env.REACT_APP_URL, {
+			query: { sessionId: id },
+		});
+
+		io.on('endSession', () => {
+			window.location.reload();
+		});
+
+		return () => io.disconnect();
+	}, [matching]);
 
 	return (
 		<StyledWrapper background={backgroundImg}>
@@ -170,6 +331,7 @@ const Root = ({ history, location }) => {
 				buttonContent={'Log in'}
 				buttonSecondary={true}
 				buttonCallback={() => setLoginModal({})}
+				loggedIn={loggedIn}
 			/>
 			<LandingWrapper>
 				<LandingTop>
@@ -207,6 +369,7 @@ const Root = ({ history, location }) => {
 						<PlanCard
 							title="Basic"
 							action="Try for free"
+							callback={() => tryForFree()}
 							items={[
 								{
 									type: 0,
@@ -214,7 +377,7 @@ const Root = ({ history, location }) => {
 								},
 								{
 									type: 0,
-									content: 'Session duration up to <b>an hour</b>',
+									content: 'Session duration up to a <b>half an hour</b>',
 								},
 								{
 									type: -1,
@@ -234,6 +397,7 @@ const Root = ({ history, location }) => {
 							title="Premium"
 							highlighted={true}
 							action="Buy now"
+							callback={() => buyNow()}
 							price="Only <b>9.99</b>PLN"
 							details="For every 10 sessions"
 							items={[
@@ -261,16 +425,35 @@ const Root = ({ history, location }) => {
 				<ScrollIndicator onClick={() => scrollBottom()}>
 					<ScrollImg src={scrollIcon} /> Scroll down
 				</ScrollIndicator>
+				{confirmModal &&
+					<Modal title='Are you sure?' description={confirmModal.description}
+						onDismissCallback={() => setConfirmModal()}
+						isExiting={confirmModal.exit}>
+						<ModalButtonsWrapper>
+							<Button onClick={() => confirmModal.callback()} color='#FF5453' loading={loading} disabled={loading}>
+								{confirmModal.confirmMessage}
+							</Button>
+							<Button onClick={() => setConfirmModal(m => ({ ...m, exit: true }))} secondary>
+								Cancel
+                    		</Button>
+						</ModalButtonsWrapper>
+					</Modal>
+				}
 				{loginModal && <LoginModal input={{ email: loginModal.email, password: loginModal.password }} callback={(data) => {
 					setLoginModal();
 					if (data.createAccount) {
 						setRegisterModal({ email: data.email, password: data.password });
+
+						return;
 					}
+					downloadUser();
 				}} />}
 				{registerModal && <RegisterModal input={{ email: registerModal.email, password: registerModal.password }} callback={(data) => {
 					setRegisterModal();
 					if (data.login) {
 						setLoginModal({ email: data.email, password: data.password });
+
+						return;
 					}
 				}} />}
 				<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />

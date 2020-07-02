@@ -28,10 +28,19 @@ export class User extends BaseEntity {
 	})
 	sessionId?: string;
 
+	@Column({ length: 256, nullable: true })
+	@ApiProperty({
+		required: false,
+		example: 'l1fcqka1nm3fvw7jl1fcqka1nm3fvw7jl1fcqka1nm3fvw7jl1fcqka1nm3fvw7j',
+		description: 'Session token used to indicate if the user is logged in',
+		nullable: true,
+	})
+	sessionToken?: string;
+
 	@Column({ length: 64, readonly: true, nullable: true })
 	@ApiProperty({
 		required: false,
-		example: 'anonymous@pointlessapps.tech',
+		example: 'anonymous@ft.tech',
 		description: 'Email of the user',
 		readOnly: true,
 		nullable: true,
@@ -48,7 +57,7 @@ export class User extends BaseEntity {
 	})
 	secret?: string;
 
-	@Column({ type: 'varchar', nullable: true })
+	@Column({ type: 'integer', nullable: true })
 	@ApiProperty({
 		required: false,
 		example: 7,
@@ -56,6 +65,23 @@ export class User extends BaseEntity {
 		nullable: true,
 	})
 	premiumSessionsLeft?: number;
+
+	@Column({ type: 'boolean', default: true })
+	@ApiProperty({
+		required: false,
+		example: true,
+		description: 'Indicates if the user was created temporarily',
+	})
+	temporary?: boolean;
+
+	@Column({ type: 'boolean', nullable: true })
+	@ApiProperty({
+		required: false,
+		example: false,
+		description: "Indicates if the user confirmed thier's email",
+		nullable: true,
+	})
+	confirmed?: boolean;
 
 	@UpdateDateColumn()
 	@ApiProperty({

@@ -18,7 +18,8 @@ import readyIcon from '../../assets/images/ready.svg';
 
 const PersonCard = ({
 	options,
-	isAdder,
+	clickable,
+	adder,
 	lists,
 	isReady,
 	name,
@@ -44,7 +45,7 @@ const PersonCard = ({
 
 	return (
 		<StyledCard
-			clickable={isAdder}
+			clickable={clickable}
 			onClick={() => clickCallback && clickCallback()}
 		>
 			{options && (
@@ -77,13 +78,13 @@ const PersonCard = ({
 			)}
 			<IconWrapper>
 				<StyledIcon
-					src={isAdder ? personAddIcon : personIcon}
+					src={adder ? personAddIcon : personIcon}
 					isReady={isReady}
 				/>
 				{isReady && <StyledImg src={readyIcon} background={'#81B800'} />}
 			</IconWrapper>
-			<StyledName dimmed={isAdder}>
-				{isAdder ? 'Invite somebody' : name}
+			<StyledName dimmed={adder}>
+				{adder ? 'Invite somebody' : name}
 			</StyledName>
 			{lists &&
 				lists.map((list, index) => (
