@@ -83,9 +83,7 @@ const PersonCard = ({
 				/>
 				{isReady && <StyledImg src={readyIcon} background={'#81B800'} />}
 			</IconWrapper>
-			<StyledName dimmed={adder}>
-				{adder ? 'Invite somebody' : name}
-			</StyledName>
+			<StyledName dimmed={adder}>{adder ? 'Invite somebody' : name}</StyledName>
 			{lists &&
 				lists.map((list, index) => (
 					<StyledListItem key={index}>

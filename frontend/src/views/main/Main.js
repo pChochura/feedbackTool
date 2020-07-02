@@ -181,39 +181,48 @@ const Main = ({ history }) => {
 		return options;
 	};
 
-	const onRoomCreated = useCallback((_) => {
-		getRooms();
-	}, [getRooms]);
+	const onRoomCreated = useCallback(
+		(_) => {
+			getRooms();
+		},
+		[getRooms]
+	);
 
-	const onRoomChanged = useCallback((data) => {
-		const tempRooms = rooms.map((room) =>
-			room.id === data.room.id ? data.room : room
-		);
-		setMaxNotesCount((max) =>
-			Math.max(
-				max,
-				(data.room.lists || []).reduce(
-					(acc, list) => (acc = Math.max(acc, list.count)),
-					0
+	const onRoomChanged = useCallback(
+		(data) => {
+			const tempRooms = rooms.map((room) =>
+				room.id === data.room.id ? data.room : room
+			);
+			setMaxNotesCount((max) =>
+				Math.max(
+					max,
+					(data.room.lists || []).reduce(
+						(acc, list) => (acc = Math.max(acc, list.count)),
+						0
+					)
 				)
-			)
-		);
-		setRooms(tempRooms);
-		setShowedRooms(tempRooms);
-	}, [rooms]);
+			);
+			setRooms(tempRooms);
+			setShowedRooms(tempRooms);
+		},
+		[rooms]
+	);
 
-	const onRoomLimit = useCallback((data) => {
-		notificationSystem.postNotification({
-			title: 'Warning',
-			description: `You have a request from ${data.room.name} to join your session. `,
-			success: true,
-			persistent: true,
-			action: 'Extend your plan',
-			callback: () => {
-				setExtendPlanModal({ name: data.room.name });
-			},
-		});
-	}, [notificationSystem]);
+	const onRoomLimit = useCallback(
+		(data) => {
+			notificationSystem.postNotification({
+				title: 'Warning',
+				description: `You have a request from ${data.room.name} to join your session. `,
+				success: true,
+				persistent: true,
+				action: 'Extend your plan',
+				callback: () => {
+					setExtendPlanModal({ name: data.room.name });
+				},
+			});
+		},
+		[notificationSystem]
+	);
 
 	const onEndSession = useCallback(() => {
 		history.push('/?reasonCode=1');
@@ -289,7 +298,9 @@ const Main = ({ history }) => {
 							options={phase === 1 ? null : getOptionsForRoom(room)}
 							isReady={room.ready}
 							lists={phase === 1 ? [] : room.lists}
-							clickCallback={() => room.own && window.open(`/room/${room.id}`, '_blank')}
+							clickCallback={() =>
+								room.own && window.open(`/room/${room.id}`, '_blank')
+							}
 							optionClickCallback={(index) => {
 								switch (index) {
 									case 1:
@@ -326,17 +337,18 @@ const Main = ({ history }) => {
 			{extendPlanModal && (
 				<Modal
 					title={`New request from ${extendPlanModal.name}`}
-					description='Your basic plan has reached a limit. To accept this request you have to extend your plan.'
+					description="Your basic plan has reached a limit. To accept this request you have to extend your plan."
 					onDismissCallback={() => setExtendPlanModal()}
 					isExiting={extendPlanModal.exit}
 				/>
 			)}
 			{endSessionModal && (
 				<Modal
-					title='Are you sure you want to end this session?'
-					description='This action cannot be undone. All notes will be discarded.'
+					title="Are you sure you want to end this session?"
+					description="This action cannot be undone. All notes will be discarded."
 					onDismissCallback={() => setEndSessionModal()}
-					isExiting={endSessionModal.exit} >
+					isExiting={endSessionModal.exit}
+				>
 					<ModalButtonsWrapper>
 						<Button
 							secondary

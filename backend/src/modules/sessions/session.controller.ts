@@ -29,7 +29,7 @@ import { AuthSoftGuard } from '../guards/auth-soft.guard';
 @ApiTags('Sessions')
 @Controller('api/v1/sessions')
 export class SessionController {
-	constructor(private readonly sessionService: SessionService) { }
+	constructor(private readonly sessionService: SessionService) {}
 
 	@Post()
 	@UseGuards(AuthSoftGuard)
@@ -136,7 +136,7 @@ export class SessionController {
 		schema: new BasicResponseSchema('Session not found'),
 	})
 	async matchAddPage(
-		@Body() body: { addLink: string; },
+		@Body() body: { addLink: string },
 		@Res() response: Response
 	) {
 		await this.sessionService.findByAddLink(body.addLink);

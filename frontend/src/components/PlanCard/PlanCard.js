@@ -14,7 +14,15 @@ import listNegativeIcon from '../../assets/images/list_negative.svg';
 import listPositiveIcon from '../../assets/images/list_positive.svg';
 import Button from '../Button/Button';
 
-const PlanCard = ({ title, highlighted, items, price, details, action, callback }) => {
+const PlanCard = ({
+	title,
+	highlighted,
+	items,
+	price,
+	details,
+	action,
+	callback,
+}) => {
 	const getIconByType = (type) => {
 		switch (type) {
 			case -1:
@@ -51,7 +59,9 @@ const PlanCard = ({ title, highlighted, items, price, details, action, callback 
 						dangerouslySetInnerHTML={{ __html: `<span>${details}</span>` }}
 					></StyledDetails>
 				)}
-				<Button secondary={!highlighted} onClick={() => callback && callback()}>{action}</Button>
+				<Button secondary={!highlighted} onClick={() => callback && callback()}>
+					{action}
+				</Button>
 			</DetailsWrapper>
 		</StyledCard>
 	);

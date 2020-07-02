@@ -117,7 +117,7 @@ export default class Footer extends Component {
 						/>
 						<StyledLabel>Your email</StyledLabel>
 						<StyledInput
-							type='email'
+							type="email"
 							onChange={(e) => this.setState({ email: e.target.value })}
 							value={this.state.email}
 							onKeyPress={(e) => {

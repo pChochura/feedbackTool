@@ -32,7 +32,7 @@ export class UserService {
 		private readonly emailService: EmailService,
 		private readonly socketGateway: SocketGateway,
 		private readonly paypalService: PaypalService
-	) { }
+	) {}
 
 	async getUserByAuthHeader(authHeader: string): Promise<User> {
 		const incomingDigest = ServerDigestAuth.analyze(authHeader, [QOP_AUTH]);
@@ -190,11 +190,18 @@ export class UserService {
 		await user.remove();
 	}
 
-	async createOrder(user: User, createOrderDto: CreateOrderDto): Promise<string> {
+	async createOrder(
+		user: User,
+		createOrderDto: CreateOrderDto
+	): Promise<string> {
 		if (!user && !createOrderDto.token) {
 			throw new UnauthorizedException('Missing credentials');
 		}
-		user = user || await this.userRespository.findOne({ sessionToken: createOrderDto.token });
+		user =
+			user ||
+			(await this.userRespository.findOne({
+				sessionToken: createOrderDto.token,
+			}));
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
@@ -224,7 +231,8 @@ export class UserService {
 		}
 
 		if (finalizeOrderDto.cancel === false) {
-			user.premiumSessionsLeft = (user.premiumSessionsLeft || 0) + transaction.amount;
+			user.premiumSessionsLeft =
+				(user.premiumSessionsLeft || 0) + transaction.amount;
 			await user.save();
 		}
 

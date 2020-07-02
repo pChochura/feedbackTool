@@ -12,4 +12,4 @@ import { UserModule } from '../users/user.module';
 	providers: [RoomService],
 	controllers: [RoomController],
 })
-export class RoomModule { }
+export class RoomModule {}

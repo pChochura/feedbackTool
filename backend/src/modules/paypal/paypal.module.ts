@@ -3,8 +3,8 @@ import { PaypalService } from './paypal.service';
 import { TransactionModule } from '../transactions/transaction.module';
 
 @Module({
-    imports: [TransactionModule],
-    providers: [PaypalService],
-    exports: [PaypalService],
+	imports: [TransactionModule],
+	providers: [PaypalService],
+	exports: [PaypalService],
 })
-export class PaypalModule { }
+export class PaypalModule {}

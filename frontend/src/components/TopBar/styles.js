@@ -18,7 +18,7 @@ export const StyledWrapper = styled.div`
 
 	@media (max-width: 450px) {
 		justify-content: ${({ onlyLogo }) =>
-		onlyLogo ? 'center' : 'space-between'};
+			onlyLogo ? 'center' : 'space-between'};
 
 		button {
 			margin-left: auto;
@@ -33,14 +33,14 @@ export const LogoWrapper = styled.div`
 
 	@media (max-width: 450px) {
 		${({ onlyLogo }) =>
-		onlyLogo
-			? css`
-				margin-left: auto;
-				margin-right: auto;
-			`
-			: css`
-				display: none;
-			`}
+			onlyLogo
+				? css`
+						margin-left: auto;
+						margin-right: auto;
+				  `
+				: css`
+						display: none;
+				  `}
 	}
 `;
 
@@ -69,7 +69,7 @@ export const LoggedBoxWrapper = styled.div`
 	display: flex;
 	align-items: center;
 	border-radius: 10px;
-	transition: .3s background-color;
+	transition: 0.3s background-color;
 	cursor: pointer;
 
 	&:hover {

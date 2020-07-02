@@ -9,8 +9,12 @@ import { UserModule } from '../users/user.module';
 import { SocketModule } from '../sockets/socket.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Session, Room, User]), UserModule, SocketModule],
+	imports: [
+		TypeOrmModule.forFeature([Session, Room, User]),
+		UserModule,
+		SocketModule,
+	],
 	providers: [SessionService],
 	controllers: [SessionController],
 })
-export class SessionModule { }
+export class SessionModule {}

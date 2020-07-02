@@ -102,7 +102,9 @@ const Root = ({ history, location }) => {
 	};
 
 	const downloadUser = async () => {
-		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users`, { credentials: 'include' });
+		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users`, {
+			credentials: 'include',
+		});
 
 		if (result.status === 200) {
 			setLoggedIn(await result.json());
@@ -113,15 +115,17 @@ const Root = ({ history, location }) => {
 		startSession();
 	};
 
-
 	const purchase = async () => {
 		setLoading(true);
 
-		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/order`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			credentials: 'include',
-		});
+		const result = await fetch(
+			`${process.env.REACT_APP_URL}/api/v1/users/order`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+			}
+		);
 		setLoading(false);
 
 		if (result.status !== 200) {
@@ -142,7 +146,8 @@ const Root = ({ history, location }) => {
 	const buyNow = () => {
 		if (loggedIn) {
 			setConfirmModal({
-				description: 'Do you want to purchase a bundle consisting of 10 premium sessions?',
+				description:
+					'Do you want to purchase a bundle consisting of 10 premium sessions?',
 				confirmMessage: 'Purchase',
 				callback: () => purchase(),
 			});
@@ -164,19 +169,23 @@ const Root = ({ history, location }) => {
 		const token = decodeURIComponent(query.id);
 		if (token) {
 			const finalizePurchase = async () => {
-				const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/order`, {
-					method: 'PATCH',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({
-						token,
-						cancel,
-					}),
-				});
+				const result = await fetch(
+					`${process.env.REACT_APP_URL}/api/v1/users/order`,
+					{
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							token,
+							cancel,
+						}),
+					}
+				);
 
 				if (result.status !== 200) {
 					notificationSystem.postNotification({
 						title: 'Error',
-						description: 'We encountered some problems while finalizing your order',
+						description:
+							'We encountered some problems while finalizing your order',
 					});
 
 					return;
@@ -184,7 +193,9 @@ const Root = ({ history, location }) => {
 
 				notificationSystem.postNotification({
 					title: 'Success',
-					description: `Your order has been ${cancel === 'true' ? 'canceled' : 'completed'} succesfully`,
+					description: `Your order has been ${
+						cancel === 'true' ? 'canceled' : 'completed'
+					} succesfully`,
 					success: true,
 				});
 
@@ -205,16 +216,20 @@ const Root = ({ history, location }) => {
 		const token = decodeURIComponent(query.id);
 		if (token) {
 			const confirmEmail = async () => {
-				const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users/email/confirm`, {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ token }),
-				});
+				const result = await fetch(
+					`${process.env.REACT_APP_URL}/api/v1/users/email/confirm`,
+					{
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ token }),
+					}
+				);
 
 				if (result.status !== 200) {
 					notificationSystem.postNotification({
 						title: 'Error',
-						description: 'We encountered some problems while confirming your email address',
+						description:
+							'We encountered some problems while confirming your email address',
 					});
 
 					return;
@@ -290,7 +305,9 @@ const Root = ({ history, location }) => {
 			).json();
 			if (room.id || session.id) {
 				setMatching({
-					room: room.id ? { id: room.id, sessionId: room.sessionId } : undefined,
+					room: room.id
+						? { id: room.id, sessionId: room.sessionId }
+						: undefined,
 					session: session.id ? { id: session.id } : undefined,
 				});
 				notificationSystem.postNotification({
@@ -356,8 +373,8 @@ const Root = ({ history, location }) => {
 										the session
 									</StyledParagraph>
 								) : (
-										<StyledParagraph>You have a room</StyledParagraph>
-									))}
+									<StyledParagraph>You have a room</StyledParagraph>
+								))}
 						</ButtonWrapper>
 					</LandingLeft>
 					<StyledImg src={landing} />
@@ -425,37 +442,64 @@ const Root = ({ history, location }) => {
 				<ScrollIndicator onClick={() => scrollBottom()}>
 					<ScrollImg src={scrollIcon} /> Scroll down
 				</ScrollIndicator>
-				{confirmModal &&
-					<Modal title='Are you sure?' description={confirmModal.description}
+				{confirmModal && (
+					<Modal
+						title="Are you sure?"
+						description={confirmModal.description}
 						onDismissCallback={() => setConfirmModal()}
-						isExiting={confirmModal.exit}>
+						isExiting={confirmModal.exit}
+					>
 						<ModalButtonsWrapper>
-							<Button onClick={() => confirmModal.callback()} color='#FF5453' loading={loading} disabled={loading}>
+							<Button
+								onClick={() => confirmModal.callback()}
+								color="#FF5453"
+								loading={loading}
+								disabled={loading}
+							>
 								{confirmModal.confirmMessage}
 							</Button>
-							<Button onClick={() => setConfirmModal(m => ({ ...m, exit: true }))} secondary>
+							<Button
+								onClick={() => setConfirmModal((m) => ({ ...m, exit: true }))}
+								secondary
+							>
 								Cancel
-                    		</Button>
+							</Button>
 						</ModalButtonsWrapper>
 					</Modal>
-				}
-				{loginModal && <LoginModal input={{ email: loginModal.email, password: loginModal.password }} callback={(data) => {
-					setLoginModal();
-					if (data.createAccount) {
-						setRegisterModal({ email: data.email, password: data.password });
+				)}
+				{loginModal && (
+					<LoginModal
+						input={{ email: loginModal.email, password: loginModal.password }}
+						callback={(data) => {
+							setLoginModal();
+							if (data.createAccount) {
+								setRegisterModal({
+									email: data.email,
+									password: data.password,
+								});
 
-						return;
-					}
-					downloadUser();
-				}} />}
-				{registerModal && <RegisterModal input={{ email: registerModal.email, password: registerModal.password }} callback={(data) => {
-					setRegisterModal();
-					if (data.login) {
-						setLoginModal({ email: data.email, password: data.password });
+								return;
+							}
+							downloadUser();
+						}}
+					/>
+				)}
+				{registerModal && (
+					<RegisterModal
+						input={{
+							email: registerModal.email,
+							password: registerModal.password,
+						}}
+						callback={(data) => {
+							setRegisterModal();
+							if (data.login) {
+								setLoginModal({ email: data.email, password: data.password });
 
-						return;
-					}
-				}} />}
+								return;
+							}
+						}}
+					/>
+				)}
 				<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 			</LandingWrapper>
 		</StyledWrapper>

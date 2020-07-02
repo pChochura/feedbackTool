@@ -168,7 +168,8 @@ export const StyledTextArea = styled(TextareaAutosize)`
 
 export const StyledInput = styled.input`
 	background-color: #efefef;
-	border: ${({ error }) => error ? '1px solid #FF5453' : '1px solid #00000000'};
+	border: ${({ error }) =>
+		error ? '1px solid #FF5453' : '1px solid #00000000'};
 	width: 100%;
 	align-self: center;
 	padding: 5px;

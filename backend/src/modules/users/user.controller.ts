@@ -38,7 +38,7 @@ import { AuthSoftGuard } from '../guards/auth-soft.guard';
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
-	constructor(private readonly userService: UserService) { }
+	constructor(private readonly userService: UserService) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Attempts logging in' })
@@ -122,8 +122,15 @@ export class UserController {
 		description: 'User not found',
 		schema: new BasicResponseSchema('User not found'),
 	})
-	async sendConfirmationEmail(@Headers() headers: any, @Body() body: { token?: string; }, @Res() response: Response) {
-		await this.userService.sendConfirmationEmail(headers['authorization'], body.token);
+	async sendConfirmationEmail(
+		@Headers() headers: any,
+		@Body() body: { token?: string },
+		@Res() response: Response
+	) {
+		await this.userService.sendConfirmationEmail(
+			headers['authorization'],
+			body.token
+		);
 		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
 	}
 
@@ -143,7 +150,10 @@ export class UserController {
 		description: 'Email is already confirmed',
 		schema: new BasicResponseSchema('Email is already confirmed'),
 	})
-	async cnfirmEmail(@Body() body: { token: string; }, @Res() response: Response) {
+	async cnfirmEmail(
+		@Body() body: { token: string },
+		@Res() response: Response
+	) {
 		await this.userService.confirmEmail(body.token);
 		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
 	}
@@ -192,14 +202,22 @@ export class UserController {
 	@ApiOperation({ summary: 'Creates a order for premium sessions bundle' })
 	@ApiOkResponse({
 		description: 'Created a order for premium sessions bundle',
-		schema: new CreatedResponseSchema('link', 'string', 'http://localhost/1234', 'Link of the paypal transaction'),
+		schema: new CreatedResponseSchema(
+			'link',
+			'string',
+			'http://localhost/1234',
+			'Link of the paypal transaction'
+		),
 	})
 	async createOrder(
 		@Body() createOrderDto: CreateOrderDto,
 		@Res() response: Response
 	) {
 		// @ts-ignore
-		const link = await this.userService.createOrder(response.user, createOrderDto);
+		const link = await this.userService.createOrder(
+			response.user,
+			createOrderDto
+		);
 		sendResponse(response, { link }, HttpStatus.OK);
 	}
 

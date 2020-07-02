@@ -21,7 +21,15 @@ class PostgresConfig {
 			username: process.env.POSTGRES_USER,
 			password: process.env.POSTGRES_PASSWORD,
 			database: process.env.POSTGRES_DATABASE,
-			entities: entities || [Session, Room, List, Note, User, Feedback, Transaction],
+			entities: entities || [
+				Session,
+				Room,
+				List,
+				Note,
+				User,
+				Feedback,
+				Transaction,
+			],
 			migrationsTableName: 'migration',
 			migrations: ['migration/*.ts'],
 			cli: {

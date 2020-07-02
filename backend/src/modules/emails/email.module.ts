@@ -4,23 +4,23 @@ import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailService } from './email.service';
 
 @Module({
-    imports: [
-        MailerModule.forRoot({
-            transport: {
-                host: process.env.SMTP_HOST,
-                port: process.env.SMTP_PORT,
-                auth: {
-                    user: process.env.SMTP_USER,
-                    pass: process.env.SMTP_PASS,
-                },
-            },
-            template: {
-                dir: process.cwd() + '/templates/',
-                adapter: new EjsAdapter(),
-            },
-        }),
-    ],
-    providers: [EmailService],
-    exports: [EmailService],
+	imports: [
+		MailerModule.forRoot({
+			transport: {
+				host: process.env.SMTP_HOST,
+				port: process.env.SMTP_PORT,
+				auth: {
+					user: process.env.SMTP_USER,
+					pass: process.env.SMTP_PASS,
+				},
+			},
+			template: {
+				dir: process.cwd() + '/templates/',
+				adapter: new EjsAdapter(),
+			},
+		}),
+	],
+	providers: [EmailService],
+	exports: [EmailService],
 })
-export class EmailModule { }
+export class EmailModule {}

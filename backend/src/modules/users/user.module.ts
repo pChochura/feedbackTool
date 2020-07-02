@@ -8,9 +8,14 @@ import { SocketModule } from '../sockets/socket.module';
 import { PaypalModule } from '../paypal/paypal.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([User]), EmailModule, SocketModule, PaypalModule],
+	imports: [
+		TypeOrmModule.forFeature([User]),
+		EmailModule,
+		SocketModule,
+		PaypalModule,
+	],
 	controllers: [UserController],
 	providers: [UserService],
 	exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

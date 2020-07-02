@@ -10,4 +10,4 @@ import { EmailModule } from '../emails/email.module';
 	providers: [FeedbackService],
 	controllers: [FeedbackController],
 })
-export class FeedbackModule { }
+export class FeedbackModule {}

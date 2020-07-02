@@ -35,8 +35,8 @@ export const StyledButton = styled.button`
 	&:hover {
 		filter: grayscale(0.75);
 		${({ disabled }) =>
-		disabled &&
-		css`
+			disabled &&
+			css`
 				cursor: not-allowed;
 			`}
 	}

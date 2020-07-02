@@ -35,11 +35,11 @@ export const StyledFooter = styled.footer`
 		padding: 0;
 	}
 
-	@media(min-width: 900px) {
+	@media (min-width: 900px) {
 		padding: 0 100px;
 	}
 
-	@media(min-width: 450px) {
+	@media (min-width: 450px) {
 		justify-content: space-between;
 		span {
 			&:last-child {

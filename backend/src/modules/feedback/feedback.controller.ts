@@ -9,7 +9,7 @@ import { BasicResponseSchema } from '../../common/basic-response.schema';
 @ApiTags('Feedback')
 @Controller('api/v1/feedback')
 export class FeedbackController {
-	constructor(private readonly feedbackService: FeedbackService) { }
+	constructor(private readonly feedbackService: FeedbackService) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Sends feedback' })

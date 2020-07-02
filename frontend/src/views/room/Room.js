@@ -370,8 +370,8 @@ const Room = ({ history }) => {
 					room.ownNotes
 						? 'Export as'
 						: room.lists.length > 0
-							? 'Ready'
-							: undefined
+						? 'Ready'
+						: undefined
 				}
 				buttonDisabled={!room.ownNotes && room.ready}
 				buttonCallback={() => {
@@ -506,20 +506,20 @@ const Room = ({ history }) => {
 										</SubmitNoteWrapper>
 									</>
 								) : (
-										<StyledAddNoteButton
-											onClick={() =>
-												setLists((lists) => ({
-													...lists,
-													[list.id]: {
-														...lists[list.id],
-														adding: true,
-													},
-												}))
-											}
-										>
-											Add note
-										</StyledAddNoteButton>
-									)}
+									<StyledAddNoteButton
+										onClick={() =>
+											setLists((lists) => ({
+												...lists,
+												[list.id]: {
+													...lists[list.id],
+													adding: true,
+												},
+											}))
+										}
+									>
+										Add note
+									</StyledAddNoteButton>
+								)}
 							</>
 						)}
 					</StyledList>

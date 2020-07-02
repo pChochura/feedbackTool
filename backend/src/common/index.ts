@@ -23,6 +23,8 @@ export const generateToken = () => {
 };
 
 export const generateConfirmationLink = (email: string, token: string) => {
-	const id = Buffer.from(JSON.stringify({ email, token }), 'utf-8').toString('base64');
+	const id = Buffer.from(JSON.stringify({ email, token }), 'utf-8').toString(
+		'base64'
+	);
 	return `${process.env.CLIENT_URL}/email?token=${id}`;
 };

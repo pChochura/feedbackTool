@@ -5,12 +5,19 @@ import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { generateToken } from '../../common';
 
 export class TransactionService {
-    constructor(@InjectRepository(Transaction) private readonly transactionRepository: Repository<Transaction>) { }
+	constructor(
+		@InjectRepository(Transaction)
+		private readonly transactionRepository: Repository<Transaction>
+	) {}
 
-    async create(createTransactionDto: CreateTransactionDto): Promise<Transaction> {
-        return this.transactionRepository.create({
-            ...createTransactionDto,
-            id: generateToken(),
-        }).save();
-    }
+	async create(
+		createTransactionDto: CreateTransactionDto
+	): Promise<Transaction> {
+		return this.transactionRepository
+			.create({
+				...createTransactionDto,
+				id: generateToken(),
+			})
+			.save();
+	}
 }

@@ -25,7 +25,7 @@ export class RoomService {
 	constructor(
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway
-	) { }
+	) {}
 
 	async create(createRoomDto: CreateRoomDto): Promise<Room> {
 		const id = generateId(createRoomDto.seed);
@@ -114,14 +114,19 @@ export class RoomService {
 		return room;
 	}
 
-	async findAllMatching(user: User, seed: string): Promise<Partial<Room & { own: boolean; }>[]> {
+	async findAllMatching(
+		user: User,
+		seed: string
+	): Promise<Partial<Room & { own: boolean }>[]> {
 		const id = generateId(seed);
 		const session = await Session.findOne(id);
 		const loggedIn = user !== null;
 
-		user = !session && user || await User.findOne({
-			where: [{ id: session.creatorId }, { id }],
-		});
+		user =
+			(!session && user) ||
+			(await User.findOne({
+				where: [{ id: session.creatorId }, { id }],
+			}));
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
@@ -137,12 +142,10 @@ export class RoomService {
 			relations: ['lists', 'lists.notes'],
 		});
 
-		return rooms.map((room) => (
-			{
-				...room,
-				own: room.id === (loggedIn ? user.sessionId : user.id),
-			}
-		));;
+		return rooms.map((room) => ({
+			...room,
+			own: room.id === (loggedIn ? user.sessionId : user.id),
+		}));
 	}
 
 	async findOneMatching(user: User, seed: string): Promise<Room> {
@@ -194,7 +197,7 @@ export class RoomService {
 			throw new NotFoundException('Session not found');
 		}
 
-		user = user || await User.findOne(session.creatorId);
+		user = user || (await User.findOne(session.creatorId));
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
@@ -245,7 +248,7 @@ export class RoomService {
 		setRoomReadyDto: SetRoomReadyDto
 	): Promise<Room> {
 		const id = generateId(seed);
-		user = user || await User.findOne(id);
+		user = user || (await User.findOne(id));
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}

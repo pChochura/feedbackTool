@@ -31,4 +31,4 @@ import { TransactionModule } from './modules/transactions/transaction.module';
 		}),
 	],
 })
-export class AppModule { }
+export class AppModule {}

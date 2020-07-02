@@ -36,7 +36,7 @@ import { AuthSoftGuard } from '../guards/auth-soft.guard';
 @ApiTags('Rooms')
 @Controller('api/v1/rooms')
 export class RoomController {
-	constructor(private readonly roomService: RoomService) { }
+	constructor(private readonly roomService: RoomService) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Creates a room' })
