@@ -39,7 +39,7 @@ const ProfileModal = ({ user, forceExit, callback }) => {
 		const success = result.status === 200;
 		notificationSystem.postNotification({
 			title: success ? 'Success' : 'Error',
-			description: success ? 'Your account has been removed successfully' : 'c',
+			description: success ? 'Your account has been removed successfully' : 'We encountered some problems while removing your account',
 			success: success,
 		});
 		setLoading(false);
