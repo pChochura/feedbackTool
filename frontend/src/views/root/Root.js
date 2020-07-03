@@ -195,7 +195,7 @@ const Root = ({ history, location }) => {
 					title: 'Success',
 					description: `Your order has been ${
 						cancel === 'true' ? 'canceled' : 'completed'
-						} succesfully`,
+					} succesfully`,
 					success: true,
 				});
 
@@ -373,8 +373,8 @@ const Root = ({ history, location }) => {
 										the session
 									</StyledParagraph>
 								) : (
-										<StyledParagraph>You have a room</StyledParagraph>
-									))}
+									<StyledParagraph>You have a room</StyledParagraph>
+								))}
 						</ButtonWrapper>
 					</LandingLeft>
 					<StyledImg src={landing} />

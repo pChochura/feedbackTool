@@ -37,14 +37,14 @@ const RegisterModal = ({ input, callback }) => {
 	const discount = 0.1;
 
 	const getPrice = (amount) => {
-		return (
-			amount * bundlePrice -
-			getSaved(amount, false)
-		).toLocaleString('pl-PL', {
-			style: 'currency',
-			currency: 'PLN',
-			currencyDisplay: 'code',
-		});
+		return (amount * bundlePrice - getSaved(amount, false)).toLocaleString(
+			'pl-PL',
+			{
+				style: 'currency',
+				currency: 'PLN',
+				currencyDisplay: 'code',
+			}
+		);
 	};
 
 	const getSaved = (amount, formatted = true) => {

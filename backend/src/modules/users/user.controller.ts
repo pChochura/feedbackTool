@@ -39,7 +39,7 @@ import { AuthResponse } from '../../common/response';
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
-	constructor(private readonly userService: UserService) { }
+	constructor(private readonly userService: UserService) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Attempts logging in' })
@@ -125,7 +125,7 @@ export class UserController {
 	})
 	async sendConfirmationEmail(
 		@Headers() headers: any,
-		@Body() body: { token?: string; },
+		@Body() body: { token?: string },
 		@Res() response: Response
 	) {
 		await this.userService.sendConfirmationEmail(
@@ -152,7 +152,7 @@ export class UserController {
 		schema: new BasicResponseSchema('Email is already confirmed'),
 	})
 	async cnfirmEmail(
-		@Body() body: { token: string; },
+		@Body() body: { token: string },
 		@Res() response: Response
 	) {
 		await this.userService.confirmEmail(body.token);
