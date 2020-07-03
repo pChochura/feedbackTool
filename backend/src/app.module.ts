@@ -9,6 +9,9 @@ import { NoteModule } from './modules/notes/note.module';
 import { RoomModule } from './modules/rooms/room.module';
 import { SocketModule } from './modules/sockets/socket.module';
 import { FeedbackModule } from './modules/feedback/feedback.module';
+import { EmailModule } from './modules/emails/email.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TransactionModule } from './modules/transactions/transaction.module';
 
 @Module({
 	imports: [
@@ -19,6 +22,9 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 		RoomModule,
 		SocketModule,
 		FeedbackModule,
+		EmailModule,
+		TransactionModule,
+		ScheduleModule.forRoot(),
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRootAsync({
 			useFactory: () => postgresConfig.getConfig(),

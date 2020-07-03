@@ -1,33 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useCookies } from 'react-cookie';
+import socketIOClient from 'socket.io-client';
 import {
 	StyledWrapper,
 	LandingWrapper,
 	LandingLeft,
+	LandingTop,
 	StyledImg,
 	StyledParagraph,
 	ButtonWrapper,
 	StyledLink,
-	FeedbackDescription,
-	StyledLabel,
-	StyledInput,
-	FeedbackSendButtonWrapper,
+	ScrollIndicator,
+	ScrollImg,
+	LandingBottom,
+	StyledTitle,
+	StyledSubtitle,
 } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import landing from '../../assets/images/landing.svg';
 import Button from '../../components/Button/Button';
 import queryParser from 'query-string';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
+import scrollIcon from '../../assets/images/scroll.svg';
+import backgroundImg from '../../assets/images/background.png';
+import PlanCard from '../../components/PlanCard/PlanCard';
+import Footer from '../../components/Footer/Footer';
+import LoginModal from '../../components/LoginModal/LoginModal';
+import RegisterModal from '../../components/RegisterModal/RegisterModal';
+import { ModalButtonsWrapper } from '../main/styles';
 import Modal from '../../components/Modal/Modal';
 
 const Root = ({ history, location }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [feedbackSent, setFeedbackSent] = useState(false);
-	const [feedbackModal, setFeedbackModal] = useState();
+	const [registerModal, setRegisterModal] = useState();
+	const [confirmModal, setConfirmModal] = useState();
+	const [loginModal, setLoginModal] = useState();
+	const [loggedIn, setLoggedIn] = useState();
 	const [matching, setMatching] = useState();
 	const [, setCookie] = useCookies(['seed']);
-	const [feedback, setFeedback] = useState();
-	const [email, setEmail] = useState();
+	const [loading, setLoading] = useState();
+	const [footer, setFooter] = useState();
+	const landingBottomRef = useRef();
 
 	const startSession = async () => {
 		if (matching) {
@@ -45,7 +58,7 @@ const Root = ({ history, location }) => {
 		const seed = `${Math.random()
 			.toString(36)
 			.slice(2)}${Math.random().toString(36).slice(2)}`.slice(0, 16);
-		setCookie('seed', seed, { maxAge: 60 * 60 }, { path: '/' });
+		setCookie('seed', seed, { path: '/' });
 		fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 			method: 'POST',
 			body: JSON.stringify({
@@ -84,49 +97,156 @@ const Root = ({ history, location }) => {
 		history.push('/?reasonCode=1');
 	};
 
-	const sendFeedback = async () => {
-		if (!feedback || feedback === '') {
-			notificationSystem.postNotification({
-				title: 'Error',
-				description: 'You have to enter the feedback field.',
-			});
+	const scrollBottom = () => {
+		window.scrollTo(0, landingBottomRef.current.offsetTop);
+	};
 
-			return;
-		}
-
-		setFeedbackSent(true);
-
-		notificationSystem.postNotification({
-			title: 'Success',
-			description: 'Thank your for your feedback!',
-			success: true,
-		});
-
-		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/feedback`, {
-			method: 'POST',
+	const downloadUser = async () => {
+		const result = await fetch(`${process.env.REACT_APP_URL}/api/v1/users`, {
 			credentials: 'include',
-			body: JSON.stringify({
-				email,
-				content: feedback,
-			}),
-			headers: { 'Content-Type': 'application/json' },
 		});
 
-		setFeedbackSent();
+		if (result.status === 200) {
+			setLoggedIn(await result.json());
+		}
+	};
+
+	const tryForFree = () => {
+		startSession();
+	};
+
+	const purchase = async () => {
+		setLoading(true);
+
+		const result = await fetch(
+			`${process.env.REACT_APP_URL}/api/v1/users/order`,
+			{
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+			}
+		);
+		setLoading(false);
 
 		if (result.status !== 200) {
 			notificationSystem.postNotification({
 				title: 'Error',
-				description: 'We encountered some problems while sending an email.',
+				description: 'We encoutered some problems while creating your order',
 			});
 
 			return;
 		}
 
-		setFeedbackModal({ exit: true });
-		setEmail();
-		setFeedback();
+		const { link } = await result.json();
+		window.open(link, '_self');
+
+		setConfirmModal({ exit: true });
 	};
+
+	const buyNow = () => {
+		if (loggedIn) {
+			setConfirmModal({
+				description:
+					'Do you want to purchase a bundle consisting of 10 premium sessions?',
+				confirmMessage: 'Purchase',
+				callback: () => purchase(),
+			});
+
+			return;
+		}
+
+		setRegisterModal({});
+	};
+
+	useEffect(() => {
+		if (!notificationSystem || location.pathname !== '/order') {
+			return;
+		}
+
+		const query = queryParser.parse(location.search);
+		// eslint-disable-next-line
+		const cancel = query.cancel == 'true';
+		const token = decodeURIComponent(query.id);
+		if (token) {
+			const finalizePurchase = async () => {
+				const result = await fetch(
+					`${process.env.REACT_APP_URL}/api/v1/users/order`,
+					{
+						method: 'PATCH',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							token,
+							cancel,
+						}),
+					}
+				);
+
+				if (result.status !== 200) {
+					notificationSystem.postNotification({
+						title: 'Error',
+						description:
+							'We encountered some problems while finalizing your order',
+					});
+
+					return;
+				}
+
+				notificationSystem.postNotification({
+					title: 'Success',
+					description: `Your order has been ${
+						cancel === 'true' ? 'canceled' : 'completed'
+					} succesfully`,
+					success: true,
+				});
+
+				downloadUser();
+			};
+			finalizePurchase();
+		}
+
+		window.history.replaceState({}, document.title, '/');
+	}, [location, notificationSystem]);
+
+	useEffect(() => {
+		if (!notificationSystem || location.pathname !== '/email') {
+			return;
+		}
+
+		const query = queryParser.parse(location.search);
+		const token = decodeURIComponent(query.id);
+		if (token) {
+			const confirmEmail = async () => {
+				const result = await fetch(
+					`${process.env.REACT_APP_URL}/api/v1/users/email/confirm`,
+					{
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ token }),
+					}
+				);
+
+				if (result.status !== 200) {
+					notificationSystem.postNotification({
+						title: 'Error',
+						description:
+							'We encountered some problems while confirming your email address',
+					});
+
+					return;
+				}
+
+				notificationSystem.postNotification({
+					title: 'Success',
+					description: 'Your email address has been confirmed successfully',
+					success: true,
+					persistent: true,
+				});
+			};
+			confirmEmail();
+		}
+
+		window.history.replaceState({}, document.title, '/');
+	}, [location, notificationSystem]);
 
 	useEffect(() => {
 		const reasonCode = queryParser.parse(location.search).reasonCode;
@@ -137,11 +257,13 @@ const Root = ({ history, location }) => {
 		switch (reasonCode) {
 			case '1':
 				notificationSystem.postNotification({
-					title: 'Error',
+					title: 'Warning',
+					success: true,
 					description:
 						'Your session has ended. Now we ask you to tell us how can we ',
 					action: 'improve',
-					callback: () => setFeedbackModal(true),
+					persistent: true,
+					callback: () => footer.showFeedbackModal(),
 				});
 				break;
 			case '2':
@@ -166,10 +288,10 @@ const Root = ({ history, location }) => {
 
 		// Avoid showing the same notification after the page reloads
 		window.history.replaceState({}, document.title, '/');
-	}, [location, notificationSystem]);
+	}, [location, notificationSystem, footer]);
 
 	useEffect(() => {
-		const getData = async () => {
+		const getSession = async () => {
 			const session = await (
 				await fetch(`${process.env.REACT_APP_URL}/api/v1/sessions`, {
 					credentials: 'include',
@@ -183,7 +305,9 @@ const Root = ({ history, location }) => {
 			).json();
 			if (room.id || session.id) {
 				setMatching({
-					room: room.id ? { id: room.id } : undefined,
+					room: room.id
+						? { id: room.id, sessionId: room.sessionId }
+						: undefined,
 					session: session.id ? { id: session.id } : undefined,
 				});
 				notificationSystem.postNotification({
@@ -194,87 +318,187 @@ const Root = ({ history, location }) => {
 			}
 		};
 
-		notificationSystem && getData();
+		notificationSystem && getSession();
 	}, [notificationSystem]);
 
+	useEffect(() => {
+		downloadUser();
+	}, []);
+
+	useEffect(() => {
+		if (!matching || (!matching.session && !matching.room)) {
+			return;
+		}
+		const id = matching.session ? matching.session.id : matching.room.sessionId;
+
+		const io = socketIOClient(process.env.REACT_APP_URL, {
+			query: { sessionId: id },
+		});
+
+		io.on('endSession', () => {
+			window.location.reload();
+		});
+
+		return () => io.disconnect();
+	}, [matching]);
+
 	return (
-		<StyledWrapper>
+		<StyledWrapper background={backgroundImg}>
 			<TopBar
-				buttonContent={matching ? 'Continue' : 'Start'}
-				buttonCallback={() => startSession()}
+				buttonContent={'Log in'}
+				buttonSecondary={true}
+				buttonCallback={() => setLoginModal({})}
+				loggedIn={loggedIn}
 			/>
 			<LandingWrapper>
-				<LandingLeft>
-					<b>Send</b> feedback
-					<br />
-					<b>Receive</b> feedback
-					<StyledParagraph>
-						Share your thoughts with your team <b>anonymously</b>
-					</StyledParagraph>
-					<ButtonWrapper>
-						<Button onClick={() => startSession()}>
-							{matching ? 'Continue' : 'Start'}
-						</Button>
-						{matching &&
-							(matching.session ? (
-								<StyledParagraph>
-									Or{' '}
-									<StyledLink onClick={() => cancelSession()}>
-										cancel
-									</StyledLink>{' '}
-									the session
-								</StyledParagraph>
-							) : (
-								<StyledParagraph>You have a room</StyledParagraph>
-							))}
-					</ButtonWrapper>
-				</LandingLeft>
-				<StyledImg src={landing} />
-				{feedbackModal && (
-					<Modal
-						title="How can we improve?"
-						description="Please describe things you liked and disliked about FeedbackTool."
-						onDismissCallback={() => setFeedbackModal()}
-						isExiting={(feedbackModal || {}).exit}
-					>
-						<FeedbackDescription>
-							If you want to hear about improvements you suggested, please give
-							us a way to contact you.
-						</FeedbackDescription>
-						<StyledLabel>
-							Your feedback<b>*</b>
-						</StyledLabel>
-						<StyledInput
-							minRows={5}
-							maxRows={5}
-							autoFocus
-							onChange={(e) => setFeedback(e.target.value)}
-							value={feedback}
-						/>
-						<StyledLabel>Your email</StyledLabel>
-						<StyledInput
-							maxRows={1}
-							onChange={(e) => setEmail(e.target.value)}
-							value={email}
-							onKeyPress={(e) => {
-								if (e.key === 'Enter') {
-									e.preventDefault();
-									if (!e.shiftKey && !e.ctrlKey) {
-										sendFeedback();
-									}
-								}
-							}}
-						/>
-						<FeedbackSendButtonWrapper>
-							<Button
-								disabled={feedbackSent}
-								loading={feedbackSent}
-								onClick={() => sendFeedback()}
-							>
-								Send
+				<LandingTop>
+					<LandingLeft>
+						<b>Send</b> feedback
+						<br />
+						<b>Receive</b> feedback
+						<StyledParagraph>
+							Share your thoughts with your team <b>anonymously</b>
+						</StyledParagraph>
+						<ButtonWrapper>
+							<Button onClick={() => startSession()}>
+								{matching ? 'Continue' : 'Start'}
 							</Button>
-						</FeedbackSendButtonWrapper>
+							{matching &&
+								(matching.session ? (
+									<StyledParagraph>
+										Or{' '}
+										<StyledLink onClick={() => cancelSession()}>
+											cancel
+										</StyledLink>{' '}
+										the session
+									</StyledParagraph>
+								) : (
+									<StyledParagraph>You have a room</StyledParagraph>
+								))}
+						</ButtonWrapper>
+					</LandingLeft>
+					<StyledImg src={landing} />
+				</LandingTop>
+				<LandingBottom ref={landingBottomRef}>
+					<StyledTitle>Pick your plan</StyledTitle>
+					<StyledSubtitle>Only pay for what you’re using</StyledSubtitle>
+					<span>
+						<PlanCard
+							title="Basic"
+							action="Try for free"
+							callback={() => tryForFree()}
+							items={[
+								{
+									type: 0,
+									content: 'Up to <b>5</b> people in a session',
+								},
+								{
+									type: 0,
+									content: 'Session duration up to a <b>half an hour</b>',
+								},
+								{
+									type: -1,
+									content: 'Possibility to <b>export</b> notes',
+								},
+								{
+									type: 1,
+									content: 'Fully <b>anonymous</b> feedback system',
+								},
+								{
+									type: 1,
+									content: 'Does not require you to create an <b>account</b>',
+								},
+							]}
+						></PlanCard>
+						<PlanCard
+							title="Premium"
+							highlighted={true}
+							action="Buy now"
+							callback={() => buyNow()}
+							price="Only <b>9.99</b>PLN"
+							details="For every 10 sessions"
+							items={[
+								{
+									type: 1,
+									content: '<b>Unlimited</b> number of people in a session',
+								},
+								{
+									type: 1,
+									content: '<b>Unlimited</b> session duration',
+								},
+								{
+									type: 1,
+									content: 'Possibility to <b>export</b> notes',
+								},
+								{
+									type: 1,
+									content: 'Fully <b>anonymous</b> feedback system',
+								},
+							]}
+						></PlanCard>
+					</span>
+				</LandingBottom>
+				<Footer ref={(footer) => setFooter(footer)} />
+				<ScrollIndicator onClick={() => scrollBottom()}>
+					<ScrollImg src={scrollIcon} /> Scroll down
+				</ScrollIndicator>
+				{confirmModal && (
+					<Modal
+						title="Are you sure?"
+						description={confirmModal.description}
+						onDismissCallback={() => setConfirmModal()}
+						isExiting={confirmModal.exit}
+					>
+						<ModalButtonsWrapper>
+							<Button
+								onClick={() => confirmModal.callback()}
+								color="#FF5453"
+								loading={loading}
+								disabled={loading}
+							>
+								{confirmModal.confirmMessage}
+							</Button>
+							<Button
+								onClick={() => setConfirmModal((m) => ({ ...m, exit: true }))}
+								secondary
+							>
+								Cancel
+							</Button>
+						</ModalButtonsWrapper>
 					</Modal>
+				)}
+				{loginModal && (
+					<LoginModal
+						input={{ email: loginModal.email, password: loginModal.password }}
+						callback={(data) => {
+							setLoginModal();
+							if (data.createAccount) {
+								setRegisterModal({
+									email: data.email,
+									password: data.password,
+								});
+
+								return;
+							}
+							window.location.reload();
+						}}
+					/>
+				)}
+				{registerModal && (
+					<RegisterModal
+						input={{
+							email: registerModal.email,
+							password: registerModal.password,
+						}}
+						callback={(data) => {
+							setRegisterModal();
+							if (data.login) {
+								setLoginModal({ email: data.email, password: data.password });
+
+								return;
+							}
+						}}
+					/>
 				)}
 				<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 			</LandingWrapper>

@@ -51,9 +51,7 @@ export const StyledNotification = styled.div`
 	right: 5px;
 	max-width: 300px;
 	width: 90%;
-	bottom: calc(
-		${({ index, offset }) => index + ' * 125px + 5px - ' + offset + 'px'}
-	);
+	bottom: calc(${({ index }) => index + ' * 125px + 30px'});
 	min-height: 60px;
 	background: #ffffff;
 	box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);

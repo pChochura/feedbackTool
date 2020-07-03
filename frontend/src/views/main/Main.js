@@ -15,15 +15,17 @@ import PersonCard from '../../components/PersonCard/PersonCard';
 import Modal from '../../components/Modal/Modal';
 import moment from 'moment';
 import Button from '../../components/Button/Button';
+import Footer from '../../components/Footer/Footer';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
 
 const Main = ({ history }) => {
 	const [expirationTimestamp, setExpirationTimestamp] = useState(0);
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [joinModalShowed, setJoinModalShowed] = useState(false);
 	const [endSessionModal, setEndSessionModal] = useState();
+	const [extendPlanModal, setExtendPlanModal] = useState();
 	const [maxNotesCount, setMaxNotesCount] = useState(0);
 	const [showedRooms, setShowedRooms] = useState([]);
+	const [joinModal, setJoinModal] = useState(false);
 	const [time, setTime] = useState('01:00:00');
 	const [addLink, setAddLink] = useState('');
 	const [phase, setPhase] = useState(0);
@@ -67,9 +69,8 @@ const Main = ({ history }) => {
 				method: 'POST',
 				credentials: 'include',
 			});
-			history.push('/?reasonCode=1');
 		}
-	}, [expirationTimestamp, history, setTime]);
+	}, [expirationTimestamp, setTime]);
 
 	const removeRoom = async (id) => {
 		fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/${id}`, {
@@ -106,7 +107,7 @@ const Main = ({ history }) => {
 				getRooms();
 				notificationSystem.postNotification({
 					title: 'Sucess',
-					description: 'The room has been succesfully marked as not ready.',
+					description: 'The room has been successfully marked as not ready.',
 					success: true,
 				});
 			})
@@ -126,7 +127,6 @@ const Main = ({ history }) => {
 					method: 'POST',
 					credentials: 'include',
 				});
-				history.push('/?reasonCode=1');
 			} else {
 				setEndSessionModal({});
 			}
@@ -181,6 +181,53 @@ const Main = ({ history }) => {
 		return options;
 	};
 
+	const onRoomCreated = useCallback(
+		(_) => {
+			getRooms();
+		},
+		[getRooms]
+	);
+
+	const onRoomChanged = useCallback(
+		(data) => {
+			const tempRooms = rooms.map((room) =>
+				room.id === data.room.id ? data.room : room
+			);
+			setMaxNotesCount((max) =>
+				Math.max(
+					max,
+					(data.room.lists || []).reduce(
+						(acc, list) => (acc = Math.max(acc, list.count)),
+						0
+					)
+				)
+			);
+			setRooms(tempRooms);
+			setShowedRooms(tempRooms);
+		},
+		[rooms]
+	);
+
+	const onRoomLimit = useCallback(
+		(data) => {
+			notificationSystem.postNotification({
+				title: 'Warning',
+				description: `You have a request from ${data.room.name} to join your session. `,
+				success: true,
+				persistent: true,
+				action: 'Extend your plan',
+				callback: () => {
+					setExtendPlanModal({ name: data.room.name });
+				},
+			});
+		},
+		[notificationSystem]
+	);
+
+	const onEndSession = useCallback(() => {
+		history.push('/?reasonCode=1');
+	}, [history]);
+
 	useEffect(() => {
 		const prepareMainPage = async () => {
 			let mainPage = await (
@@ -192,6 +239,7 @@ const Main = ({ history }) => {
 				history.push('/?reasonCode=3');
 				return;
 			}
+
 			getRooms();
 			setAddLink(mainPage.addLink);
 			setPhase(mainPage.phase);
@@ -200,21 +248,6 @@ const Main = ({ history }) => {
 
 		prepareMainPage();
 	}, [history, id, getRooms]);
-
-	useEffect(() => {
-		const checkMatchingRoom = async () => {
-			const matchingRoom = await (
-				await fetch(`${process.env.REACT_APP_URL}/api/v1/rooms/find`, {
-					credentials: 'include',
-				})
-			).json();
-			if (matchingRoom.id) {
-				(rooms.find((room) => room.id === matchingRoom.id) || {}).own = true;
-			}
-		};
-
-		checkMatchingRoom();
-	}, [rooms]);
 
 	useEffect(() => {
 		const timerInterval = setInterval(refreshTimer, 1000);
@@ -229,34 +262,14 @@ const Main = ({ history }) => {
 				sessionId: id,
 			},
 		});
-		io.on('roomCreated', (_) => {
-			getRooms();
-		});
 
-		io.on('roomChanged', (data) => {
-			Object.assign(
-				rooms.find((room) => room.id === data.room.id) || {},
-				data.room
-			);
-			setMaxNotesCount((max) =>
-				Math.max(
-					max,
-					(data.room.lists || []).reduce(
-						(acc, list) => (acc = Math.max(acc, list.count)),
-						0
-					)
-				)
-			);
-			setRooms(rooms);
-			setShowedRooms(rooms);
-		});
-
-		io.on('endSession', () => {
-			history.push('/?reasonCode=1');
-		});
+		io.on('roomCreated', onRoomCreated);
+		io.on('roomChanged', onRoomChanged);
+		io.on('roomLimit', onRoomLimit);
+		io.on('endSession', onEndSession);
 
 		return () => io.disconnect();
-	}, [rooms, getRooms, maxNotesCount, id, history]);
+	}, [id, onRoomCreated, onRoomChanged, onRoomLimit, onEndSession]);
 
 	return (
 		<StyledWrapper>
@@ -264,7 +277,7 @@ const Main = ({ history }) => {
 				buttonContent={phase === 0 ? 'Continue' : 'End session'}
 				buttonDisabled={rooms.length <= 1 || rooms.some((room) => !room.ready)}
 				buttonCallback={() => nextPhase()}
-				message={time}
+				message={expirationTimestamp !== null ? time : ''}
 			/>
 			<DashboardWrapper>
 				<MainBarWrapper>
@@ -279,11 +292,15 @@ const Main = ({ history }) => {
 					{showedRooms.map((room, index) => (
 						<PersonCard
 							key={index}
+							clickable={room.own}
 							maxNotesCount={maxNotesCount}
 							name={room.name}
 							options={phase === 1 ? null : getOptionsForRoom(room)}
 							isReady={room.ready}
 							lists={phase === 1 ? [] : room.lists}
+							clickCallback={() =>
+								room.own && window.open(`/room/${room.id}`, '_blank')
+							}
 							optionClickCallback={(index) => {
 								switch (index) {
 									case 1:
@@ -303,16 +320,26 @@ const Main = ({ history }) => {
 					))}
 					{phase === 0 && (
 						<PersonCard
-							isAdder={true}
-							clickCallback={() => setJoinModalShowed(true)}
+							clickable={true}
+							adder={true}
+							clickCallback={() => setJoinModal(true)}
 						/>
 					)}
 				</CardsWrapper>
 			</DashboardWrapper>
-			{joinModalShowed && (
+			<Footer />
+			{joinModal && (
 				<Modal
-					onDismissCallback={() => setJoinModalShowed(false)}
+					onDismissCallback={() => setJoinModal(false)}
 					link={`${window.location.origin}/add/${addLink}`}
+				/>
+			)}
+			{extendPlanModal && (
+				<Modal
+					title={`New request from ${extendPlanModal.name}`}
+					description="Your basic plan has reached a limit. To accept this request you have to extend your plan."
+					onDismissCallback={() => setExtendPlanModal()}
+					isExiting={extendPlanModal.exit}
 				/>
 			)}
 			{endSessionModal && (
@@ -320,7 +347,7 @@ const Main = ({ history }) => {
 					title="Are you sure you want to end this session?"
 					description="This action cannot be undone. All notes will be discarded."
 					onDismissCallback={() => setEndSessionModal()}
-					isExiting={(endSessionModal || {}).exit}
+					isExiting={endSessionModal.exit}
 				>
 					<ModalButtonsWrapper>
 						<Button

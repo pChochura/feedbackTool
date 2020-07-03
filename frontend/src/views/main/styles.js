@@ -8,8 +8,10 @@ export const StyledWrapper = styled.div`
 `;
 
 export const DashboardWrapper = styled.div`
+	box-sizing: border-box;
 	display: flex;
 	padding: 30px;
+	min-height: calc(100vh - 150px);
 	flex-direction: column;
 
 	@media (min-width: 900px) {

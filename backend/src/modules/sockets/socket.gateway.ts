@@ -14,12 +14,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private server: Server;
 
 	handleConnection(@ConnectedSocket() client: Socket) {
-		client.join(client.handshake.query.sessionId);
+		if (client.handshake.query.sessionId) {
+			client.join(client.handshake.query.sessionId);
+		}
 	}
 
-	handleDisconnect() {}
+	handleDisconnect(@ConnectedSocket() client: Socket) {
+		if (client.handshake.query.sessionId) {
+			client.leave(client.handshake.query.sessionId);
+		}
+	}
 
-	endSession(sessionId: string) {
+	sessionEnded(sessionId: string) {
 		this.server.to(sessionId).emit('endSession');
 	}
 
@@ -40,6 +46,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					associatedRoomId: list.associatedRoomId,
 				})),
 				ready: room.ready,
+				own: room.id === sessionId,
 			},
 		});
 	}
@@ -64,6 +71,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				})),
 				ready: room.ready,
 			},
+		});
+	}
+
+	roomLimit(sessionId: string, name: string) {
+		this.server.to(sessionId).emit('roomLimit', {
+			room: { name },
 		});
 	}
 }

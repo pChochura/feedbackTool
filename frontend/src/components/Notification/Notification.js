@@ -16,6 +16,7 @@ const Notification = ({
 	description,
 	icon,
 	callback,
+	persistent,
 	duration = 3000,
 	index,
 	action,
@@ -25,26 +26,25 @@ const Notification = ({
 	const descriptionRef = useRef();
 
 	useEffect(() => {
-		if (action) {
+		if (persistent) {
 			return;
 		}
 
 		const timeout = setTimeout(() => setExit(true), duration);
 
 		return () => clearTimeout(timeout);
-	}, [duration, action]);
+	}, [duration, persistent]);
 
 	return (
 		<StyledNotification
 			exit={exit}
 			index={index}
-			offset={window.pageYOffset}
 			onAnimationEnd={() => exit && callback && callback(id)}
 		>
 			<TitleWrapper>
 				<StyledIcon src={icon || warningIcon} />
 				<StyledTitle>{title}</StyledTitle>
-				{action && (
+				{persistent && (
 					<StyledImg
 						clickable={true}
 						src={closeIcon}

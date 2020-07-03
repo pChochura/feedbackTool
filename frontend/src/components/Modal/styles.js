@@ -1,4 +1,5 @@
 import styled, { keyframes } from 'styled-components';
+import TextareaAutosize from 'react-textarea-autosize';
 
 const enterAnimation = keyframes`
     0% {
@@ -56,7 +57,7 @@ export const StyledCard = styled.div`
 
 	@media (min-width: 900px) {
 		width: 50%;
-		padding: 75px 25px;
+		padding: 50px 25px;
 	}
 `;
 
@@ -116,4 +117,75 @@ export const StyledBox = styled.div`
 			font-size: 1rem;
 		}
 	}
+`;
+
+export const FeedbackDescription = styled.p`
+	color: #ababab;
+	font-weight: 300;
+	text-align: center;
+	font-size: 0.8rem;
+
+	@media (min-width: 900px) {
+		font-size: 1rem;
+	}
+`;
+
+export const StyledLabel = styled.label`
+	font-weight: 300;
+	font-size: 0.8rem;
+	color: #ababab;
+	margin: 10px;
+	align-self: flex-start;
+
+	b {
+		color: #ff5453;
+	}
+
+	@media (min-width: 900px) {
+		font-size: 1rem;
+	}
+`;
+
+export const StyledTextArea = styled(TextareaAutosize)`
+	background-color: #efefef;
+	border: none;
+	width: 100%;
+	align-self: center;
+	padding: 5px;
+	outline-color: #3750db;
+	outline-width: 1px;
+	box-sizing: border-box;
+	font-family: 'Montserrat';
+	font-size: 1rem;
+	font-weight: 300;
+	color: #515151;
+	resize: none;
+
+	@media (min-width: 900px) {
+		padding: 15px 10px;
+	}
+`;
+
+export const StyledInput = styled.input`
+	background-color: #efefef;
+	border: ${({ error }) =>
+		error ? '1px solid #FF5453' : '1px solid #00000000'};
+	width: 100%;
+	align-self: center;
+	padding: 5px;
+	outline-color: #3750db;
+	outline-width: 1px;
+	box-sizing: border-box;
+	font-family: 'Montserrat';
+	font-size: 1rem;
+	font-weight: 300;
+	color: #515151;
+
+	@media (min-width: 900px) {
+		padding: 15px 10px;
+	}
+`;
+
+export const FeedbackSendButtonWrapper = styled.div`
+	margin-top: 50px;
 `;

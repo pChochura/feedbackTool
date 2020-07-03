@@ -12,6 +12,7 @@ export class CreateRoomDto {
 	readonly seed: string;
 
 	@IsString()
+	@Length(3, 64)
 	@ApiProperty({
 		required: true,
 		description: 'Name of the room',

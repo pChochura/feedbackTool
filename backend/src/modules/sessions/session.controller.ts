@@ -6,6 +6,7 @@ import {
 	Body,
 	Get,
 	Patch,
+	UseGuards,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -13,10 +14,9 @@ import {
 	ApiOkResponse,
 	ApiBadRequestResponse,
 	ApiNotFoundResponse,
-	ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { SessionService } from './session.service';
-import { sendResponse, sendError } from '../../common';
+import { sendResponse } from '../../common';
 import { Response } from 'express';
 import { CreateSessionDto } from './dto/create-session.dto';
 import { CreatedResponseSchema } from '../../common/created-response.schema';
@@ -24,6 +24,8 @@ import { BasicResponseSchema } from '../../common/basic-response.schema';
 import { Cookies } from '@nestjsplus/cookies';
 import { Session } from './entities/session.entity';
 import { OneOfResponseSchema } from '../../common/one-of-response.schema';
+import { AuthSoftGuard } from '../guards/auth-soft.guard';
+import { AuthResponse } from '../../common/response';
 
 @ApiTags('Sessions')
 @Controller('api/v1/sessions')
@@ -31,6 +33,7 @@ export class SessionController {
 	constructor(private readonly sessionService: SessionService) {}
 
 	@Post()
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Creates a new session' })
 	@ApiOkResponse({
 		description: 'Created a new session',
@@ -47,17 +50,17 @@ export class SessionController {
 	})
 	async create(
 		@Body() createSessionDto: CreateSessionDto,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		try {
-			const session = await this.sessionService.create(createSessionDto);
-			sendResponse(response, { id: session.id }, HttpStatus.CREATED);
-		} catch (error) {
-			sendError(response, error);
-		}
+		const session = await this.sessionService.create(
+			createSessionDto,
+			response.user
+		);
+		sendResponse(response, { id: session.id }, HttpStatus.CREATED);
 	}
 
 	@Get()
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Returns session matched by a seed in a cookie' })
 	@ApiOkResponse({
 		description: 'Returned session matched by a seed in a cookie',
@@ -70,22 +73,13 @@ export class SessionController {
 			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session can access it'
-		),
-	})
-	async find(@Cookies('seed') seed: string, @Res() response: Response) {
-		try {
-			const session = await this.sessionService.findMatching(seed);
-			sendResponse(response, session);
-		} catch (error) {
-			sendError(response, error);
-		}
+	async find(@Cookies('seed') seed: string, @Res() response: AuthResponse) {
+		const session = await this.sessionService.findMatching(response.user, seed);
+		sendResponse(response, session);
 	}
 
 	@Post('/end')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({
 		summary: 'Ends a session and removes associated users froms the database',
 	})
@@ -101,22 +95,13 @@ export class SessionController {
 			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session can modify it'
-		),
-	})
-	async end(@Cookies('seed') seed: string, @Res() response: Response) {
-		try {
-			await this.sessionService.endMatching(seed);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+	async end(@Cookies('seed') seed: string, @Res() response: AuthResponse) {
+		await this.sessionService.endMatching(response.user, seed);
+		sendResponse(response, { status: 'OK' });
 	}
 
 	@Patch('/aggregate')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({
 		summary:
 			'Aggregates all notes from the room associated with a given session',
@@ -130,19 +115,12 @@ export class SessionController {
 		description: 'User not found',
 		schema: new BasicResponseSchema('User not found'),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session can modify it'
-		),
-	})
-	async aggregate(@Cookies('seed') seed: string, @Res() response: Response) {
-		try {
-			await this.sessionService.aggregateMatching(seed);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+	async aggregate(
+		@Cookies('seed') seed: string,
+		@Res() response: AuthResponse
+	) {
+		await this.sessionService.aggregateMatching(response.user, seed);
+		sendResponse(response, { status: 'OK' });
 	}
 
 	@Post('/checkAdd')
@@ -161,11 +139,7 @@ export class SessionController {
 		@Body() body: { addLink: string },
 		@Res() response: Response
 	) {
-		try {
-			await this.sessionService.findByAddLink(body.addLink);
-			sendResponse(response, { status: 'OK' });
-		} catch (error) {
-			sendError(response, error);
-		}
+		await this.sessionService.findByAddLink(body.addLink);
+		sendResponse(response, { status: 'OK' });
 	}
 }

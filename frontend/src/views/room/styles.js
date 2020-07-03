@@ -3,9 +3,14 @@ import TextareaAutosize from 'react-textarea-autosize';
 
 export const StyledWrapper = styled.div`
 	width: 100%;
-	height: 100%;
-	padding-bottom: 100px;
+	min-height: 100vh;
 	position: relative;
+	display: flex;
+	flex-direction: column;
+
+	footer {
+		margin-top: auto;
+	}
 `;
 
 export const StyledTitle = styled.h1`
@@ -25,6 +30,7 @@ export const StyledListsWrapper = styled.div`
 	overflow-x: auto;
 	overflow-y: hidden;
 	display: inline-flex;
+	margin-bottom: 50px;
 `;
 
 export const StyledList = styled.div`
@@ -99,10 +105,20 @@ export const StyledListNote = styled.div`
 export const SubmitNoteWrapper = styled.div`
 	box-sizing: border-box;
 	width: 100%;
-	padding: 0px 15px;
+	padding: 0px 5px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+
+	@media (min-width: 900px) {
+		padding: 0px 15px;
+	}
+
+	@media (max-width: 900px) {
+		> * {
+			padding: 0 5px;
+		}
+	}
 `;
 
 export const StyledNoteIndicator = styled.div`
@@ -200,6 +216,17 @@ export const NoteRatingWrapper = styled.div`
 	align-items: center;
 	justify-content: space-between;
 	margin: 10px 0;
+
+	span {
+		display: flex;
+
+		img {
+			@media (max-width: 900px) {
+				margin: 0;
+				padding: 2px;
+			}
+		}
+	}
 `;
 
 export const StyledParagraph = styled.p`

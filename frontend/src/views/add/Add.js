@@ -11,6 +11,7 @@ import {
 	ButtonWrapper,
 } from './styles';
 import Button from '../../components/Button/Button';
+import Footer from '../../components/Footer/Footer';
 import { useParams } from 'react-router-dom';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
 
@@ -90,7 +91,7 @@ const Add = ({ history }) => {
 			</StyledParagraph>
 			<StyledBox>
 				<StyledParagraph>
-					To help identify you by your friends,
+					To help identify who your friends are writing about,
 					<br />
 					please enter a name
 				</StyledParagraph>
@@ -105,6 +106,7 @@ const Add = ({ history }) => {
 					<Button onClick={() => join()}>Join</Button>
 				</ButtonWrapper>
 			</StyledBox>
+			<Footer />
 			<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 		</StyledWrapper>
 	);

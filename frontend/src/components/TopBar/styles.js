@@ -44,7 +44,7 @@ export const LogoWrapper = styled.div`
 	}
 `;
 
-export const StyledImg = styled.img`
+export const StyledLogo = styled.img`
 	width: 21px;
 	height: 17px;
 	align-self: center;
@@ -63,4 +63,30 @@ export const StyledParagraph = styled.p`
 	@media (min-width: 900px) {
 		font-size: 1.2rem;
 	}
+`;
+
+export const LoggedBoxWrapper = styled.div`
+	display: flex;
+	align-items: center;
+	border-radius: 10px;
+	transition: 0.3s background-color;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #efefef;
+	}
+`;
+
+export const StyledImg = styled.img`
+	background-color: #efefef;
+	border-radius: 50%;
+	width: 48px;
+	height: 48px;
+	padding: 8px;
+	box-sizing: border-box;
+`;
+
+export const StyledEmail = styled.p`
+	font-size: 1rem;
+	margin: 0 10px;
 `;
