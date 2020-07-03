@@ -34,11 +34,12 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { FinalizeOrderDto } from './dto/finalize-order.dto';
 import { CreatedResponseSchema } from '../../common/created-response.schema';
 import { AuthSoftGuard } from '../guards/auth-soft.guard';
+import { AuthResponse } from '../../common/response';
 
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(private readonly userService: UserService) { }
 
 	@Post()
 	@ApiOperation({ summary: 'Attempts logging in' })
@@ -124,7 +125,7 @@ export class UserController {
 	})
 	async sendConfirmationEmail(
 		@Headers() headers: any,
-		@Body() body: { token?: string },
+		@Body() body: { token?: string; },
 		@Res() response: Response
 	) {
 		await this.userService.sendConfirmationEmail(
@@ -151,7 +152,7 @@ export class UserController {
 		schema: new BasicResponseSchema('Email is already confirmed'),
 	})
 	async cnfirmEmail(
-		@Body() body: { token: string },
+		@Body() body: { token: string; },
 		@Res() response: Response
 	) {
 		await this.userService.confirmEmail(body.token);
@@ -169,13 +170,11 @@ export class UserController {
 		description: 'Missing credentials',
 		schema: new BasicResponseSchema('Missing credentials'),
 	})
-	async findByToken(@Res() response: Response) {
-		// @ts-ignore
+	async findByToken(@Res() response: AuthResponse) {
 		if (!response.user) {
 			throw new ForbiddenException('Missing credentials');
 		}
 
-		// @ts-ignore
 		const { secret, sessionToken, ...user } = response.user;
 		sendResponse(response, user, HttpStatus.OK);
 	}
@@ -191,8 +190,7 @@ export class UserController {
 		description: 'Missing credentials',
 		schema: new BasicResponseSchema('Missing credentials'),
 	})
-	async delete(@Res() response: Response) {
-		// @ts-ignore
+	async delete(@Res() response: AuthResponse) {
 		await this.userService.delete(response.user);
 		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
 	}
@@ -211,9 +209,8 @@ export class UserController {
 	})
 	async createOrder(
 		@Body() createOrderDto: CreateOrderDto,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		// @ts-ignore
 		const link = await this.userService.createOrder(
 			response.user,
 			createOrderDto

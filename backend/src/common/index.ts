@@ -3,8 +3,8 @@ import * as seedRandom from 'seedrandom';
 import { HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 
-export const sendResponse = (
-	response: Response,
+export const sendResponse = <T extends Response>(
+	response: T,
 	message: object,
 	statusCode: number = HttpStatus.OK
 ) => {

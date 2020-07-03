@@ -18,13 +18,14 @@ import NotificationSystem from '../NotificationSystem/NotificationSystem';
 
 const ProfileModal = ({ user, forceExit, callback }) => {
 	const [notificationSystem, setNotificationSystem] = useState();
-	const [, , removeCookie] = useCookies(['x-session']);
+	const [, , removeCookie] = useCookies(['x-session', 'seed']);
 	const [confirmModal, setConfirmModal] = useState();
 	const [loading, setLoading] = useState();
 	const [exit, setExit] = useState(false);
 
 	const logout = () => {
 		removeCookie('x-session');
+		removeCookie('seed');
 		window.location.reload();
 	};
 

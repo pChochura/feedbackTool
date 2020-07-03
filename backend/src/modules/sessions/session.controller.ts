@@ -25,11 +25,12 @@ import { Cookies } from '@nestjsplus/cookies';
 import { Session } from './entities/session.entity';
 import { OneOfResponseSchema } from '../../common/one-of-response.schema';
 import { AuthSoftGuard } from '../guards/auth-soft.guard';
+import { AuthResponse } from '../../common/response';
 
 @ApiTags('Sessions')
 @Controller('api/v1/sessions')
 export class SessionController {
-	constructor(private readonly sessionService: SessionService) {}
+	constructor(private readonly sessionService: SessionService) { }
 
 	@Post()
 	@UseGuards(AuthSoftGuard)
@@ -49,11 +50,10 @@ export class SessionController {
 	})
 	async create(
 		@Body() createSessionDto: CreateSessionDto,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
 		const session = await this.sessionService.create(
 			createSessionDto,
-			// @ts-ignore
 			response.user
 		);
 		sendResponse(response, { id: session.id }, HttpStatus.CREATED);
@@ -73,8 +73,7 @@ export class SessionController {
 			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	async find(@Cookies('seed') seed: string, @Res() response: Response) {
-		// @ts-ignore
+	async find(@Cookies('seed') seed: string, @Res() response: AuthResponse) {
 		const session = await this.sessionService.findMatching(response.user, seed);
 		sendResponse(response, session);
 	}
@@ -96,8 +95,7 @@ export class SessionController {
 			new BasicResponseSchema('Session not found'),
 		]),
 	})
-	async end(@Cookies('seed') seed: string, @Res() response: Response) {
-		// @ts-ignore
+	async end(@Cookies('seed') seed: string, @Res() response: AuthResponse) {
 		await this.sessionService.endMatching(response.user, seed);
 		sendResponse(response, { status: 'OK' });
 	}
@@ -117,8 +115,7 @@ export class SessionController {
 		description: 'User not found',
 		schema: new BasicResponseSchema('User not found'),
 	})
-	async aggregate(@Cookies('seed') seed: string, @Res() response: Response) {
-		// @ts-ignore
+	async aggregate(@Cookies('seed') seed: string, @Res() response: AuthResponse) {
 		await this.sessionService.aggregateMatching(response.user, seed);
 		sendResponse(response, { status: 'OK' });
 	}
@@ -136,7 +133,7 @@ export class SessionController {
 		schema: new BasicResponseSchema('Session not found'),
 	})
 	async matchAddPage(
-		@Body() body: { addLink: string },
+		@Body() body: { addLink: string; },
 		@Res() response: Response
 	) {
 		await this.sessionService.findByAddLink(body.addLink);

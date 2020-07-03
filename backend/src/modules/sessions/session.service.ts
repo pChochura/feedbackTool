@@ -23,7 +23,7 @@ export class SessionService {
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
 		private readonly socketGateway: SocketGateway,
 		private readonly schedulerRegistry: SchedulerRegistry
-	) {}
+	) { }
 
 	private addExpirationTimeout(
 		session: Session,
@@ -104,17 +104,21 @@ export class SessionService {
 		const id = generateId(seed);
 
 		let session = await this.sessionRepository.findOne(id);
-		if (session) {
-			user = await User.findOne(session.creatorId);
-			if (!user) {
-				throw new NotFoundException('User not found');
-			}
-		} else {
-			session = await this.sessionRepository.findOne({
+		if (user) {
+			const tempSession = await this.sessionRepository.findOne({
 				where: {
 					creatorId: user.id,
 				},
 			});
+
+			if (tempSession) {
+				session = tempSession;
+			}
+		} else {
+			user = await User.findOne(session.creatorId);
+			if (!user) {
+				throw new NotFoundException('User not found');
+			}
 		}
 
 		if (!session) {
@@ -194,7 +198,7 @@ export class SessionService {
 
 		const lists = rooms.flatMap((room) => room.lists);
 
-		const temp: { [k: string]: Note[] } = {};
+		const temp: { [k: string]: Note[]; } = {};
 
 		const notesByRoom = lists.reduce((acc, list) => {
 			if (acc[list.associatedRoomId]) {

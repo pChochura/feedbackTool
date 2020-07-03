@@ -32,11 +32,12 @@ import { SubmitNoteDto } from './dto/submit-note.dto';
 import { RemoveNoteDto } from './dto/remove-note.dto';
 import { CustomResponseSchema } from '../../common/custom-response.schema';
 import { AuthSoftGuard } from '../guards/auth-soft.guard';
+import { AuthResponse } from '../../common/response';
 
 @ApiTags('Rooms')
 @Controller('api/v1/rooms')
 export class RoomController {
-	constructor(private readonly roomService: RoomService) {}
+	constructor(private readonly roomService: RoomService) { }
 
 	@Post()
 	@ApiOperation({ summary: 'Creates a room' })
@@ -93,9 +94,8 @@ export class RoomController {
 	})
 	async findAllMatching(
 		@Cookies('seed') seed: string,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		// @ts-ignore
 		const rooms = await this.roomService.findAllMatching(response.user, seed);
 		sendResponse(
 			response,
@@ -129,9 +129,8 @@ export class RoomController {
 	})
 	async findOneMatching(
 		@Cookies('seed') seed: string,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		// @ts-ignore
 		const room = await this.roomService.findOneMatching(response.user, seed);
 		sendResponse(response, room);
 	}
@@ -186,9 +185,8 @@ export class RoomController {
 	async remove(
 		@Cookies('seed') seed: string,
 		@Param('id') id: string,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		// @ts-ignore
 		await this.roomService.remove(response.user, seed, id);
 		sendResponse(response, { status: 'OK' });
 	}
@@ -224,9 +222,8 @@ export class RoomController {
 		@Cookies('seed') seed: string,
 		@Param('id') id: string,
 		@Body() setRoomReadyDto: SetRoomReadyDto,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		// @ts-ignore
 		await this.roomService.setReady(response.user, seed, id, setRoomReadyDto);
 		sendResponse(response, { status: 'OK' });
 	}
