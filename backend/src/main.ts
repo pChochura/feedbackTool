@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
 import { AnyExceptionFilter } from './common/any-exception.filter';
+import { CorrelationIdMiddleware } from "@eropple/nestjs-correlation-id";
 require('dotenv').config();
 
 declare const module: any;
@@ -13,6 +14,7 @@ async function bootstrap() {
 	app.useGlobalFilters(new AnyExceptionFilter());
 	app.useGlobalPipes(new ValidationPipe());
 	app.use(CookieParser('secret'));
+	app.use(CorrelationIdMiddleware());
 	app.enableCors({
 		origin: process.env.CLIENT_URL,
 		credentials: true,
@@ -30,7 +32,7 @@ async function bootstrap() {
 	SwaggerModule.setup('api/v1/docs', app, document);
 
 	if (!module.parent) {
-		await app.listen(8000);
+		await app.listen(process.env.PORT);
 	}
 
 	if (module.hot) {

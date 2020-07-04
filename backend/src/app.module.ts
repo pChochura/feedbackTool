@@ -12,6 +12,7 @@ import { FeedbackModule } from './modules/feedback/feedback.module';
 import { EmailModule } from './modules/emails/email.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TransactionModule } from './modules/transactions/transaction.module';
+import { LoggerModule } from './modules/logger/logger.module';
 
 @Module({
 	imports: [
@@ -24,6 +25,7 @@ import { TransactionModule } from './modules/transactions/transaction.module';
 		FeedbackModule,
 		EmailModule,
 		TransactionModule,
+		LoggerModule,
 		ScheduleModule.forRoot(),
 		ConfigModule.forRoot({ isGlobal: true }),
 		TypeOrmModule.forRootAsync({
@@ -31,4 +33,4 @@ import { TransactionModule } from './modules/transactions/transaction.module';
 		}),
 	],
 })
-export class AppModule {}
+export class AppModule { }

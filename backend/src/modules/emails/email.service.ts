@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class EmailService {
-	constructor(private readonly mailerService: MailerService) {}
+	constructor(
+		private readonly mailerService: MailerService,
+		private readonly loggerService: LoggerService
+	) { }
 
 	async sendFeedback(email: string, content: string) {
 		email = email || 'anonymous@ft.tech';
 
-		console.log(email, content);
+		this.loggerService.info('Feedback email sent', {
+			email,
+			content: content.substr(0, 20) + '...'
+		}, 'email.service');
 
 		await this.mailerService.sendMail({
 			to: process.env.RECEIVER_EMAIL,
@@ -20,6 +27,10 @@ export class EmailService {
 	}
 
 	async sendEmailConfirmation(email: string, token: string) {
+		this.loggerService.info('Confirmation email sent', {
+			email,
+		}, 'email.service');
+
 		await this.mailerService.sendMail({
 			to: email,
 			from: process.env.SENDER_EMAIL,

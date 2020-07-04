@@ -4,19 +4,22 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Feedback } from './entities/feedback.entity';
 import { Repository } from 'typeorm';
 import { EmailService } from '../emails/email.service';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class FeedbackService {
 	constructor(
 		@InjectRepository(Feedback)
 		private readonly feedbackRepository: Repository<Feedback>,
-		private readonly emailService: EmailService
-	) {}
+		private readonly emailService: EmailService,
+		private readonly loggerService: LoggerService
+	) { }
 
 	async send(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
 		const feedback = this.feedbackRepository.create(createFeedbackDto);
 		await feedback.save();
 
+		this.loggerService.log('Nothing');
 		await this.emailService.sendFeedback(
 			createFeedbackDto.email,
 			createFeedbackDto.content

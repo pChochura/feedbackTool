@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
 import { EmailService } from './email.service';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
 	imports: [
@@ -19,8 +20,9 @@ import { EmailService } from './email.service';
 				adapter: new EjsAdapter(),
 			},
 		}),
+		LoggerModule,
 	],
 	providers: [EmailService],
 	exports: [EmailService],
 })
-export class EmailModule {}
+export class EmailModule { }

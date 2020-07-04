@@ -4,7 +4,6 @@ import {
 	ConflictException,
 	ForbiddenException,
 	NotFoundException,
-	BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
@@ -24,6 +23,7 @@ import { PaypalService } from '../paypal/paypal.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { FinalizeOrderDto } from './dto/finalize-order.dto';
 import { Transaction } from '../transactions/entities/transaction.entity';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class UserService {
@@ -31,8 +31,9 @@ export class UserService {
 		@InjectRepository(User) private readonly userRespository: Repository<User>,
 		private readonly emailService: EmailService,
 		private readonly socketGateway: SocketGateway,
-		private readonly paypalService: PaypalService
-	) {}
+		private readonly paypalService: PaypalService,
+		private readonly loggerService: LoggerService
+	) { }
 
 	async getUserByAuthHeader(authHeader: string): Promise<User> {
 		const incomingDigest = ServerDigestAuth.analyze(authHeader, [QOP_AUTH]);
