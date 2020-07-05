@@ -1,1 +1,0 @@
-{"requestId":"a0702ffe-7206-4903-85c0-bcb4a69b5195","requestUrl":"/api/v1/feedback","hostname":"localhost","method":"POST","ip":"::1","customProperties":{"email":"lol@lel.com","content":"Fajna jaka..."},"level":"info","message":"Feedback email sent","ms":"+2ms","timestamp":"2020-07-03T20:35:52.317Z"}

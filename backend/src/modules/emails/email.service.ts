@@ -7,7 +7,9 @@ export class EmailService {
 	constructor(
 		private readonly mailerService: MailerService,
 		private readonly loggerService: LoggerService
-	) { }
+	) {
+		this.loggerService.setContext('email.service');
+	}
 
 	async sendFeedback(email: string, content: string) {
 		email = email || 'anonymous@ft.tech';
@@ -15,7 +17,7 @@ export class EmailService {
 		this.loggerService.info('Feedback email sent', {
 			email,
 			content: content.substr(0, 20) + '...'
-		}, 'email.service');
+		});
 
 		await this.mailerService.sendMail({
 			to: process.env.RECEIVER_EMAIL,
@@ -27,9 +29,7 @@ export class EmailService {
 	}
 
 	async sendEmailConfirmation(email: string, token: string) {
-		this.loggerService.info('Confirmation email sent', {
-			email,
-		}, 'email.service');
+		this.loggerService.info('Confirmation email sent', { email });
 
 		await this.mailerService.sendMail({
 			to: email,

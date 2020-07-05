@@ -19,13 +19,17 @@ import { SubmitNoteDto } from './dto/submit-note.dto';
 import { Note } from '../notes/entities/note.entity';
 import { RemoveNoteDto } from './dto/remove-note.dto';
 import { SocketGateway } from '../sockets/socket.gateway';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class RoomService {
 	constructor(
 		@InjectRepository(Room) private roomRepository: Repository<Room>,
-		private readonly socketGateway: SocketGateway
-	) {}
+		private readonly socketGateway: SocketGateway,
+		private readonly loggerService: LoggerService
+	) {
+		this.loggerService.setContext('room.service');
+	}
 
 	async create(createRoomDto: CreateRoomDto): Promise<Room> {
 		const id = generateId(createRoomDto.seed);
@@ -109,6 +113,8 @@ export class RoomService {
 		await this.roomRepository.save(room);
 		await List.save(listsToSave);
 
+		this.loggerService.info('Room created', { sessionId: session.id, roomId: room.id });
+
 		this.socketGateway.roomCreated(session.id, room);
 
 		return room;
@@ -117,10 +123,10 @@ export class RoomService {
 	async findAllMatching(
 		user: User,
 		seed: string
-	): Promise<Partial<Room & { own: boolean }>[]> {
+	): Promise<Partial<Room & { own: boolean; }>[]> {
 		const id = generateId(seed);
 		const session = await Session.findOne(id);
-		const loggedIn = user !== null;
+		const loggedIn = !!user;
 
 		user =
 			(!session && user) ||
@@ -142,6 +148,12 @@ export class RoomService {
 			relations: ['lists', 'lists.notes'],
 		});
 
+		this.loggerService.info('Found all matching', {
+			loggedIn,
+			sessionId: session.id,
+			roomsIds: rooms.map((room) => room.id),
+		});
+
 		return rooms.map((room) => ({
 			...room,
 			own: room.id === (loggedIn ? user.sessionId : user.id),
@@ -150,6 +162,7 @@ export class RoomService {
 
 	async findOneMatching(user: User, seed: string): Promise<Room> {
 		const id = generateId(seed);
+		const loggedIn = !!user;
 		const room = await this.roomRepository.findOne({
 			where: { id: user ? user.sessionId : id },
 			relations: ['lists'],
@@ -162,6 +175,8 @@ export class RoomService {
 		if (!(await Session.findOne(room.sessionId))) {
 			throw new NotFoundException('Session not found');
 		}
+
+		this.loggerService.info('Found one matching', { loggedIn, sessionId: room.sessionId, roomId: room.id });
 
 		return room;
 	}
@@ -187,12 +202,15 @@ export class RoomService {
 			throw new NotFoundException('Session not found');
 		}
 
+		this.loggerService.info('Found one', { roomId: roomId });
+
 		return room;
 	}
 
 	async remove(user: User, seed: string, roomId: string): Promise<Room> {
 		const id = generateId(seed);
 		const session = await Session.findOne(id);
+		const loggedIn = !!user;
 		if (!session) {
 			throw new NotFoundException('Session not found');
 		}
@@ -231,10 +249,17 @@ export class RoomService {
 		];
 
 		await Note.remove(notesToRemove);
+		this.loggerService.info('Notes removed', { notesIds: notesToRemove.map((note) => note.id) });
+
 		await List.remove(listsToRemove);
+		this.loggerService.info('Lists removed', { listsIds: listsToRemove.map((list) => list.id) });
+
+		// @todo: check if it works when logged in
 		await (await User.findOne(room.id)).remove();
+		this.loggerService.info('User removed', { sessionId: session.id, userId: room.id, });
 
 		await room.remove();
+		this.loggerService.info('Room removed', { loggedIn, sessionId: session.id, roomId: room.id });
 
 		this.socketGateway.roomRemoved(session.id, roomId);
 
@@ -248,6 +273,7 @@ export class RoomService {
 		setRoomReadyDto: SetRoomReadyDto
 	): Promise<Room> {
 		const id = generateId(seed);
+		const loggedIn = !!user;
 		user = user || (await User.findOne(id));
 		if (!user) {
 			throw new NotFoundException('User not found');
@@ -274,6 +300,7 @@ export class RoomService {
 		room.ready = setRoomReadyDto.ready;
 
 		await room.save();
+		this.loggerService.info('Room set ready', { loggedIn, sessionId: session.id, roomId: room.id, ready: room.ready });
 
 		this.socketGateway.roomChanged(session.id, room);
 
@@ -332,6 +359,7 @@ export class RoomService {
 		}
 
 		await room.save();
+		this.loggerService.info('Note submitted', { roomId: room.id, userId: user.id });
 
 		this.socketGateway.roomChanged(session.id, room);
 
@@ -383,6 +411,7 @@ export class RoomService {
 
 		list.notes.splice(noteIndex, 1);
 		await list.save();
+		this.loggerService.info('Note removed', { roomId: room.id, userId: user.id, noteId: removeNoteDto.id });
 
 		this.socketGateway.roomChanged(session.id, room);
 

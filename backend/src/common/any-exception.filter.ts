@@ -19,7 +19,7 @@ export class AnyExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>();
 		const trace = stackTraceParser.parse(exception.stack || '');
 
-		new LoggerService(request).exception(undefined, exception);
+		new LoggerService(request).exception(undefined, exception, {}, 'exceptions');
 
 		sendResponse(
 			response,

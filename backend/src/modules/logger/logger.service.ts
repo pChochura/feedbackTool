@@ -44,6 +44,13 @@ export class LoggerService {
 		];
 	}
 
+	setContext(channel: string) {
+		this.currentChannel = channel;
+		this.logger.configure({
+			transports: this.getTransports(channel),
+		});
+	}
+
 	log(message: string, level: string = 'info', customProperties: any = {}, channel?: string) {
 		if (channel && this.currentChannel !== channel) {
 			this.logger.configure({

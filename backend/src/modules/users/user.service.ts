@@ -33,7 +33,9 @@ export class UserService {
 		private readonly socketGateway: SocketGateway,
 		private readonly paypalService: PaypalService,
 		private readonly loggerService: LoggerService
-	) { }
+	) {
+		this.loggerService.setContext('user.service');
+	}
 
 	async getUserByAuthHeader(authHeader: string): Promise<User> {
 		const incomingDigest = ServerDigestAuth.analyze(authHeader, [QOP_AUTH]);
@@ -73,6 +75,8 @@ export class UserService {
 		user.sessionToken = sessionToken;
 		await user.save();
 
+		this.loggerService.info('User logged in', { email: incomingDigest.username });
+
 		return sessionToken;
 	}
 
@@ -90,6 +94,8 @@ export class UserService {
 			})
 			.save();
 
+		this.loggerService.info('User created', { email: createUserDto.email });
+
 		await this.emailService.sendEmailConfirmation(
 			createUserDto.email,
 			user.sessionToken
@@ -99,6 +105,7 @@ export class UserService {
 	}
 
 	async checkEmail(checkEmailDto: CheckEmailDto) {
+		this.loggerService.info('Checking email for duplicate', { email: checkEmailDto.email });
 		if (await this.userRespository.findOne({ email: checkEmailDto.email })) {
 			throw new ConflictException('Such user already exist');
 		}
@@ -110,6 +117,8 @@ export class UserService {
 			const user = await this.userRespository.findOne({
 				email: digest.username,
 			});
+
+			this.loggerService.info('Sending confirmation email - auth', { email: digest.username });
 
 			if (!user || !(await this.verifyBySecret(digest, user))) {
 				throw new UnauthorizedException('Invalid credentials');
@@ -146,6 +155,8 @@ export class UserService {
 
 		user.confirmed = true;
 		await user.save();
+
+		this.loggerService.info('Email confirmed', { email: user.email });
 	}
 
 	async findByToken(token: string): Promise<User> {
@@ -158,14 +169,17 @@ export class UserService {
 			throw new NotFoundException('User not found');
 		}
 
+		this.loggerService.info('User found by token', { email: user.email });
+
 		return user;
 	}
 
 	async delete(user: User) {
 		const sessions = await Session.find({
-			where: {
-				id: user.id,
-			},
+			where: [
+				{ id: user.id },
+				{ creatorId: user.id },
+			],
 		});
 		if (sessions.length > 0) {
 			const rooms = await Room.find({
@@ -176,9 +190,16 @@ export class UserService {
 			const listsToRemove = rooms.flatMap((_room) => _room.lists);
 
 			await Note.remove(listsToRemove.flatMap((list) => list.notes));
+			this.loggerService.info('Notes removed', { notesIds: listsToRemove.flatMap((list) => list.notes.map((note) => note.id)) });
+
 			await List.remove(listsToRemove);
+			this.loggerService.info('Lists removed', { listsIds: listsToRemove.map((list) => list.id) });
+
 			await Room.remove(rooms);
+			this.loggerService.info('Rooms removed', { roomsIds: rooms.map((room) => room.id) });
+
 			await Session.remove(sessions);
+			this.loggerService.info('Sessions removed', { sessionsId: sessions.map((session) => session.id) });
 
 			rooms.forEach((room) =>
 				this.socketGateway.roomRemoved(room.sessionId, room.id)
@@ -189,6 +210,7 @@ export class UserService {
 		}
 
 		await user.remove();
+		this.loggerService.info('User removed', { email: user.email });
 	}
 
 	async createOrder(
@@ -198,11 +220,12 @@ export class UserService {
 		if (!user && !createOrderDto.token) {
 			throw new UnauthorizedException('Missing credentials');
 		}
-		user =
-			user ||
+		const loggedIn = !!user;
+		user = user ||
 			(await this.userRespository.findOne({
 				sessionToken: createOrderDto.token,
 			}));
+
 		if (!user) {
 			throw new NotFoundException('User not found');
 		}
@@ -210,6 +233,8 @@ export class UserService {
 		if (!user.confirmed) {
 			throw new ForbiddenException('Email not confirmed');
 		}
+
+		this.loggerService.info('Create order', { loggedIn, email: user.email, amount: createOrderDto.amount });
 
 		const link = await this.paypalService.createOrder(user, createOrderDto);
 
@@ -239,5 +264,7 @@ export class UserService {
 
 		transaction.finalized = true;
 		await transaction.save();
+
+		this.loggerService.info('Transaction finalized', { canceled: finalizeOrderDto.cancel, amount: transaction.amount });
 	}
 }
