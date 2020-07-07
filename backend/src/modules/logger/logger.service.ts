@@ -45,6 +45,7 @@ export class LoggerService {
 				extension: '.log',
 				dirname: 'logs',
 				filename: `${channel}-%DATE%`,
+				maxFiles: '10d',
 			}),
 		];
 	}

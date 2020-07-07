@@ -28,3 +28,10 @@ export const generateConfirmationLink = (email: string, token: string) => {
 	);
 	return `${process.env.CLIENT_URL}/email?token=${id}`;
 };
+
+export function dateComparator<T extends { createdAt: Date }>(
+	element1: T,
+	element2: T
+) {
+	return element1.createdAt < element2.createdAt ? -1 : 1;
+}

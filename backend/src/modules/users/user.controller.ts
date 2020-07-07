@@ -12,6 +12,7 @@ import {
 	Patch,
 	UseGuards,
 	ForbiddenException,
+	Query,
 } from '@nestjs/common';
 import {
 	ApiTags,
@@ -35,6 +36,13 @@ import { FinalizeOrderDto } from './dto/finalize-order.dto';
 import { CreatedResponseSchema } from '../../common/created-response.schema';
 import { AuthSoftGuard } from '../guards/auth-soft.guard';
 import { AuthResponse } from '../../common/response';
+import { ImageResponseContent } from '../../common/image-response.content';
+import { Cookies } from '@nestjsplus/cookies';
+
+export enum EXPORT_TYPE {
+	IMAGE,
+	TEXT,
+}
 
 @ApiTags('Users')
 @Controller('api/v1/users')
@@ -240,6 +248,44 @@ export class UserController {
 		@Res() response: Response
 	) {
 		await this.userService.finalizeOrder(finalizeOrderDto);
+		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
+	}
+
+	@Post('/export')
+	@UseGuards(AuthSoftGuard)
+	@ApiOperation({
+		summary: 'Exports notes from the current room as a text or image',
+	})
+	@ApiOkResponse({
+		description: 'Exported notes from the current room as a image',
+		content: new ImageResponseContent('image/*', 'text/plain'),
+	})
+	async export(
+		@Query('type') type: EXPORT_TYPE = EXPORT_TYPE.IMAGE,
+		@Res() response: AuthResponse
+	) {
+		await this.userService.exportNotes(response.user, '', type);
+		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
+	}
+
+	@Get('/export')
+	@UseGuards(AuthSoftGuard)
+	@ApiOperation({ summary: 'Checks if the current user can export notes' })
+	@ApiOkResponse({
+		description: 'Current user can export notes',
+		schema: new BasicResponseSchema('OK'),
+	})
+	@ApiForbiddenResponse({
+		description: 'Current user cannot export notes',
+		schema: new BasicResponseSchema(
+			'Only premium session members can export notes'
+		),
+	})
+	async checkExport(
+		@Cookies('seed') seed: string,
+		@Res() response: AuthResponse
+	) {
+		await this.userService.checkExport(response.user, seed);
 		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
 	}
 }

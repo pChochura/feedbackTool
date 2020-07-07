@@ -30,7 +30,8 @@ export const StyledListsWrapper = styled.div`
 	overflow-x: auto;
 	overflow-y: hidden;
 	display: inline-flex;
-	margin-bottom: 50px;
+	padding-bottom: 50px;
+	flex: 1;
 `;
 
 export const StyledList = styled.div`
