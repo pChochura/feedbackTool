@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import TopBar from '../../components/TopBar/TopBar';
 import {
@@ -26,7 +26,7 @@ const Add = ({ history }) => {
 	const [name, setName] = useState('');
 	const { id } = useParams();
 
-	const join = useCallback(async () => {
+	const join = () => {
 		fetch(`${process.env.REACT_APP_URL}/api/v1/rooms`, {
 			method: 'POST',
 			credentials: 'include',
@@ -41,7 +41,8 @@ const Add = ({ history }) => {
 				if (data.status !== 201) {
 					notificationSystem.postNotification({
 						title: 'Error',
-						description: (await data.json()).message,
+						description:
+							'Make sure that the value is valid and is longer than or equal to 3 characters',
 					});
 					return;
 				}
@@ -57,7 +58,7 @@ const Add = ({ history }) => {
 						'We encountered some problems while joining you with your team.',
 				});
 			});
-	}, [history, seed, cookies, setCookie, name, notificationSystem, id]);
+	};
 
 	useEffect(() => {
 		const checkAddPage = async () => {

@@ -136,6 +136,7 @@ export class RoomController {
 	}
 
 	@Get('/:id')
+	@UseGuards(AuthSoftGuard)
 	@ApiOperation({ summary: 'Returns a room by the given id' })
 	@ApiOkResponse({
 		description: 'Returned a room by the given id',
@@ -148,18 +149,12 @@ export class RoomController {
 			new BasicResponseSchema('Room not found'),
 		]),
 	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the room can access it'
-		),
-	})
 	async findOne(
 		@Cookies('seed') seed: string,
 		@Param('id') id: string,
-		@Res() response: Response
+		@Res() response: AuthResponse
 	) {
-		const room = await this.roomService.findOne(seed, id);
+		const room = await this.roomService.findOne(response.user, seed, id);
 		sendResponse(response, room);
 	}
 
@@ -207,12 +202,6 @@ export class RoomController {
 			new BasicResponseSchema('User not found'),
 			new BasicResponseSchema('Room not found'),
 		]),
-	})
-	@ApiForbiddenResponse({
-		description: 'Authorization error',
-		schema: new BasicResponseSchema(
-			'Only the creator of the session or room can modify it'
-		),
 	})
 	@ApiBadRequestResponse({
 		description: 'This action is now locked',

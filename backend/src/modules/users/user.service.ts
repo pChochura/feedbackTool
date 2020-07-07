@@ -24,6 +24,9 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { FinalizeOrderDto } from './dto/finalize-order.dto';
 import { Transaction } from '../transactions/entities/transaction.entity';
 import { LoggerService } from '../logger/logger.service';
+import { EXPORT_TYPE } from './user.controller';
+import { createCanvas } from 'canvas';
+import * as fs from 'fs';
 
 @Injectable()
 export class UserService {
@@ -287,5 +290,68 @@ export class UserService {
 			canceled: finalizeOrderDto.cancel,
 			amount: transaction.amount,
 		});
+	}
+
+	async exportNotes(user: User, seed: string, type: EXPORT_TYPE) {
+		const id = generateId(seed);
+		const room = await Room.findOne({
+			where: [{ id: user.sessionId }, { id }],
+		});
+		if (!room) {
+			throw new NotFoundException('Room not found');
+		}
+
+		const lists = await List.find({
+			where: { associatedRoomId: room.id },
+			relations: ['notes'],
+		});
+
+		const COLUMN_WIDTH = 300;
+		const LISTS_PADDING = 50;
+		const NOTES_PADDING = 20;
+		const NOTES_MARGIN = 10;
+		const NOTES_WIDTH = COLUMN_WIDTH - 2 * (NOTES_PADDING + NOTES_MARGIN);
+		const LINE_HEIGHT = 20;
+
+		const tempContext = createCanvas(COLUMN_WIDTH, 1000).getContext('2d');
+
+		const width = lists.length * COLUMN_WIDTH + 2 * LISTS_PADDING;
+		const height = lists.reduce((finalHeight, list) => {
+			const textHeight = list.notes.reduce((height, note) => {
+				let currentLine = '';
+				const linesCount = note.content.split(' ').reduce((count, word) => {
+					currentLine += word + ' ';
+					if (tempContext.measureText(currentLine).width > NOTES_WIDTH) {
+						currentLine = word;
+						count++;
+					}
+
+					return count;
+				}, 0);
+
+				return Math.max(linesCount * LINE_HEIGHT + NOTES_PADDING, height);
+			}, 0);
+			const height = list.notes.length * (NOTES_PADDING * 2 + textHeight);
+			return Math.max(height, finalHeight);
+		}, 0);
+
+		// @todo: finish exporting notes
+	}
+
+	async checkExport(user: User, seed: string) {
+		const id = generateId(seed);
+		user = user || (await User.findOne(id));
+		if (!user) {
+			throw new ForbiddenException(
+				'Only premium session members can export notes'
+			);
+		}
+
+		const session = await Session.findOne(user.sessionId);
+		if (!session || session.expirationTimestamp) {
+			throw new ForbiddenException(
+				'Only premium session members can export notes'
+			);
+		}
 	}
 }

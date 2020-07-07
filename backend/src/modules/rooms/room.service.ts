@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Room } from './entities/room.entity';
 import { CreateRoomDto } from './dto/create-room.dto';
-import { generateId } from '../../common';
+import { generateId, dateComparator } from '../../common';
 import { Session, SessionPhase } from '../sessions/entities/session.entity';
 import { List } from '../lists/entities/list.entity';
 import { User } from '../users/entities/user.entity';
@@ -153,14 +153,19 @@ export class RoomService {
 
 		this.loggerService.info('Found all matching', {
 			loggedIn,
-			sessionId: session.id,
+			sessionId: user.sessionId,
 			roomsIds: rooms.map((room) => room.id),
 		});
 
-		return rooms.map((room) => ({
-			...room,
-			own: room.id === (loggedIn ? user.sessionId : user.id),
-		}));
+		return rooms.map((room) => {
+			room.lists.sort(dateComparator);
+			room.lists.forEach((list) => list.notes.sort(dateComparator));
+
+			return {
+				...room,
+				own: room.id === (loggedIn ? user.sessionId : user.id),
+			};
+		});
 	}
 
 	async findOneMatching(user: User, seed: string): Promise<Room> {
@@ -185,13 +190,17 @@ export class RoomService {
 			roomId: room.id,
 		});
 
+		room.lists.sort(dateComparator);
+		room.lists.forEach((list) => list.notes.sort(dateComparator));
+
 		return room;
 	}
 
-	async findOne(seed: string, roomId: string): Promise<Room> {
+	async findOne(user: User, seed: string, roomId: string): Promise<Room> {
 		const id = generateId(seed);
+		const loggedIn = !!user;
 		const room = await this.roomRepository.findOne({
-			where: { id: roomId },
+			where: { id: user ? user.sessionId : id },
 			relations: ['lists', 'lists.notes'],
 		});
 
@@ -199,17 +208,14 @@ export class RoomService {
 			throw new NotFoundException('Room not found');
 		}
 
-		if (room.id !== id) {
-			throw new ForbiddenException(
-				'Only the creator of the room can access it'
-			);
-		}
-
 		if (!(await Session.findOne(room.sessionId))) {
 			throw new NotFoundException('Session not found');
 		}
 
-		this.loggerService.info('Found one', { roomId: roomId });
+		room.lists.sort(dateComparator);
+		room.lists.forEach((list) => list.notes.sort(dateComparator));
+
+		this.loggerService.info('Found one', { loggedIn, roomId: roomId });
 
 		return room;
 	}
@@ -265,7 +271,6 @@ export class RoomService {
 			listsIds: listsToRemove.map((list) => list.id),
 		});
 
-		// @todo: check if it works when logged in
 		await (await User.findOne(room.id)).remove();
 		this.loggerService.info('User removed', {
 			sessionId: session.id,
@@ -295,12 +300,6 @@ export class RoomService {
 		user = user || (await User.findOne(id));
 		if (!user) {
 			throw new NotFoundException('User not found');
-		}
-
-		if (user.id !== roomId && user.id !== user.sessionId) {
-			throw new ForbiddenException(
-				'Only the creator of the session or room can modify it'
-			);
 		}
 
 		const session = await Session.findOne(user.sessionId);
@@ -381,6 +380,8 @@ export class RoomService {
 			);
 		}
 
+		room.lists.sort(dateComparator);
+		room.lists.forEach((list) => list.notes.sort(dateComparator));
 		await room.save();
 		this.loggerService.info('Note submitted', {
 			roomId: room.id,
@@ -436,6 +437,8 @@ export class RoomService {
 		}
 
 		list.notes.splice(noteIndex, 1);
+		room.lists.sort(dateComparator);
+		room.lists.forEach((list) => list.notes.sort(dateComparator));
 		await list.save();
 		this.loggerService.info('Note removed', {
 			roomId: room.id,

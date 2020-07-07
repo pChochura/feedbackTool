@@ -43,6 +43,7 @@ const Room = ({ history }) => {
 	const [showingOptions, setShowingOptions] = useState();
 	const [exportAsModal, setExportAsModal] = useState();
 	const [room, setRoom] = useState({ lists: [] });
+	const [canExport, setCanExport] = useState(false);
 	const [lists, setLists] = useState({});
 	const { id } = useParams();
 	const ownNotesRef = useRef();
@@ -242,7 +243,7 @@ const Room = ({ history }) => {
 		document.body.removeChild(a);
 	};
 
-	const exportAs = (mode) => {
+	const exportAs = async (mode) => {
 		switch (mode) {
 			case 1:
 				ownNotesRef.current.style.width = 'auto';
@@ -359,6 +360,20 @@ const Room = ({ history }) => {
 		return () => io.disconnect();
 	}, [getRoom, history, id, room]);
 
+	useEffect(() => {
+		const checkExport = async () => {
+			const result = await fetch(
+				`${process.env.REACT_APP_URL}/api/v1/users/export`,
+				{ credentials: 'include' }
+			);
+			if (result.status === 200) {
+				setCanExport(true);
+			}
+		};
+
+		checkExport();
+	}, []);
+
 	return (
 		<StyledWrapper
 			onClick={() =>
@@ -368,10 +383,8 @@ const Room = ({ history }) => {
 			<TopBar
 				buttonContent={
 					room.ownNotes
-						? 'Export as'
-						: room.lists.length > 0
-						? 'Ready'
-						: undefined
+						? canExport && 'Export as'
+						: room.lists.length > 0 && 'Ready'
 				}
 				buttonDisabled={!room.ownNotes && room.ready}
 				buttonCallback={() => {
@@ -441,7 +454,7 @@ const Room = ({ history }) => {
 							<StyledParagraph centered>
 								{room.ready
 									? "There's nothing here!"
-									: 'Please describe things that you like and dislike about me.'}
+									: `Please describe things that you like and dislike about ${list.name}.`}
 							</StyledParagraph>
 						)}
 						{!room.ready && (
