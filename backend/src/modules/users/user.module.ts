@@ -20,4 +20,4 @@ import { LoggerModule } from '../logger/logger.module';
 	providers: [UserService],
 	exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

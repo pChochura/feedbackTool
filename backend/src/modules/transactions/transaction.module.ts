@@ -9,4 +9,4 @@ import { LoggerModule } from '../logger/logger.module';
 	providers: [TransactionService],
 	exports: [TransactionService],
 })
-export class TransactionModule { }
+export class TransactionModule {}

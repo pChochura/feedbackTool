@@ -33,4 +33,4 @@ import { LoggerModule } from './modules/logger/logger.module';
 		}),
 	],
 })
-export class AppModule { }
+export class AppModule {}

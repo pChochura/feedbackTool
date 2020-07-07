@@ -16,7 +16,7 @@ export class EmailService {
 
 		this.loggerService.info('Feedback email sent', {
 			email,
-			content: content.substr(0, 20) + '...'
+			content: content.substr(0, 20) + '...',
 		});
 
 		await this.mailerService.sendMail({

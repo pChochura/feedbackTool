@@ -11,7 +11,7 @@ import { LoggerService } from '../modules/logger/logger.service';
 
 @Catch()
 export class AnyExceptionFilter implements ExceptionFilter {
-	constructor() { }
+	constructor() {}
 
 	catch(exception: any, host: ArgumentsHost) {
 		const ctx = host.switchToHttp();
@@ -19,7 +19,12 @@ export class AnyExceptionFilter implements ExceptionFilter {
 		const request = ctx.getRequest<Request>();
 		const trace = stackTraceParser.parse(exception.stack || '');
 
-		new LoggerService(request).exception(undefined, exception, {}, 'exceptions');
+		new LoggerService(request).exception(
+			undefined,
+			exception,
+			{},
+			'exceptions'
+		);
 
 		sendResponse(
 			response,

@@ -35,7 +35,9 @@ export class SessionService {
 		seed: string
 	) {
 		const sessionExpirationTimeout = setTimeout(() => {
-			this.loggerService.info('Session expiration timeout', { sessionId: session.id });
+			this.loggerService.info('Session expiration timeout', {
+				sessionId: session.id,
+			});
 			this.endMatching(null, seed);
 		}, timeToExpire * 1000);
 
@@ -81,7 +83,10 @@ export class SessionService {
 		user.premiumSessionsLeft = Math.max(0, (user.premiumSessionsLeft || 0) - 1);
 		await user.save();
 
-		this.loggerService.info('Session created', { loggedIn: !!loggedInUser, sessionId: session.id });
+		this.loggerService.info('Session created', {
+			loggedIn: !!loggedInUser,
+			sessionId: session.id,
+		});
 
 		return session;
 	}
@@ -90,7 +95,10 @@ export class SessionService {
 		if (user) {
 			const session = await this.sessionRepository.findOne(user.sessionId);
 			if (session) {
-				this.loggerService.info('Found session', { loggedIn: true, sessionId: session.id });
+				this.loggerService.info('Found session', {
+					loggedIn: true,
+					sessionId: session.id,
+				});
 				return session;
 			}
 		}
@@ -105,7 +113,10 @@ export class SessionService {
 			throw new NotFoundException('User not found');
 		}
 
-		this.loggerService.info('Found session', { loggedIn: false, sessionId: session.id });
+		this.loggerService.info('Found session', {
+			loggedIn: false,
+			sessionId: session.id,
+		});
 
 		return session;
 	}
@@ -148,7 +159,9 @@ export class SessionService {
 			},
 		});
 		await User.remove(users);
-		this.loggerService.info('Removed users', { usersIds: users.map((user) => user.id) });
+		this.loggerService.info('Removed users', {
+			usersIds: users.map((user) => user.id),
+		});
 
 		const rooms = await Room.find({
 			where: {
@@ -166,7 +179,9 @@ export class SessionService {
 			)
 		);
 		await Room.remove(rooms);
-		this.loggerService.info('Removed rooms', { roomsIds: rooms.map((room) => room.id) });
+		this.loggerService.info('Removed rooms', {
+			roomsIds: rooms.map((room) => room.id),
+		});
 
 		if (session.expirationTimestamp) {
 			this.schedulerRegistry.deleteTimeout(`sessionExpiration_${session.id}`);
@@ -175,7 +190,11 @@ export class SessionService {
 		this.socketGateway.sessionEnded(session.id);
 
 		await this.sessionRepository.remove(session);
-		this.loggerService.info('Session removed', { sessionId: session.id, loggedIn, temporary: user.temporary });
+		this.loggerService.info('Session removed', {
+			sessionId: session.id,
+			loggedIn,
+			temporary: user.temporary,
+		});
 
 		return session;
 	}
@@ -213,7 +232,7 @@ export class SessionService {
 
 		const lists = rooms.flatMap((room) => room.lists);
 
-		const temp: { [k: string]: Note[]; } = {};
+		const temp: { [k: string]: Note[] } = {};
 
 		const notesByRoom = lists.reduce((acc, list) => {
 			if (acc[list.associatedRoomId]) {
@@ -263,15 +282,22 @@ export class SessionService {
 		});
 
 		await Note.remove(notesToRemove);
-		this.loggerService.info('Removed notes', { notesIds: notesToRemove.map((note) => note.id) });
+		this.loggerService.info('Removed notes', {
+			notesIds: notesToRemove.map((note) => note.id),
+		});
 
 		await List.remove(listsToRemove);
-		this.loggerService.info('Lists removed', { listsIds: listsToRemove.map((list) => list.id) });
+		this.loggerService.info('Lists removed', {
+			listsIds: listsToRemove.map((list) => list.id),
+		});
 
 		await this.roomRepository.save(rooms);
 		await session.save();
 
-		this.loggerService.info('Aggregated notes', { sessionId: session.id, loggedIn });
+		this.loggerService.info('Aggregated notes', {
+			sessionId: session.id,
+			loggedIn,
+		});
 
 		this.socketGateway.aggregateNotes(session.id);
 
@@ -288,7 +314,10 @@ export class SessionService {
 			throw new NotFoundException('Session not found');
 		}
 
-		this.loggerService.info('Found by add link', { addLink, sessionId: session.id });
+		this.loggerService.info('Found by add link', {
+			addLink,
+			sessionId: session.id,
+		});
 
 		return session;
 	}

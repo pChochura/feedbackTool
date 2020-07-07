@@ -9,8 +9,13 @@ const DEFAULT_CHANNEL = 'system';
 
 @Injectable({ scope: Scope.REQUEST })
 export class LoggerService {
-
-	private readonly data: { requestId: string, requestUrl: string, hostname: string, ip: string, method: string; };
+	private readonly data: {
+		requestId: string;
+		requestUrl: string;
+		hostname: string;
+		ip: string;
+		method: string;
+	};
 	private readonly logger: winston.Logger;
 
 	private currentChannel = DEFAULT_CHANNEL;
@@ -28,7 +33,7 @@ export class LoggerService {
 			format: winston.format.combine(
 				winston.format.ms(),
 				winston.format.timestamp(),
-				winston.format.json(),
+				winston.format.json()
 			),
 			transports: this.getTransports(),
 		});
@@ -51,7 +56,12 @@ export class LoggerService {
 		});
 	}
 
-	log(message: string, level: string = 'info', customProperties: any = {}, channel?: string) {
+	log(
+		message: string,
+		level: string = 'info',
+		customProperties: any = {},
+		channel?: string
+	) {
 		if (channel && this.currentChannel !== channel) {
 			this.logger.configure({
 				transports: this.getTransports(channel),
@@ -76,14 +86,24 @@ export class LoggerService {
 		this.log(message, 'warn', customProperties, channel);
 	}
 
-	exception(message: string, exception?: Error, customProperties: any = {}, channel?: string) {
-		this.log(message, 'error', {
-			...customProperties,
-			exception: {
-				message: exception.message,
-				name: exception.name,
-				stack: stackTraceParser.parse(exception.stack || ''),
+	exception(
+		message: string,
+		exception?: Error,
+		customProperties: any = {},
+		channel?: string
+	) {
+		this.log(
+			message,
+			'error',
+			{
+				...customProperties,
+				exception: {
+					message: exception.message,
+					name: exception.name,
+					stack: stackTraceParser.parse(exception.stack || ''),
+				},
 			},
-		}, channel);
+			channel
+		);
 	}
 }

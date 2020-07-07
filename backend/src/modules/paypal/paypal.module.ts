@@ -8,4 +8,4 @@ import { LoggerModule } from '../logger/logger.module';
 	providers: [PaypalService],
 	exports: [PaypalService],
 })
-export class PaypalModule { }
+export class PaypalModule {}

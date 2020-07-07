@@ -19,4 +19,4 @@ import { LoggerModule } from '../logger/logger.module';
 	providers: [SessionService],
 	controllers: [SessionController],
 })
-export class SessionModule { }
+export class SessionModule {}

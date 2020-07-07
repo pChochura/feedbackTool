@@ -55,7 +55,12 @@ export class PaypalService {
 			});
 		}
 
-		this.loggerService.info('Create order', { amount, totalSum, discount, bundlePrice });
+		this.loggerService.info('Create order', {
+			amount,
+			totalSum,
+			discount,
+			bundlePrice,
+		});
 
 		const transaction = await this.transactionService.create({
 			amount: amount * bundleAmount,
@@ -93,7 +98,7 @@ export class PaypalService {
 					},
 					description: `It's a bundle consiting of ${
 						bundleAmount * amount
-						} premium sessions for FeedbackTool.`,
+					} premium sessions for FeedbackTool.`,
 				},
 			],
 		};

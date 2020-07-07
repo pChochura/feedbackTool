@@ -11,7 +11,7 @@ export class FeedbackService {
 		@InjectRepository(Feedback)
 		private readonly feedbackRepository: Repository<Feedback>,
 		private readonly emailService: EmailService
-	) { }
+	) {}
 
 	async send(createFeedbackDto: CreateFeedbackDto): Promise<Feedback> {
 		const feedback = this.feedbackRepository.create(createFeedbackDto);

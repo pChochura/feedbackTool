@@ -4,7 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as CookieParser from 'cookie-parser';
 import { AnyExceptionFilter } from './common/any-exception.filter';
-import { CorrelationIdMiddleware } from "@eropple/nestjs-correlation-id";
+import { CorrelationIdMiddleware } from '@eropple/nestjs-correlation-id';
 require('dotenv').config();
 
 declare const module: any;
