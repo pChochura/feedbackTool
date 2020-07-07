@@ -12,7 +12,7 @@ export class EmailService {
 	}
 
 	async sendFeedback(email: string, content: string) {
-		email = email || 'anonymous@ft.tech';
+		email = email || 'anonymous@feedbacktool.tech';
 
 		this.loggerService.info('Feedback email sent', {
 			email,
@@ -21,7 +21,7 @@ export class EmailService {
 
 		await this.mailerService.sendMail({
 			to: process.env.RECEIVER_EMAIL,
-			from: email,
+			from: process.env.SENDER_EMAIL,
 			subject: `Feedback from ${email} <FeedbackTool>`,
 			template: 'feedback',
 			context: { email, content },
@@ -41,6 +41,7 @@ export class EmailService {
 				confirmLink: `${process.env.CLIENT_URL}/email?id=${encodeURIComponent(
 					token
 				)}`,
+				url: process.env.CLIENT_URL,
 			},
 		});
 	}

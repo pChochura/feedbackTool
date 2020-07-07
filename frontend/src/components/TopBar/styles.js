@@ -18,9 +18,9 @@ export const StyledWrapper = styled.div`
 
 	@media (max-width: 450px) {
 		justify-content: ${({ onlyLogo }) =>
-			onlyLogo ? 'center' : 'space-between'};
+		onlyLogo ? 'center' : 'space-between'};
 
-		button {
+		button, span {
 			margin-left: auto;
 		}
 	}
@@ -33,12 +33,12 @@ export const LogoWrapper = styled.div`
 
 	@media (max-width: 450px) {
 		${({ onlyLogo }) =>
-			onlyLogo
-				? css`
+		onlyLogo
+			? css`
 						margin-left: auto;
 						margin-right: auto;
 				  `
-				: css`
+			: css`
 						display: none;
 				  `}
 	}
@@ -65,7 +65,7 @@ export const StyledParagraph = styled.p`
 	}
 `;
 
-export const LoggedBoxWrapper = styled.div`
+export const LoggedBoxWrapper = styled.span`
 	display: flex;
 	align-items: center;
 	border-radius: 10px;
