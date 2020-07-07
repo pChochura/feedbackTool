@@ -1,4 +1,6 @@
 node_modules/
-.env
+*.env
 ormconfig.json
 migration
+
+logs/**

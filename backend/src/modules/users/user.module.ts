@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { EmailModule } from '../emails/email.module';
 import { SocketModule } from '../sockets/socket.module';
 import { PaypalModule } from '../paypal/paypal.module';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
 	imports: [
@@ -13,6 +14,7 @@ import { PaypalModule } from '../paypal/paypal.module';
 		EmailModule,
 		SocketModule,
 		PaypalModule,
+		LoggerModule,
 	],
 	controllers: [UserController],
 	providers: [UserService],

@@ -45,6 +45,7 @@ export const StyledCard = styled.div`
 
 	@media (max-width: 450px) {
 		right: 0;
+		left: 0;
 	}
 `;
 

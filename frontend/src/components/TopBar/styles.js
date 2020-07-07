@@ -20,7 +20,8 @@ export const StyledWrapper = styled.div`
 		justify-content: ${({ onlyLogo }) =>
 			onlyLogo ? 'center' : 'space-between'};
 
-		button {
+		button,
+		span {
 			margin-left: auto;
 		}
 	}
@@ -65,7 +66,7 @@ export const StyledParagraph = styled.p`
 	}
 `;
 
-export const LoggedBoxWrapper = styled.div`
+export const LoggedBoxWrapper = styled.span`
 	display: flex;
 	align-items: center;
 	border-radius: 10px;

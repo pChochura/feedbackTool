@@ -1,6 +1,7 @@
 import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
 import { UserService } from '../users/user.service';
 import { Request } from 'express';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class AuthSoftGuard implements CanActivate {
@@ -14,6 +15,7 @@ export class AuthSoftGuard implements CanActivate {
 		try {
 			const user = await this.userService.findByToken(sessionToken);
 			response.user = user;
+			new LoggerService(request).info('User authorized', { userId: user.id });
 		} catch (error) {
 			return true;
 		}

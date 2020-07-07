@@ -3,15 +3,21 @@ import * as paypal from 'paypal-rest-sdk';
 import { CreateOrderDto } from '../users/dto/create-order.dto';
 import { TransactionService } from '../transactions/transaction.service';
 import { User } from '../users/entities/user.entity';
+import { LoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class PaypalService {
-	constructor(private readonly transactionService: TransactionService) {
+	constructor(
+		private readonly transactionService: TransactionService,
+		private readonly loggerService: LoggerService
+	) {
 		paypal.configure({
 			mode: 'sandbox', // @todo: make this production when NODE_ENV
 			client_id: process.env.PAYPAL_CLIENT,
 			client_secret: process.env.PAYPAL_SECRET,
 		});
+
+		this.loggerService.setContext('paypal.service');
 	}
 
 	async createOrder(
@@ -48,6 +54,13 @@ export class PaypalService {
 				quantity: 1,
 			});
 		}
+
+		this.loggerService.info('Create order', {
+			amount,
+			totalSum,
+			discount,
+			bundlePrice,
+		});
 
 		const transaction = await this.transactionService.create({
 			amount: amount * bundleAmount,

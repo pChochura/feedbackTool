@@ -1,1 +1,0 @@
-{"version":3,"file":"basic-response.schema.js","sourceRoot":"","sources":["../../src/common/basic-response.schema.ts"],"names":[],"mappings":";;;AAKA,MAAa,mBAAmB;IAI/B,YAAY,MAAY;QAHxB,SAAI,GAAG,QAAQ,CAAC;QAIf,IAAI,CAAC,UAAU,GAAG;YACjB,MAAM,EAAE;gBACP,WAAW,EAAE,sBAAsB;gBACnC,OAAO,EAAE,MAAM,IAAI,IAAI;gBACvB,IAAI,EAAE,QAAQ;aACd;SACD,CAAC;IACH,CAAC;CACD;AAbD,kDAaC"}

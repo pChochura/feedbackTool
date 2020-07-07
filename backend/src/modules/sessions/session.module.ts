@@ -7,12 +7,14 @@ import { Room } from '../rooms/entities/room.entity';
 import { User } from '../users/entities/user.entity';
 import { UserModule } from '../users/user.module';
 import { SocketModule } from '../sockets/socket.module';
+import { LoggerModule } from '../logger/logger.module';
 
 @Module({
 	imports: [
 		TypeOrmModule.forFeature([Session, Room, User]),
 		UserModule,
 		SocketModule,
+		LoggerModule,
 	],
 	providers: [SessionService],
 	controllers: [SessionController],
