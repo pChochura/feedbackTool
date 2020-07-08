@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<style>
+			body {
+				padding: 0;
+				margin: 0;
+				width: 720px;
+				background-color: #EFEFEF;
+				font-family: Verdana, Geneva, Tahoma, sans-serif;
+				text-align: center;
+			}
+
+			#topBar {
+				width: 100%;
+				box-sizing: border-box;
+				background-color: #ffffff;
+			}
+
+			#logo {
+				display: inline-table;
+				margin: auto 0;
+				top: 0;
+				bottom: 0;
+				text-align: center;
+				padding-top: 20px;
+				padding-bottom: 20px;
+				text-decoration: none;
+			}
+
+			#logoImage {
+				width: 48px;
+				height: 48px;
+			}
+
+			#logoText {
+				font-size: 1.2rem;
+				font-weight: 400;
+				color: #515151;
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+			#title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				margin-top: 100px;
+				margin-left: 20px;
+				margin-right: 20px;
+				margin-bottom: 50px;
+				color: #515151;
+				text-align: center;
+			}
+
+			table {
+				box-sizing: border-box;
+				width: 90%;
+				margin: 0 auto;
+				padding: 30px;
+				color: #ABABAB;
+				font-size: 0.7rem;
+			}
+
+			#items {
+				background-color: #ffffff;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			#total {
+				text-align: right;
+			}
+
+			#items--firstRow {
+				color: #515151;
+				font-size: 1.2rem;
+			}
+
+			#items--firstColumn {
+				text-align: left;
+			}
+
+			#items--secondColumn {
+				text-align: right;
+			}
+
+			#note {
+				margin-top: 50px;
+				color: #ABABAB;
+				font-size: 0.8rem;
+			}
+
+			.bold {
+				font-weight: 600;
+			}
+
+			.emphasize {
+				font-size: 1.2rem;
+				color: #3750db;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="topBar">
+			<a id="logo" href="<%= url %>">
+				<img src="<%= url %>/favicon.ico" id="logoImage" />
+				<p id="logoText">FeedbackTool</p>
+			</a>
+		</div>
+		<p id="title">You have purchased a bundle of premium sessions</p>
+		<table id="items">
+			<tr id="items--firstRow">
+				<td id="items--firstColumn">
+					<span id="items--firstColumn--">10 sessions bundle
+				</td>
+				<td id="items--secondColumn">
+					<span class="emphasize"><%= unitPrize %>PLN</span>
+				</td>
+			</tr>
+			<tr>
+				<td id="items--firstColumn">
+					-10% for every 10 additional sessions
+				</td>
+				<td id="items--secondColumn">
+					quantity: <span class="bold"><%= quantity %></span>
+				</td>
+			</tr>
+		</table>
+		<table id="total">
+			<tr>
+				<td>sum: <span class="emphasize"><%= total %>PLN</span></td>
+			</tr>
+			<tr>
+				<td class="bold"><%= discount %>PLN</td>
+			</tr>
+		</table>
+		<p id="note">If you don’t know what this email is about, just ignore it.</p>
+	</body>
+
+</html>
