@@ -28,7 +28,7 @@ export class Transaction extends BaseEntity {
 	})
 	userId: string;
 
-	@Column({ type: 'varchar', length: 8, readonly: true })
+	@Column({ type: 'varchar', length: 16, readonly: true })
 	@ApiProperty({
 		required: true,
 		example: '18.98',
@@ -36,6 +36,31 @@ export class Transaction extends BaseEntity {
 		readOnly: true,
 	})
 	price: string;
+
+	@Column({ type: 'varchar', length: 16, readonly: true, default: '9.99' })
+	@ApiProperty({
+		required: true,
+		description: 'Bundle price',
+		example: '9.99',
+	})
+	unitPrice: string;
+
+	@Column({ type: 'varchar', length: 16, readonly: true, default: '0.00' })
+	@ApiProperty({
+		required: true,
+		description: 'Discount',
+		example: '-0.99',
+	})
+	discount: string;
+
+	@Column({ type: 'integer', readonly: true, default: 1 })
+	@ApiProperty({
+		required: true,
+		example: 2,
+		description: 'Number of bundles bought',
+		readOnly: true,
+	})
+	bundleCount: number;
 
 	@Column({ type: 'integer', readonly: true })
 	@ApiProperty({

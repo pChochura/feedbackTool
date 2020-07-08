@@ -377,7 +377,10 @@ const RegisterModal = ({ input, callback }) => {
 			...d,
 			email: input.email,
 			password: input.password,
+			sessionToken: input.sessionToken,
 		}));
+
+		setCurrentStep(input.currentStep || 0);
 	}, [input]);
 
 	return (

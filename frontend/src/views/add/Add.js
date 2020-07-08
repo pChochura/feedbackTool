@@ -38,6 +38,14 @@ const Add = ({ history }) => {
 			headers: { 'Content-Type': 'application/json' },
 		})
 			.then(async (data) => {
+				if (data.status === 423) {
+					notificationSystem.postNotification({
+						title: 'Error',
+						description: 'Sorry. This session reached its members count limit',
+					});
+					return;
+				}
+
 				if (data.status !== 201) {
 					notificationSystem.postNotification({
 						title: 'Error',

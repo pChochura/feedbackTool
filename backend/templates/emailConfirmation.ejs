@@ -1,36 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 
-	<body style="
-			padding: 0;
-			margin: 0;
-			width: 720px;
-			background-color: #EFEFEF;
-			font-family: Verdana, Geneva, Tahoma, sans-serif;
-		">
-		<div style="
+	<head>
+		<style>
+			body {
+				padding: 0;
+				margin: 0;
+				width: 720px;
+				background-color: #EFEFEF;
+				font-family: Verdana, Geneva, Tahoma, sans-serif;
+				text-align: center;
+			}
+
+			#topBar {
 				width: 100%;
-				height: 100px;
 				box-sizing: border-box;
 				background-color: #ffffff;
-				display: table;
-				position: relative;
-			">
-			<span style="display: table; position: absolute; margin: auto 0; top: 0; bottom: 0; text-align: center;">
-				<img src="<%= url %>/favicon.ico" style="width: 48px; height: 48px;"" />
-				<p style=" font-size: 1.2rem; font-weight: 400; color: #515151; display: table-cell; vertical-align: middle;
-					margin-block-end: 0; margin-block-start: 0; ">
-					FeedbackTool
-				</p>
-			</span>
+			}
+
+			#logo {
+				display: inline-table;
+				margin: auto 0;
+				top: 0;
+				bottom: 0;
+				text-align: center;
+				padding-top: 20px;
+				padding-bottom: 20px;
+				text-decoration: none;
+			}
+
+			#logoImage {
+				width: 48px;
+				height: 48px;
+			}
+
+			#logoText {
+				font-size: 1.2rem;
+				font-weight: 400;
+				color: #515151;
+				display: table-cell;
+				vertical-align: middle;
+			}
+
+			#title {
+				font-size: 1.3rem;
+				font-weight: 600;
+				margin-top: 100px;
+				margin-left: 20px;
+				margin-right: 20px;
+				margin-bottom: 50px;
+				color: #515151;
+				text-align: center;
+			}
+
+			#subTitle {
+				font-size: 1.2rem;
+				font-weight: 100;
+				line-height: 1.5;
+				margin: 50px 20px;
+				color: #515151;
+				text-align: center;
+			}
+
+			#button {
+				text-decoration: none;
+				background-color: #3750db;
+				color: #ffffff;
+				text-align: center;
+				padding: 10px;
+				box-sizing: border-box;
+				border-radius: 5px;
+				width: 150px;
+				display: inline-block;
+				margin-top: 50px;
+			}
+
+			#note {
+				color: #ABABAB;
+				font-size: 0.8rem;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="topBar">
+			<a id="logo" href="<%= url %>">
+				<img src="<%= url %>/favicon.ico" id="logoImage" />
+				<p id="logoText">FeedbackTool</p>
+			</a>
 		</div>
-		<p style=" font-size: 1.3rem; font-weight: 400; margin: 50px 20px; color: #515151; ">
-			You have a new message from <%= email %>!
+		<p id="title">Please confirm your email address</p>
+		<p id="subTitle">
+			You have created an account for FeedbackTool<br />to fully benefit from the Premium Plan.<br />
+			To confirm your email address please press the button below.
 		</p>
-		<div style=" font-size: 1rem; box-sizing: border-box; padding: 30px 20px; margin: 10px; background-color: #ffffff;
-					box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.05); color: #676767; ">
-			<%= confirmLink %>
-		</div>
+		<a id="button" href="<%= confirmLink %>" target="_blank">Confirm</a>
+		<p id="note">If you don’t know what this email is about, just ignore it.</p>
 	</body>
 
 </html>

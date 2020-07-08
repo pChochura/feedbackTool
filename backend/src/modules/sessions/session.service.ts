@@ -61,8 +61,10 @@ export class SessionService {
 			user = await User.create({ id, sessionId: id }).save();
 		}
 
-		const timeToExpire =
-			((loggedInUser || {}).premiumSessionsLeft || 0) > 0 ? null : 1800;
+		const isPremium =
+			createSessionDto.forceFree === false &&
+			((loggedInUser || {}).premiumSessionsLeft || 0) > 0;
+		const timeToExpire = isPremium ? null : 1800;
 
 		const session = await this.sessionRepository
 			.create({
@@ -72,6 +74,7 @@ export class SessionService {
 				expirationTimestamp: timeToExpire
 					? Math.floor(Date.now() / 1000 + timeToExpire)
 					: null,
+				premium: isPremium,
 			})
 			.save();
 
@@ -80,7 +83,12 @@ export class SessionService {
 		}
 
 		user.sessionId = id;
-		user.premiumSessionsLeft = Math.max(0, (user.premiumSessionsLeft || 0) - 1);
+		if (isPremium) {
+			user.premiumSessionsLeft = Math.max(
+				0,
+				(user.premiumSessionsLeft || 0) - 1
+			);
+		}
 		await user.save();
 
 		this.loggerService.info('Session created', {
@@ -184,7 +192,13 @@ export class SessionService {
 		});
 
 		if (session.expirationTimestamp) {
-			this.schedulerRegistry.deleteTimeout(`sessionExpiration_${session.id}`);
+			try {
+				this.schedulerRegistry.deleteTimeout(`sessionExpiration_${session.id}`);
+			} catch (error) {
+				this.loggerService.warning('Tried to delete not existing timeout', {
+					name: `sessionExpiration_${session.id}`,
+				});
+			}
 		}
 
 		this.socketGateway.sessionEnded(session.id);

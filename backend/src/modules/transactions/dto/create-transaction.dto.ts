@@ -26,6 +26,32 @@ export class CreateTransactionDto {
 	})
 	readonly price: string;
 
+	@IsCurrency({ require_decimal: true, thousands_separator: '' })
+	@ApiProperty({
+		required: true,
+		description: 'Bundle price',
+		example: '9.99',
+	})
+	readonly unitPrice: string;
+
+	@IsCurrency({ require_decimal: true, thousands_separator: '' })
+	@ApiProperty({
+		required: true,
+		description: 'Discount',
+		example: '9.99',
+	})
+	readonly discount: string;
+
+	@IsNumber()
+	@Max(10)
+	@Min(1)
+	@ApiProperty({
+		required: true,
+		description: 'Number of bundles bought',
+		example: 2,
+	})
+	readonly bundleCount: number;
+
 	@IsNumber()
 	@Max(100)
 	@Min(10)

@@ -11,8 +11,9 @@ export class EmailService {
 		this.loggerService.setContext('email.service');
 	}
 
-	async sendFeedback(email: string, content: string) {
+	async sendFeedback(email: string, content: string, createdAt: Date) {
 		email = email || 'anonymous@feedbacktool.tech';
+		const name = email.substring(0, email.indexOf('@'));
 
 		this.loggerService.info('Feedback email sent', {
 			email,
@@ -22,9 +23,22 @@ export class EmailService {
 		await this.mailerService.sendMail({
 			to: process.env.RECEIVER_EMAIL,
 			from: process.env.SENDER_EMAIL,
-			subject: `Feedback from ${email} <FeedbackTool>`,
+			subject: `Feedback from ${name} <FeedbackTool>`,
 			template: 'feedback',
-			context: { email, content },
+			context: {
+				name,
+				email,
+				responseSubject: encodeURIComponent('Feedback reponse'),
+				responseBody: encodeURIComponent(
+					`Response for your feedback: \n> ${content.replace(
+						/\n/g,
+						'\n> '
+					)}\n\n`
+				),
+				content: content,
+				date: createdAt.toDateString(),
+				url: process.env.CLIENT_URL,
+			},
 		});
 	}
 
@@ -42,6 +56,34 @@ export class EmailService {
 					token
 				)}`,
 				url: process.env.CLIENT_URL,
+			},
+		});
+	}
+
+	async sendPayment(
+		email: string,
+		unitPrize: string,
+		quantity: number,
+		discount: string,
+		total: string
+	) {
+		this.loggerService.info('Payment email sent', {
+			unitPrize,
+			quantity,
+			discount,
+		});
+
+		await this.mailerService.sendMail({
+			to: email,
+			from: process.env.SENDER_EMAIL,
+			subject: `Purchase summary <FeedbackTool>`,
+			template: 'payment',
+			context: {
+				url: process.env.CLIENT_URL,
+				unitPrize,
+				quantity,
+				discount,
+				total,
 			},
 		});
 	}

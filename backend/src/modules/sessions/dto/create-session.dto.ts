@@ -1,4 +1,4 @@
-import { IsString, Length } from 'class-validator';
+import { IsString, Length, IsBoolean } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateSessionDto {
@@ -10,4 +10,12 @@ export class CreateSessionDto {
 		example: 'l1fcqka1nm3fvw7j',
 	})
 	readonly seed: string;
+
+	@IsBoolean()
+	@ApiProperty({
+		required: false,
+		description: 'Forces free session even if the user can create premium one',
+		example: true,
+	})
+	readonly forceFree?: boolean;
 }

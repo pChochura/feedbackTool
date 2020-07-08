@@ -19,7 +19,8 @@ export class FeedbackService {
 
 		await this.emailService.sendFeedback(
 			createFeedbackDto.email,
-			createFeedbackDto.content
+			createFeedbackDto.content,
+			feedback.createdAt
 		);
 
 		return feedback;

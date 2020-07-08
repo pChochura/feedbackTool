@@ -72,7 +72,9 @@ export const ButtonWrapper = styled.div`
 	height: 60px;
 
 	p {
+		z-index: 10;
 		margin-left: 10px;
+		margin-right: 10px;
 	}
 
 	button {
