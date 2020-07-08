@@ -53,31 +53,50 @@
 				text-align: center;
 			}
 
-			#subTitle {
-				font-size: 1.2rem;
-				font-weight: 100;
-				line-height: 1.5;
-				margin: 50px 20px;
-				color: #515151;
-				text-align: center;
+			table {
+				box-sizing: border-box;
+				width: 90%;
+				margin: 0 auto;
+				padding: 30px;
+				color: #ABABAB;
+				font-size: 0.7rem;
 			}
 
-			#button {
-				text-decoration: none;
-				background-color: #3750db;
-				color: #ffffff;
-				text-align: center;
-				padding: 10px;
-				box-sizing: border-box;
-				border-radius: 5px;
-				width: 150px;
-				display: inline-block;
-				margin-top: 50px;
+			#items {
+				background-color: #ffffff;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+			}
+
+			#total {
+				text-align: right;
+			}
+
+			#items--firstRow {
+				color: #515151;
+				font-size: 1.2rem;
+			}
+
+			#items--firstColumn {
+				text-align: left;
+			}
+
+			#items--secondColumn {
+				text-align: right;
 			}
 
 			#note {
+				margin-top: 50px;
 				color: #ABABAB;
 				font-size: 0.8rem;
+			}
+
+			.bold {
+				font-weight: 600;
+			}
+
+			.emphasize {
+				font-size: 1.2rem;
+				color: #3750db;
 			}
 		</style>
 	</head>
@@ -89,12 +108,33 @@
 				<p id="logoText">FeedbackTool</p>
 			</a>
 		</div>
-		<p id="title">Please confirm your email address</p>
-		<p id="subTitle">
-			You have created an account for FeedbackTool<br />to fully benefit from the Premium Plan.<br />
-			To confirm your email address please press the button below.
-		</p>
-		<a id="button" href="<%= confirmLink %>" target="_blank">Confirm</a>
+		<p id="title">You have purchased a bundle of premium sessions</p>
+		<table id="items">
+			<tr id="items--firstRow">
+				<td id="items--firstColumn">
+					<span id="items--firstColumn--">10 sessions bundle
+				</td>
+				<td id="items--secondColumn">
+					<span class="emphasize"><%= unitPrize %>PLN</span>
+				</td>
+			</tr>
+			<tr>
+				<td id="items--firstColumn">
+					-10% for every 10 additional sessions
+				</td>
+				<td id="items--secondColumn">
+					quantity: <span class="bold"><%= quantity %></span>
+				</td>
+			</tr>
+		</table>
+		<table id="total">
+			<tr>
+				<td>sum: <span class="emphasize"><%= total %>PLN</span></td>
+			</tr>
+			<tr>
+				<td class="bold"><%= discount %>PLN</td>
+			</tr>
+		</table>
 		<p id="note">If you don’t know what this email is about, just ignore it.</p>
 	</body>
 

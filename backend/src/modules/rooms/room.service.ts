@@ -58,7 +58,7 @@ export class RoomService {
 		const [, existingRoomsCount] = await Room.findAndCount({
 			where: { sessionId: session.id },
 		});
-		if ((creator.premiumSessionsLeft || 0) <= 0 && existingRoomsCount >= 5) {
+		if (!session.premium && existingRoomsCount >= 5) {
 			// @todo: Add possibility to extend plan while in a session
 			// this.socketGateway.roomLimit(session.id, createRoomDto.name);
 			throw new HttpException(

@@ -27,17 +27,16 @@ export class PaypalService {
 		const bundlePrice = parseFloat(process.env.BUNDLE_PRICE);
 		const amount = createOrderDto.amount || 1;
 		const bundleAmount = 10;
-		const discount = -amount * (amount - 1) * 0.5 * 0.1 * bundlePrice;
+		const discount = parseFloat(
+			(-amount * (amount - 1) * 0.5 * 0.1 * bundlePrice).toFixed(2)
+		);
 		const price = bundlePrice;
-		const totalSum = amount * price + discount;
+		const totalSum = parseFloat((amount * price + discount).toFixed(2));
 
 		const items = [
 			{
 				name: 'Feedback Tool sessions bundle',
-				price: price.toLocaleString('pl-PL', {
-					maximumFractionDigits: 2,
-					minimumFractionDigits: 2,
-				}),
+				price: price.toFixed(2),
 				currency: 'PLN',
 				quantity: amount,
 			},
@@ -46,10 +45,7 @@ export class PaypalService {
 		if (amount > 1) {
 			items.push({
 				name: 'Discount',
-				price: discount.toLocaleString('pl-PL', {
-					maximumFractionDigits: 2,
-					minimumFractionDigits: 2,
-				}),
+				price: discount.toFixed(2),
 				currency: 'PLN',
 				quantity: 1,
 			});
@@ -64,10 +60,10 @@ export class PaypalService {
 
 		const transaction = await this.transactionService.create({
 			amount: amount * bundleAmount,
-			price: totalSum.toLocaleString('pl-PL', {
-				maximumFractionDigits: 2,
-				minimumFractionDigits: 2,
-			}),
+			price: totalSum.toFixed(2),
+			unitPrice: bundlePrice.toFixed(2),
+			discount: discount.toFixed(2),
+			bundleCount: bundleAmount,
 			userId: user.id,
 		});
 
@@ -91,10 +87,7 @@ export class PaypalService {
 					},
 					amount: {
 						currency: 'PLN',
-						total: totalSum.toLocaleString('pl-PL', {
-							maximumFractionDigits: 2,
-							minimumFractionDigits: 2,
-						}),
+						total: totalSum.toFixed(2),
 					},
 					description: `It's a bundle consiting of ${
 						bundleAmount * amount

@@ -61,6 +61,15 @@ export class Session extends BaseEntity {
 	})
 	phase: SessionPhase;
 
+	@Column({ type: 'boolean', default: false })
+	@ApiProperty({
+		required: true,
+		example: false,
+		description: 'Indicates if the session is premium',
+		default: false,
+	})
+	premium: boolean;
+
 	@UpdateDateColumn({ readonly: true })
 	@ApiProperty({
 		required: true,

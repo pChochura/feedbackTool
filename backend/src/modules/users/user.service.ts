@@ -286,7 +286,16 @@ export class UserService {
 		transaction.finalized = true;
 		await transaction.save();
 
+		this.emailService.sendPayment(
+			user.email,
+			transaction.unitPrice,
+			transaction.amount / transaction.bundleCount,
+			transaction.discount,
+			transaction.price
+		);
+
 		this.loggerService.info('Transaction finalized', {
+			userId: user.id,
 			canceled: finalizeOrderDto.cancel,
 			amount: transaction.amount,
 		});

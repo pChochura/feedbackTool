@@ -42,7 +42,7 @@ const Root = ({ history, location }) => {
 	const [footer, setFooter] = useState();
 	const landingBottomRef = useRef();
 
-	const startSession = async () => {
+	const startSession = async (forceFree = false) => {
 		if (matching) {
 			if (matching.session) {
 				history.push(`/${matching.session.id}`);
@@ -63,6 +63,7 @@ const Root = ({ history, location }) => {
 			method: 'POST',
 			body: JSON.stringify({
 				seed,
+				forceFree,
 			}),
 			headers: { 'Content-Type': 'application/json' },
 			credentials: 'include',
@@ -112,7 +113,7 @@ const Root = ({ history, location }) => {
 	};
 
 	const tryForFree = () => {
-		startSession();
+		startSession(true);
 	};
 
 	const purchase = async () => {
@@ -194,7 +195,7 @@ const Root = ({ history, location }) => {
 				notificationSystem.postNotification({
 					title: 'Success',
 					description: `Your order has been ${
-						cancel === 'true' ? 'canceled' : 'completed'
+						cancel ? 'canceled' : 'completed'
 					} succesfully`,
 					success: true,
 				});
@@ -237,9 +238,16 @@ const Root = ({ history, location }) => {
 
 				notificationSystem.postNotification({
 					title: 'Success',
-					description: 'Your email address has been confirmed successfully',
+					description: 'Your email address has been confirmed successfully. ',
+					action: 'Get discount',
 					success: true,
 					persistent: true,
+					callback: () => {
+						setRegisterModal({
+							currentStep: 1,
+							sessionToken: token,
+						});
+					},
 				});
 			};
 			confirmEmail();
@@ -489,6 +497,8 @@ const Root = ({ history, location }) => {
 						input={{
 							email: registerModal.email,
 							password: registerModal.password,
+							currentStep: registerModal.currentStep,
+							sessionToken: registerModal.sessionToken,
 						}}
 						callback={(data) => {
 							setRegisterModal();
