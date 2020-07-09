@@ -17,12 +17,17 @@ import moment from 'moment';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
+import {
+	StyledOptions,
+	StyledOptionItem,
+} from '../../components/PersonCard/styles';
 
 const Main = ({ history }) => {
 	const [expirationTimestamp, setExpirationTimestamp] = useState(0);
 	const [notificationSystem, setNotificationSystem] = useState();
 	const [endSessionModal, setEndSessionModal] = useState();
 	const [extendPlanModal, setExtendPlanModal] = useState();
+	const [showingOptions, setShowingOptions] = useState();
 	const [maxNotesCount, setMaxNotesCount] = useState(0);
 	const [showedRooms, setShowedRooms] = useState([]);
 	const [joinModal, setJoinModal] = useState(false);
@@ -160,21 +165,21 @@ const Main = ({ history }) => {
 		const options = [
 			{
 				name: 'Remove',
-				id: 1,
+				callback: () => removeRoom(room.id),
 			},
 		];
 
 		if (room.ready) {
 			options.push({
 				name: 'Mark as not ready',
-				id: 2,
+				callback: () => markRoomAsNotReady(room.id),
 			});
 		}
 
 		if (room.own) {
 			options.push({
 				name: 'Open',
-				id: 3,
+				callback: () => window.open(`/room/${room.id}`, '_blank'),
 			});
 		}
 
@@ -272,7 +277,11 @@ const Main = ({ history }) => {
 	}, [id, onRoomCreated, onRoomChanged, onRoomLimit, onEndSession]);
 
 	return (
-		<StyledWrapper>
+		<StyledWrapper
+			onClick={() =>
+				showingOptions && setShowingOptions({ ...showingOptions, exit: true })
+			}
+		>
 			<TopBar
 				buttonContent={phase === 0 ? 'Continue' : 'End session'}
 				buttonDisabled={rooms.length <= 1 || rooms.some((room) => !room.ready)}
@@ -295,28 +304,36 @@ const Main = ({ history }) => {
 							clickable={room.own}
 							maxNotesCount={maxNotesCount}
 							name={room.name}
-							options={phase === 1 ? null : getOptionsForRoom(room)}
 							isReady={room.ready}
 							lists={phase === 1 ? [] : room.lists}
 							clickCallback={() =>
 								room.own && window.open(`/room/${room.id}`, '_blank')
 							}
-							optionClickCallback={(index) => {
-								switch (index) {
-									case 1:
-										removeRoom(room.id);
-										break;
-									case 2:
-										markRoomAsNotReady(room.id);
-										break;
-									case 3:
-										window.open(`/room/${room.id}`, '_blank');
-										break;
-									default:
-										break;
-								}
-							}}
-						/>
+							optionClickCallback={
+								phase !== 1 && (() => setShowingOptions({ roomId: room.id }))
+							}
+						>
+							{showingOptions && showingOptions.roomId === room.id && (
+								<StyledOptions
+									exit={showingOptions.exit}
+									onAnimationEnd={() =>
+										showingOptions.exit && setShowingOptions()
+									}
+								>
+									{getOptionsForRoom(room).map((option) => (
+										<StyledOptionItem
+											onClick={(e) => {
+												e.stopPropagation();
+												setShowingOptions();
+												option.callback();
+											}}
+										>
+											{option.name}
+										</StyledOptionItem>
+									))}
+								</StyledOptions>
+							)}
+						</PersonCard>
 					))}
 					{phase === 0 && (
 						<PersonCard

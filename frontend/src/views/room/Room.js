@@ -29,13 +29,12 @@ import happySelectedIcon from '../../assets/images/happy_selected.svg';
 import happyIcon from '../../assets/images/happy_notSelected.svg';
 import closeIcon from '../../assets/images/close.svg';
 import optionsIcon from '../../assets/images/options.svg';
+import arrowIcon from '../../assets/images/arrow_down.svg';
 import socketIOClient from 'socket.io-client';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
 import Modal from '../../components/Modal/Modal';
-import html2canvas from 'html2canvas';
-import { table, getBorderCharacters } from 'table';
-import { ModalButtonsWrapper } from '../main/styles';
+import { ModalButtonsWrapper, StyledDropdown } from '../main/styles';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
 
 const Room = ({ history }) => {
@@ -43,7 +42,7 @@ const Room = ({ history }) => {
 	const [showingOptions, setShowingOptions] = useState();
 	const [exportAsModal, setExportAsModal] = useState();
 	const [room, setRoom] = useState({ lists: [] });
-	const [canExport, setCanExport] = useState(false);
+	const [canExport, setCanExport] = useState();
 	const [lists, setLists] = useState({});
 	const { id } = useParams();
 	const ownNotesRef = useRef();
@@ -59,15 +58,6 @@ const Room = ({ history }) => {
 
 			return;
 		}
-
-		room.lists.sort(
-			(a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)
-		);
-		room.lists.forEach((list) =>
-			list.notes.sort(
-				(a, b) => Date.parse(a.createdAt) - Date.parse(b.createdAt)
-			)
-		);
 
 		setRoom(room);
 	}, [history, id]);
@@ -243,71 +233,50 @@ const Room = ({ history }) => {
 		document.body.removeChild(a);
 	};
 
-	const exportAs = async (mode) => {
-		switch (mode) {
-			case 1:
-				ownNotesRef.current.style.width = 'auto';
-				ownNotesRef.current.style.maxWidth = 'unset';
-				html2canvas(ownNotesRef.current, {
-					backgroundColor: '#EFEFEF',
-					width: ownNotesRef.current.offsetWidth,
-					onclone: (document) => {
-						document.querySelectorAll('textarea').forEach((textarea) => {
-							textarea.outerHTML =
-								'<div>' + textarea.value.replace(/\n/g, '<br/>') + '<div/>';
-						});
-					},
-				}).then((canvas) => {
-					ownNotesRef.current.style.width = 'unset';
-					ownNotesRef.current.style.maxWidth = '100%';
-					saveAs(
-						canvas.toDataURL('image/jpeg', 1.0),
-						'Your notes.jpeg',
-						'image/jpeg'
-					);
-				});
+	const exportAs = async () => {
+		if (!canExport.selected) {
+			notificationSystem.postNotification({
+				title: 'Error',
+				description: 'You have to choose one of the export types to continue',
+			});
+
+			return;
+		}
+
+		const result = await fetch(
+			`${process.env.REACT_APP_URL}/api/v1/users/export?type=${canExport.selected}`,
+			{
+				method: 'POST',
+				credentials: 'include',
+			}
+		);
+
+		if (result.status !== 200) {
+			notificationSystem.postNotification({
+				title: 'Error',
+				description: 'We encountered some problems while exporting your notes',
+			});
+
+			return;
+		}
+
+		const blob = await result.blob();
+		let extension = 'png';
+		switch (canExport.selected) {
+			case 'IMAGE':
+				extension = 'png';
 				break;
-			case 2:
-				const notes = room.lists.reduce(
-					(notes, list) => {
-						const result = list.notes.reduce(
-							(acc, note) => {
-								if (note.positive) {
-									acc.good.push(note.content);
-								} else {
-									acc.bad.push(note.content);
-								}
-								return acc;
-							},
-							{ good: [], bad: [] }
-						);
-						notes.good.push(...result.good);
-						notes.bad.push(...result.bad);
-						return notes;
-					},
-					{ good: [], bad: [] }
-				);
-				const maxLength = Math.max(notes.good.length, notes.bad.length);
-				const data = [['           Positive', '           Negative']];
-				for (let i = 0; i < maxLength; i++) {
-					data.push([notes.good[i], notes.bad[i]]);
-				}
-				const result = table(data, {
-					border: getBorderCharacters('ramac'),
-					columnDefault: {
-						width: 30,
-					},
-				});
-				saveAs(
-					URL.createObjectURL(
-						new Blob([result], { type: 'text/plain;charset=utf-8' })
-					),
-					'Your notes.txt'
-				);
+			case 'TEXT':
+				extension = 'txt';
+				break;
+			case 'CSV':
+				extension = 'csv';
 				break;
 			default:
+				extension = 'png';
 				break;
 		}
+		saveAs(window.URL.createObjectURL(blob), `Your notes.${extension}`);
 	};
 
 	useEffect(() => {
@@ -367,7 +336,7 @@ const Room = ({ history }) => {
 				{ credentials: 'include' }
 			);
 			if (result.status === 200) {
-				setCanExport(true);
+				setCanExport({ types: (await result.json()).exportTypes });
 			}
 		};
 
@@ -542,27 +511,37 @@ const Room = ({ history }) => {
 			{exportAsModal && (
 				<Modal
 					title="Do you want to export all your notes?"
-					description="It is advised to save the notes to not loose your feedback."
+					description="It is advised to save the notes to not lose your feedback."
 					onDismissCallback={() => setExportAsModal()}
-					isExiting={(exportAsModal || {}).exit}
+					isExiting={exportAsModal.exit}
 				>
 					<ModalButtonsWrapper>
-						<Button
-							onClick={() => {
-								setExportAsModal({ exit: true });
-								exportAs(1);
-							}}
-						>
-							As image
-						</Button>
-						<Button
-							onClick={() => {
-								setExportAsModal({ exit: true });
-								exportAs(2);
-							}}
-						>
-							As text
-						</Button>
+						<StyledDropdown onClick={() => setShowingOptions({ export: true })}>
+							{(canExport.selected &&
+								canExport.selected[0] +
+									canExport.selected.slice(1).toLowerCase()) ||
+								'Select type'}
+							<img src={arrowIcon} alt="" />
+							{showingOptions && showingOptions.export && (
+								<StyledOptions
+									exit={showingOptions.exit}
+									onAnimationEnd={() =>
+										showingOptions.exit && setShowingOptions()
+									}
+								>
+									{canExport.types.map((exportType) => (
+										<StyledOptionItem
+											onClick={() =>
+												setCanExport((c) => ({ ...c, selected: exportType }))
+											}
+										>
+											{exportType[0] + exportType.slice(1).toLowerCase()}
+										</StyledOptionItem>
+									))}
+								</StyledOptions>
+							)}
+						</StyledDropdown>
+						<Button onClick={() => exportAs()}>Export</Button>
 					</ModalButtonsWrapper>
 				</Modal>
 			)}

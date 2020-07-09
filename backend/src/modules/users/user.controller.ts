@@ -38,16 +38,21 @@ import { AuthSoftGuard } from '../guards/auth-soft.guard';
 import { AuthResponse } from '../../common/response';
 import { ImageResponseContent } from '../../common/image-response.content';
 import { Cookies } from '@nestjsplus/cookies';
+import { ExportService } from '../export/export.service';
 
 export enum EXPORT_TYPE {
-	IMAGE,
-	TEXT,
+	IMAGE = 'IMAGE',
+	TEXT = 'TEXT',
+	CSV = 'CSV',
 }
 
 @ApiTags('Users')
 @Controller('api/v1/users')
 export class UserController {
-	constructor(private readonly userService: UserService) {}
+	constructor(
+		private readonly userService: UserService,
+		private readonly exportService: ExportService
+	) {}
 
 	@Post()
 	@ApiOperation({ summary: 'Attempts logging in' })
@@ -260,12 +265,33 @@ export class UserController {
 		description: 'Exported notes from the current room as a image',
 		content: new ImageResponseContent('image/*', 'text/plain'),
 	})
+	@ApiNotFoundResponse({
+		description: 'Item not found',
+		schema: new OneOfResponseSchema([
+			new BasicResponseSchema('User not found'),
+			new BasicResponseSchema('Session not found'),
+		]),
+	})
+	@ApiForbiddenResponse({
+		description: 'Current user cannot export notes',
+		schema: new BasicResponseSchema(
+			'Only premium session members can export notes'
+		),
+	})
 	async export(
 		@Query('type') type: EXPORT_TYPE = EXPORT_TYPE.IMAGE,
+		@Cookies('seed') seed: string,
 		@Res() response: AuthResponse
 	) {
-		await this.userService.exportNotes(response.user, '', type);
-		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
+		const filename = await this.userService.exportNotes(
+			response.user,
+			seed,
+			type
+		);
+		response.status(200).sendFile(filename, { root: '.' });
+		response.on('finish', async () => {
+			await this.exportService.removeFile(filename);
+		});
 	}
 
 	@Get('/export')
@@ -273,7 +299,12 @@ export class UserController {
 	@ApiOperation({ summary: 'Checks if the current user can export notes' })
 	@ApiOkResponse({
 		description: 'Current user can export notes',
-		schema: new BasicResponseSchema('OK'),
+		schema: new CreatedResponseSchema(
+			'exportTypes',
+			'array',
+			['IMAGE', 'TXT'],
+			'Possible export types'
+		),
 	})
 	@ApiForbiddenResponse({
 		description: 'Current user cannot export notes',
@@ -285,7 +316,10 @@ export class UserController {
 		@Cookies('seed') seed: string,
 		@Res() response: AuthResponse
 	) {
-		await this.userService.checkExport(response.user, seed);
-		sendResponse(response, { status: 'OK' }, HttpStatus.OK);
+		const possibleExportTypes = await this.userService.checkExport(
+			response.user,
+			seed
+		);
+		sendResponse(response, { exportTypes: possibleExportTypes }, HttpStatus.OK);
 	}
 }

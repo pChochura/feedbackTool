@@ -1,5 +1,5 @@
 {
-	"name": "feedback",
+	"name": "feedbacktool",
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
@@ -7,7 +7,6 @@
 		"@testing-library/jest-dom": "^4.2.4",
 		"@testing-library/react": "^9.3.2",
 		"@testing-library/user-event": "^7.1.2",
-		"html2canvas": "^1.0.0-rc.5",
 		"moment": "^2.26.0",
 		"query-string": "^6.13.0",
 		"react": "^16.13.1",
@@ -17,8 +16,7 @@
 		"react-scripts": "3.4.1",
 		"react-textarea-autosize": "^8.0.1",
 		"socket.io-client": "^2.3.0",
-		"styled-components": "^5.1.1",
-		"table": "^5.4.6"
+		"styled-components": "^5.1.1"
 	},
 	"scripts": {
 		"start": "react-scripts start",

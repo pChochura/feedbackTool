@@ -1,11 +1,11 @@
 import { CanActivate, Injectable, ExecutionContext } from '@nestjs/common';
-import { UserService } from '../users/user.service';
 import { Request } from 'express';
 import { LoggerService } from '../logger/logger.service';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthSoftGuard implements CanActivate {
-	constructor(private readonly userService: UserService) {}
+	constructor() {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const request: Request = context.switchToHttp().getRequest();
@@ -13,9 +13,13 @@ export class AuthSoftGuard implements CanActivate {
 		const sessionToken = request.cookies['x-session'];
 
 		try {
-			const user = await this.userService.findByToken(sessionToken);
+			const user = await User.findOne({ sessionToken });
 			response.user = user;
-			new LoggerService(request).info('User authorized', { userId: user.id });
+			new LoggerService(request).info(
+				'User authorized',
+				{ userId: user.id },
+				'auth.guard'
+			);
 		} catch (error) {
 			return true;
 		}
