@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
 	StyledCard,
 	StyledIcon,
@@ -8,8 +8,6 @@ import {
 	StyledListItem,
 	StyledParagraph,
 	ListItemFill,
-	StyledOptions,
-	StyledOptionItem,
 } from './styles';
 import personAddIcon from '../../assets/images/personAdd.svg';
 import personIcon from '../../assets/images/person.svg';
@@ -17,7 +15,6 @@ import optionsIcon from '../../assets/images/options.svg';
 import readyIcon from '../../assets/images/ready.svg';
 
 const PersonCard = ({
-	options,
 	clickable,
 	adder,
 	lists,
@@ -26,55 +23,22 @@ const PersonCard = ({
 	maxNotesCount,
 	clickCallback,
 	optionClickCallback,
+	children,
 }) => {
-	const [showingOptions, setShowingOptions] = useState();
-
-	const showOptions = useCallback(() => {
-		setShowingOptions({});
-
-		const timeout = setTimeout(() => {
-			setShowingOptions((options) => {
-				if (options) {
-					return { exit: true };
-				}
-			});
-		}, 3000);
-
-		return () => clearTimeout(timeout);
-	}, []);
-
 	return (
 		<StyledCard
 			clickable={clickable}
 			onClick={() => clickCallback && clickCallback()}
 		>
-			{options && (
+			{optionClickCallback && (
 				<StyledImg
 					src={optionsIcon}
 					clickable
 					onClick={(e) => {
-						showOptions();
+						optionClickCallback();
 						e.stopPropagation();
 					}}
 				/>
-			)}
-			{showingOptions && options && (
-				<StyledOptions
-					exit={showingOptions.exit}
-					onAnimationEnd={() => showingOptions.exit && setShowingOptions()}
-				>
-					{options.map((option, index) => (
-						<StyledOptionItem
-							key={index}
-							onClick={() => {
-								setShowingOptions();
-								optionClickCallback && optionClickCallback(option.id);
-							}}
-						>
-							{option.name}
-						</StyledOptionItem>
-					))}
-				</StyledOptions>
 			)}
 			<IconWrapper>
 				<StyledIcon
@@ -98,6 +62,7 @@ const PersonCard = ({
 						)}
 					</StyledListItem>
 				))}
+			{children}
 		</StyledCard>
 	);
 };

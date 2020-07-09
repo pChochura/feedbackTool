@@ -21,7 +21,7 @@ export const StyledButton = styled.button`
 	font-size: ${({ small }) => (small ? '0.8rem' : '1.1rem')};
 	font-weight: ${({ secondary }) => (secondary ? '300' : '400')};
 	font-family: 'Montserrat';
-	transition: 0.5s all;
+	transition: 0.5s filter;
 
 	${({ disabled }) =>
 		disabled

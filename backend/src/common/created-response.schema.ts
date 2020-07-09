@@ -11,7 +11,7 @@ export class CreatedResponseSchema implements SchemaObject {
 	constructor(
 		field?: string,
 		type?: string,
-		example?: string,
+		example?: any,
 		description?: string
 	) {
 		this.properties = {

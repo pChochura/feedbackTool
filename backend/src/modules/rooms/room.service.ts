@@ -86,6 +86,7 @@ export class RoomService {
 				associatedRoomId: id,
 				name: createRoomDto.name,
 				notes: [],
+				createdAt: room.createdAt,
 			});
 			listsToSave.push(list);
 			room.lists.push(list);
@@ -104,6 +105,7 @@ export class RoomService {
 					associatedRoomId: room.id,
 					name: room.name,
 					notes: [],
+					createdAt: room.createdAt,
 				});
 				listsToSave.push(list);
 				return list;
@@ -150,6 +152,8 @@ export class RoomService {
 			},
 			relations: ['lists', 'lists.notes'],
 		});
+
+		rooms.sort(dateComparator);
 
 		this.loggerService.info('Found all matching', {
 			loggedIn,
