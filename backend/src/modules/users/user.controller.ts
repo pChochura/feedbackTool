@@ -269,6 +269,7 @@ export class UserController {
 		description: 'Item not found',
 		schema: new OneOfResponseSchema([
 			new BasicResponseSchema('User not found'),
+			new BasicResponseSchema('Room not found'),
 			new BasicResponseSchema('Session not found'),
 		]),
 	})

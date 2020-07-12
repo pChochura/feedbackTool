@@ -307,6 +307,11 @@ export class UserService {
 		type: EXPORT_TYPE
 	): Promise<string> {
 		const id = generateId(seed);
+		user = user || (await User.findOne(id));
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+
 		const room = await Room.findOne({
 			where: [{ id: user.sessionId }, { id }],
 			relations: ['lists', 'lists.notes'],

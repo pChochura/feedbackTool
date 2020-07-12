@@ -12,12 +12,16 @@ import {
 	StyledLink,
 	ScrollIndicator,
 	ScrollImg,
-	LandingBottom,
+	LandingPage,
 	StyledTitle,
 	StyledSubtitle,
+	Watermark,
 } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import landing from '../../assets/images/landing.svg';
+import landing_2 from '../../assets/images/landing_2.svg';
+import landing_3 from '../../assets/images/landing_3.svg';
+import listPositiveIcon from '../../assets/images/list_positive.svg';
 import Button from '../../components/Button/Button';
 import queryParser from 'query-string';
 import NotificationSystem from '../../components/NotificationSystem/NotificationSystem';
@@ -29,18 +33,24 @@ import LoginModal from '../../components/LoginModal/LoginModal';
 import RegisterModal from '../../components/RegisterModal/RegisterModal';
 import { ModalButtonsWrapper } from '../main/styles';
 import Modal from '../../components/Modal/Modal';
+import {
+	ColumnWrapper,
+	RowWrapper,
+} from '../../components/RegisterModal/styles';
+import { StyledListItem } from '../../components/PlanCard/styles';
 
 const Root = ({ history, location }) => {
+	const [cookies, setCookie] = useCookies(['seed', 'cookies-agree']);
 	const [notificationSystem, setNotificationSystem] = useState();
 	const [registerModal, setRegisterModal] = useState();
 	const [confirmModal, setConfirmModal] = useState();
 	const [loginModal, setLoginModal] = useState();
+	const [infoModal, setInfoModal] = useState();
 	const [loggedIn, setLoggedIn] = useState();
 	const [matching, setMatching] = useState();
-	const [, setCookie] = useCookies(['seed']);
 	const [loading, setLoading] = useState();
 	const [footer, setFooter] = useState();
-	const landingBottomRef = useRef();
+	const landingPageRef = useRef();
 
 	const startSession = async (forceFree = false) => {
 		if (matching) {
@@ -99,7 +109,7 @@ const Root = ({ history, location }) => {
 	};
 
 	const scrollBottom = () => {
-		window.scrollTo(0, landingBottomRef.current.offsetTop);
+		window.scrollTo(0, landingPageRef.current.offsetTop);
 	};
 
 	const downloadUser = async () => {
@@ -334,6 +344,30 @@ const Root = ({ history, location }) => {
 	}, []);
 
 	useEffect(() => {
+		if (!notificationSystem) {
+			return;
+		}
+
+		if (!cookies['cookies-agree']) {
+			notificationSystem.postNotification({
+				title: 'Warning',
+				description: 'We use cookies to not require you to create an account. ',
+				action: 'Read more',
+				persistent: true,
+				callback: () =>
+					setInfoModal({
+						title: 'We have to use cookies',
+						description: `We store information about who is the owner of the current room so nobody else can access it.
+						Data stored there is unique and random so it won't leak your personal info.
+						Additionally we have to store information if you are currently logged in which is also uniqe and random.
+						By using this site you agree to this terms.`,
+						callback: () => setCookie('cookies-agree', true),
+					}),
+			});
+		}
+	}, [notificationSystem, cookies, setCookie]);
+
+	useEffect(() => {
 		if (!matching || (!matching.session && !matching.room)) {
 			return;
 		}
@@ -361,11 +395,9 @@ const Root = ({ history, location }) => {
 			<LandingWrapper>
 				<LandingTop>
 					<LandingLeft>
-						<b>Send</b> feedback
-						<br />
-						<b>Receive</b> feedback
+						<b>Exchange feedback</b>
 						<StyledParagraph>
-							Share your thoughts with your team <b>anonymously</b>
+							Share your thoughts with your team <strong>anonymously</strong>
 						</StyledParagraph>
 						<ButtonWrapper>
 							<Button onClick={() => startSession()}>
@@ -387,9 +419,73 @@ const Root = ({ history, location }) => {
 					</LandingLeft>
 					<StyledImg src={landing} />
 				</LandingTop>
-				<LandingBottom ref={landingBottomRef}>
-					<StyledTitle>Pick your plan</StyledTitle>
-					<StyledSubtitle>Only pay for what you’re using</StyledSubtitle>
+				<LandingPage ref={landingPageRef}>
+					<Watermark left={true}>SHARING</Watermark>
+					<StyledTitle>Scared of being honest?</StyledTitle>
+					<StyledSubtitle>
+						Don’t be afraid of telling your coworkers how you feel about them
+						any longer
+					</StyledSubtitle>
+					<ColumnWrapper>
+						<StyledImg src={landing_2} widthScale={true} />
+						<RowWrapper style={{ maxWidth: '400px' }}>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Whole process is fully <b>anonymous</b>
+								</span>
+							</StyledListItem>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Your notes are <b>never stored</b> after the session finishes
+								</span>
+							</StyledListItem>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Notes written by you <b>are visible only by you</b> and person
+									you have written about
+								</span>
+							</StyledListItem>
+						</RowWrapper>
+					</ColumnWrapper>
+				</LandingPage>
+				<LandingPage>
+					<Watermark left={false}>IMPROVING</Watermark>
+					<StyledTitle>Want to improve?</StyledTitle>
+					<StyledSubtitle>
+						Exchanging feedback with your team and you can increase your
+						productivity and self-esteem.
+					</StyledSubtitle>
+					<ColumnWrapper style={{ flexWrap: 'wrap-reverse' }}>
+						<RowWrapper style={{ maxWidth: '400px' }}>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Let everyone describe your <b>strengths</b> and{' '}
+									<b>weaknesses</b>
+								</span>
+							</StyledListItem>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Introduce a <b>routine of sharing</b> your feelings with
+									others
+								</span>
+							</StyledListItem>
+							<StyledListItem img={listPositiveIcon} bigger={true}>
+								<span>
+									Become a better version of yourself by receiving a{' '}
+									<b>meaningful feedback</b>
+								</span>
+							</StyledListItem>
+						</RowWrapper>
+						<StyledImg src={landing_3} widthScale={true} />
+					</ColumnWrapper>
+				</LandingPage>
+				<LandingPage>
+					<Watermark left={true}>CUSTOMIZING</Watermark>
+					<StyledTitle>Pick your plan!</StyledTitle>
+					<StyledSubtitle>
+						Improve your experience by choosing a premium plan. <br />A small
+						price for a huge advantage.
+					</StyledSubtitle>
 					<span>
 						<PlanCard
 							title="Basic"
@@ -445,7 +541,7 @@ const Root = ({ history, location }) => {
 							]}
 						></PlanCard>
 					</span>
-				</LandingBottom>
+				</LandingPage>
 				<Footer ref={(footer) => setFooter(footer)} />
 				<ScrollIndicator onClick={() => scrollBottom()}>
 					<ScrollImg src={scrollIcon} /> Scroll down
@@ -471,6 +567,27 @@ const Root = ({ history, location }) => {
 								secondary
 							>
 								Cancel
+							</Button>
+						</ModalButtonsWrapper>
+					</Modal>
+				)}
+				{infoModal && (
+					<Modal
+						title={infoModal.title}
+						description={infoModal.description}
+						onDismissCallback={() =>
+							setInfoModal((m) => ({ ...m, exit: true }))
+						}
+						isExiting={infoModal.exit}
+					>
+						<ModalButtonsWrapper>
+							<Button
+								onClick={() => {
+									infoModal.callback && infoModal.callback();
+									setInfoModal((m) => ({ ...m, exit: true }));
+								}}
+							>
+								OK
 							</Button>
 						</ModalButtonsWrapper>
 					</Modal>

@@ -48,40 +48,37 @@ export class ExportService {
 		ctx: CanvasRenderingContext2D,
 		content: string,
 		maxWidth: number,
-		maxCharacters: number,
-		newLineCallback?: (line: string, word: string, wordSplit: boolean) => void
+		newLineCallback?: (line: string) => void
 	): number {
-		let currentLine = '';
-		return content.split(' ').reduce((count, word) => {
-			if (word.includes('\n')) {
-				const lines = word.split('\n');
-				lines.forEach((line) => {
-					newLineCallback && newLineCallback('', line, true);
-					count++;
+		return content
+			.split('\n')
+			.map((line) => line.split(' '))
+			.reduce((count, words) => {
+				let currentLine = '';
+				words.forEach((word, index) => {
+					currentLine += word + ' ';
+
+					if (ctx.measureText(currentLine).width > maxWidth) {
+						let tempCurrentLine = '';
+						let letterIndex = 1;
+						do {
+							tempCurrentLine = currentLine.substring(
+								0,
+								currentLine.length - letterIndex++
+							);
+						} while (ctx.measureText(tempCurrentLine).width > maxWidth);
+						count++;
+						newLineCallback && newLineCallback(tempCurrentLine);
+						currentLine = currentLine.substring(tempCurrentLine.length);
+					}
+
+					if (index === words.length - 1) {
+						newLineCallback && newLineCallback(currentLine);
+					}
 				});
 
-				return count;
-			}
-
-			currentLine += word;
-			if (ctx.measureText(currentLine).width > maxWidth) {
-				const temp = count;
-				while (ctx.measureText(word).width > maxWidth) {
-					newLineCallback && newLineCallback(currentLine, word, true);
-					currentLine = word.substring(0, maxCharacters);
-					word = word.substring(maxCharacters);
-					count++;
-				}
-
-				if (count === temp) {
-					newLineCallback && newLineCallback(currentLine, word, false);
-					currentLine = word + ' ';
-					count++;
-				}
-			}
-
-			return count;
-		}, 1);
+				return count + 1;
+			}, 0);
 	}
 
 	async exportAsImage(room: Room): Promise<string> {
@@ -107,8 +104,7 @@ export class ExportService {
 					const linesCount = this.getLineCount(
 						tempContext,
 						note.content,
-						NOTES_WIDTH - NOTES_PADDING * 2,
-						LINE_CHARACTERS
+						NOTES_WIDTH - NOTES_PADDING * 2
 					);
 					return (
 						linesCount * LINE_HEIGHT + NOTES_PADDING * 2 + NOTES_MARGIN + height
@@ -170,8 +166,7 @@ export class ExportService {
 				const linesCount = this.getLineCount(
 					ctx,
 					note.content,
-					NOTES_WIDTH - NOTES_PADDING * 2,
-					LINE_CHARACTERS
+					NOTES_WIDTH - NOTES_PADDING * 2
 				);
 				const x = index * COLUMN_WIDTH + LISTS_PADDING + NOTES_MARGIN;
 
@@ -193,38 +188,21 @@ export class ExportService {
 
 				ctx.fillStyle = '#515151';
 
-				let currentLine = '';
-				const lineCount = this.getLineCount(
+				this.getLineCount(
 					ctx,
 					note.content,
 					NOTES_WIDTH - NOTES_PADDING * 2,
-					LINE_CHARACTERS,
-					(line, word, wordSplit) => {
-						if (wordSplit) {
-							ctx.fillText(
-								word.substring(0, LINE_CHARACTERS),
-								x + NOTES_PADDING,
-								y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-							);
-							currentLine = word.substring(0, LINE_CHARACTERS);
-						} else {
-							ctx.fillText(
-								line.substring(0, line.length - word.length - 1),
-								x + NOTES_PADDING,
-								y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-							);
-							currentLine = word + ' ';
-						}
+					(line) => {
+						ctx.fillText(
+							line,
+							x + NOTES_PADDING,
+							y + LINE_HEIGHT * 0.75 + NOTES_PADDING
+						);
 						y += LINE_HEIGHT;
 					}
 				);
-				ctx.fillText(
-					lineCount === 1 ? note.content : currentLine,
-					x + NOTES_PADDING,
-					y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-				);
 
-				y += LINE_HEIGHT + NOTES_PADDING * 2 + NOTES_MARGIN;
+				y += NOTES_PADDING * 2 + NOTES_MARGIN;
 			});
 
 			if (list.notes.length === 0) {
@@ -288,7 +266,13 @@ export class ExportService {
 		const maxLength = Math.max(notes.good.length, notes.bad.length);
 		const data = [['           Positive', '           Negative']];
 		for (let i = 0; i < maxLength; i++) {
-			data.push([notes.good[i], notes.bad[i]]);
+			const good = notes.good[i].includes(',')
+				? `"${notes.good[i]}"`
+				: notes.good[i];
+			const bad = notes.bad[i].includes(',')
+				? `"${notes.bad[i]}"`
+				: notes.bad[i];
+			data.push([good, bad]);
 		}
 		const result = table(data, {
 			border: getBorderCharacters('ramac'),
@@ -326,11 +310,17 @@ export class ExportService {
 		);
 		const count = Math.max(notes.good.length, notes.bad.length);
 		for (let i = 0; i < count; i++) {
-			result +=
-				(notes.good[i] || '').replace(/\n/g, ' ') +
-				',' +
-				(notes.bad[i] || '').replace(/\n/g, ' ') +
-				'\n';
+			const good = notes.good[i]
+				? notes.good[i].includes(',') || notes.good[i].includes('\n')
+					? `"${notes.good[i]}"`
+					: notes.good[i]
+				: '';
+			const bad = notes.bad[i]
+				? notes.bad[i].includes(',') || notes.bad[i].includes('\n')
+					? `"${notes.bad[i]}"`
+					: notes.bad[i]
+				: '';
+			result += `${good.replace(/\n/g, '\r')},${bad.replace(/\n/g, '\r')}\r\n`;
 		}
 
 		const filename = `./files/tempExportNotes_${Date.now()}.txt`;

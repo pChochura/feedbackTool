@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
 export const StyledWrapper = styled.div`
 	width: 100%;
@@ -36,15 +36,40 @@ export const LandingTop = styled.div`
 `;
 
 export const LandingLeft = styled.div`
-	font-size: 1.5rem;
+	font-size: 1.8rem;
 	align-self: center;
 	line-height: 3rem;
 	text-align: center;
 	margin-top: 50px;
 	flex: none;
 
+	b {
+		position: relative;
+		z-index: 2;
+
+		&::before {
+			position: absolute;
+			left: -10px;
+			top: 20px;
+			display: block;
+			content: ' ';
+			background-color: #3750db;
+			width: 115px;
+			height: 20px;
+			opacity: 0.2;
+			z-index: 1;
+		}
+	}
+
 	@media (min-width: 900px) {
 		text-align: left;
+		font-size: 2.4rem;
+
+		b::before {
+			left: -5px;
+			top: 30px;
+			width: 145px;
+		}
 	}
 `;
 
@@ -52,8 +77,14 @@ export const StyledImg = styled.img`
 	height: 50%;
 	align-self: center;
 	flex: none;
+	${({ widthScale }) =>
+		widthScale &&
+		css`
+			width: 60%;
+		`}
 
 	@media (min-width: 900px) {
+		margin: 50px 100px 20px 100px;
 		max-width: 40%;
 	}
 `;
@@ -78,6 +109,7 @@ export const ButtonWrapper = styled.div`
 	}
 
 	button {
+		z-index: 10;
 		flex: none;
 	}
 
@@ -130,12 +162,14 @@ export const ScrollImg = styled.img`
 	animation: ${scroll} 5s infinite ease-in-out;
 `;
 
-export const LandingBottom = styled.div`
+export const LandingPage = styled.div`
+	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 100px;
-	max-height: 100%;
+	padding: 70px;
+	height: 100%;
+	overflow: hidden;
 
 	span {
 		margin-top: 50px;
@@ -145,7 +179,7 @@ export const LandingBottom = styled.div`
 	}
 
 	@media (max-width: 900px) {
-		padding: 10px;
+		padding: 50px;
 
 		span {
 			flex-wrap: wrap;
@@ -154,21 +188,51 @@ export const LandingBottom = styled.div`
 `;
 
 export const StyledTitle = styled.h1`
-	font-weight: 400;
-	font-size: 2rem;
+	font-weight: 800;
+	font-size: 1.8rem;
 	text-align: center;
 	padding: 10px;
 
 	@media (min-width: 900px) {
-		font-size: 3rem;
+		font-size: 2.4rem;
 	}
 `;
 
 export const StyledSubtitle = styled.h3`
 	font-weight: 300;
-	font-size: 1.5rem;
-	color: #ababab;
+	font-size: 1.3rem;
+	max-width: 600px;
 	margin-block-end: 0;
 	margin-block-start: 0;
 	text-align: center;
+`;
+
+export const Watermark = styled.p`
+	margin-block-end: 0;
+	margin-block-start: 0;
+	font-size: calc(40px + (70 - 40) * ((100vw - 300px) / (1600 - 300)));
+	opacity: 0.1;
+	font-weight: 800;
+	position: absolute;
+	top: 0;
+	${({ left }) =>
+		left
+			? css`
+					left: -10px;
+			  `
+			: css`
+					right: -10px;
+			  `};
+
+	@media (min-width: 900px) {
+		font-size: calc(70px + (120 - 70) * ((100vw - 300px) / (1600 - 300)));
+		${({ left }) =>
+			left
+				? css`
+						left: -50px;
+				  `
+				: css`
+						right: -50px;
+				  `};
+	}
 `;
