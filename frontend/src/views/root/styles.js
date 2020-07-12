@@ -229,10 +229,10 @@ export const Watermark = styled.p`
 		${({ left }) =>
 			left
 				? css`
-						left: -50px;
+						left: -30px;
 				  `
 				: css`
-						right: -50px;
+						right: -30px;
 				  `};
 	}
 `;

@@ -195,7 +195,6 @@ export class RoomService {
 		});
 
 		room.lists.sort(dateComparator);
-		room.lists.forEach((list) => list.notes.sort(dateComparator));
 
 		return room;
 	}
