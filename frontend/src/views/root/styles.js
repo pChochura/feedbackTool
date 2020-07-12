@@ -227,12 +227,12 @@ export const Watermark = styled.p`
 	@media (min-width: 900px) {
 		font-size: calc(70px + (120 - 70) * ((100vw - 300px) / (1600 - 300)));
 		${({ left }) =>
-			left
-				? css`
-						left: -50px;
+		left
+			? css`
+						left: -30px;
 				  `
-				: css`
-						right: -50px;
+			: css`
+						right: -30px;
 				  `};
 	}
 `;

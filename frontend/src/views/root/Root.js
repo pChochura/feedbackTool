@@ -206,7 +206,7 @@ const Root = ({ history, location }) => {
 					title: 'Success',
 					description: `Your order has been ${
 						cancel ? 'canceled' : 'completed'
-					} succesfully`,
+						} succesfully`,
 					success: true,
 				});
 
@@ -413,14 +413,14 @@ const Root = ({ history, location }) => {
 										the session
 									</StyledParagraph>
 								) : (
-									<StyledParagraph>You have a room</StyledParagraph>
-								))}
+										<StyledParagraph>You have a room</StyledParagraph>
+									))}
 						</ButtonWrapper>
 					</LandingLeft>
 					<StyledImg src={landing} />
 				</LandingTop>
 				<LandingPage ref={landingPageRef}>
-					<Watermark left={true}>SHARING</Watermark>
+					<Watermark left={true}>SHARE</Watermark>
 					<StyledTitle>Scared of being honest?</StyledTitle>
 					<StyledSubtitle>
 						Don’t be afraid of telling your coworkers how you feel about them
@@ -449,7 +449,7 @@ const Root = ({ history, location }) => {
 					</ColumnWrapper>
 				</LandingPage>
 				<LandingPage>
-					<Watermark left={false}>IMPROVING</Watermark>
+					<Watermark left={false}>IMPROVE</Watermark>
 					<StyledTitle>Want to improve?</StyledTitle>
 					<StyledSubtitle>
 						Exchanging feedback with your team and you can increase your
@@ -480,7 +480,7 @@ const Root = ({ history, location }) => {
 					</ColumnWrapper>
 				</LandingPage>
 				<LandingPage>
-					<Watermark left={true}>CUSTOMIZING</Watermark>
+					<Watermark left={true}>CUSTOMIZE</Watermark>
 					<StyledTitle>Pick your plan!</StyledTitle>
 					<StyledSubtitle>
 						Improve your experience by choosing a premium plan. <br />A small
