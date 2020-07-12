@@ -50,29 +50,35 @@ export class ExportService {
 		maxWidth: number,
 		newLineCallback?: (line: string) => void
 	): number {
-		return content.split('\n').map((line) => line.split(' ')).reduce((count, words) => {
-			let currentLine = '';
-			words.forEach((word, index) => {
-				currentLine += word + ' ';
+		return content
+			.split('\n')
+			.map((line) => line.split(' '))
+			.reduce((count, words) => {
+				let currentLine = '';
+				words.forEach((word, index) => {
+					currentLine += word + ' ';
 
-				if (ctx.measureText(currentLine).width > maxWidth) {
-					let tempCurrentLine = '';
-					let letterIndex = 1;
-					do {
-						tempCurrentLine = currentLine.substring(0, currentLine.length - letterIndex++);
-					} while (ctx.measureText(tempCurrentLine).width > maxWidth);
-					count++;
-					newLineCallback && newLineCallback(tempCurrentLine);
-					currentLine = currentLine.substring(tempCurrentLine.length);
-				}
+					if (ctx.measureText(currentLine).width > maxWidth) {
+						let tempCurrentLine = '';
+						let letterIndex = 1;
+						do {
+							tempCurrentLine = currentLine.substring(
+								0,
+								currentLine.length - letterIndex++
+							);
+						} while (ctx.measureText(tempCurrentLine).width > maxWidth);
+						count++;
+						newLineCallback && newLineCallback(tempCurrentLine);
+						currentLine = currentLine.substring(tempCurrentLine.length);
+					}
 
-				if (index === words.length - 1) {
-					newLineCallback && newLineCallback(currentLine);
-				}
-			});
+					if (index === words.length - 1) {
+						newLineCallback && newLineCallback(currentLine);
+					}
+				});
 
-			return count + 1;
-		}, 0);
+				return count + 1;
+			}, 0);
 	}
 
 	async exportAsImage(room: Room): Promise<string> {
@@ -117,7 +123,7 @@ export class ExportService {
 		ctx.fillRect(0, 0, width, height);
 
 		const leaf = await loadImage('./files/leaf.png');
-		const leafs: Array<{ x: number; y: number; }> = [];
+		const leafs: Array<{ x: number; y: number }> = [];
 		for (let i = Math.floor(Math.random() * 3) + 5; i >= 0; i--) {
 			let x: number, y: number;
 			do {
@@ -149,8 +155,8 @@ export class ExportService {
 			ctx.fillText(
 				list.name,
 				index * COLUMN_WIDTH +
-				(COLUMN_WIDTH - ctx.measureText(list.name).width) * 0.5 +
-				LISTS_PADDING,
+					(COLUMN_WIDTH - ctx.measureText(list.name).width) * 0.5 +
+					LISTS_PADDING,
 				50
 			);
 
@@ -204,8 +210,8 @@ export class ExportService {
 				ctx.fillText(
 					text,
 					index * COLUMN_WIDTH +
-					(COLUMN_WIDTH - ctx.measureText(text).width) * 0.5 +
-					LISTS_PADDING,
+						(COLUMN_WIDTH - ctx.measureText(text).width) * 0.5 +
+						LISTS_PADDING,
 					80
 				);
 			}
@@ -260,8 +266,12 @@ export class ExportService {
 		const maxLength = Math.max(notes.good.length, notes.bad.length);
 		const data = [['           Positive', '           Negative']];
 		for (let i = 0; i < maxLength; i++) {
-			const good = notes.good[i].includes(',') ? `"${notes.good[i]}"` : notes.good[i];
-			const bad = notes.bad[i].includes(',') ? `"${notes.bad[i]}"` : notes.bad[i];
+			const good = notes.good[i].includes(',')
+				? `"${notes.good[i]}"`
+				: notes.good[i];
+			const bad = notes.bad[i].includes(',')
+				? `"${notes.bad[i]}"`
+				: notes.bad[i];
 			data.push([good, bad]);
 		}
 		const result = table(data, {
@@ -300,8 +310,16 @@ export class ExportService {
 		);
 		const count = Math.max(notes.good.length, notes.bad.length);
 		for (let i = 0; i < count; i++) {
-			const good = notes.good[i] ? (notes.good[i].includes(',') || notes.good[i].includes('\n') ? `"${notes.good[i]}"` : notes.good[i]) : '';
-			const bad = notes.bad[i] ? (notes.bad[i].includes(',') || notes.bad[i].includes('\n') ? `"${notes.bad[i]}"` : notes.bad[i]) : '';
+			const good = notes.good[i]
+				? notes.good[i].includes(',') || notes.good[i].includes('\n')
+					? `"${notes.good[i]}"`
+					: notes.good[i]
+				: '';
+			const bad = notes.bad[i]
+				? notes.bad[i].includes(',') || notes.bad[i].includes('\n')
+					? `"${notes.bad[i]}"`
+					: notes.bad[i]
+				: '';
 			result += `${good.replace(/\n/g, '\r')},${bad.replace(/\n/g, '\r')}\r\n`;
 		}
 

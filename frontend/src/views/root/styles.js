@@ -77,7 +77,11 @@ export const StyledImg = styled.img`
 	height: 50%;
 	align-self: center;
 	flex: none;
-	${({ widthScale }) => widthScale && css`width: 60%;`}
+	${({ widthScale }) =>
+		widthScale &&
+		css`
+			width: 60%;
+		`}
 
 	@media (min-width: 900px) {
 		margin: 50px 100px 20px 100px;
@@ -211,10 +215,24 @@ export const Watermark = styled.p`
 	font-weight: 800;
 	position: absolute;
 	top: 0;
-	${({ left }) => left ? css`left: -10px` : css`right: -10px`};
+	${({ left }) =>
+		left
+			? css`
+					left: -10px;
+			  `
+			: css`
+					right: -10px;
+			  `};
 
 	@media (min-width: 900px) {
 		font-size: calc(70px + (120 - 70) * ((100vw - 300px) / (1600 - 300)));
-		${({ left }) => left ? css`left: -50px` : css`right: -50px`};
+		${({ left }) =>
+			left
+				? css`
+						left: -50px;
+				  `
+				: css`
+						right: -50px;
+				  `};
 	}
 `;

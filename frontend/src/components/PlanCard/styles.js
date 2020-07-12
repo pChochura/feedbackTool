@@ -52,15 +52,19 @@ export const StyledListItem = styled.li`
 	list-style: none;
 	align-items: center;
 	display: inline-flex;
-	font-size: ${({ bigger }) => bigger ? '1.2rem' : '0.9rem'};
+	font-size: ${({ bigger }) => (bigger ? '1.2rem' : '0.9rem')};
 
 	&::before {
 		display: block;
 		content: url(${({ img }) => img});
-		${({ bigger }) => bigger && css`zoom: 2;`}
+		${({ bigger }) =>
+			bigger &&
+			css`
+				zoom: 2;
+			`}
 		width: 24px;
 		height: 24px;
-		margin-right: ${({ bigger }) => bigger ? '10px' : '5px'};
+		margin-right: ${({ bigger }) => (bigger ? '10px' : '5px')};
 	}
 
 	span,
@@ -75,10 +79,14 @@ export const StyledListItem = styled.li`
 	}
 
 	@media (max-width: 900px) {
-		font-size: ${({ bigger }) => bigger ? '1rem' : '0.9rem'};
+		font-size: ${({ bigger }) => (bigger ? '1rem' : '0.9rem')};
 
 		b::before {
-			${({ bigger }) => bigger && css`zoom: 1.5;`}
+			${({ bigger }) =>
+				bigger &&
+				css`
+					zoom: 1.5;
+				`}
 		}
 	}
 `;

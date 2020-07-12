@@ -33,7 +33,10 @@ import LoginModal from '../../components/LoginModal/LoginModal';
 import RegisterModal from '../../components/RegisterModal/RegisterModal';
 import { ModalButtonsWrapper } from '../main/styles';
 import Modal from '../../components/Modal/Modal';
-import { ColumnWrapper, RowWrapper } from '../../components/RegisterModal/styles';
+import {
+	ColumnWrapper,
+	RowWrapper,
+} from '../../components/RegisterModal/styles';
 import { StyledListItem } from '../../components/PlanCard/styles';
 
 const Root = ({ history, location }) => {
@@ -203,7 +206,7 @@ const Root = ({ history, location }) => {
 					title: 'Success',
 					description: `Your order has been ${
 						cancel ? 'canceled' : 'completed'
-						} succesfully`,
+					} succesfully`,
 					success: true,
 				});
 
@@ -351,15 +354,15 @@ const Root = ({ history, location }) => {
 				description: 'We use cookies to not require you to create an account. ',
 				action: 'Read more',
 				persistent: true,
-				callback: () => setInfoModal({
-					title: 'We have to use cookies',
-					description:
-						`We store information about who is the owner of the current room so nobody else can access it.
+				callback: () =>
+					setInfoModal({
+						title: 'We have to use cookies',
+						description: `We store information about who is the owner of the current room so nobody else can access it.
 						Data stored there is unique and random so it won't leak your personal info.
 						Additionally we have to store information if you are currently logged in which is also uniqe and random.
 						By using this site you agree to this terms.`,
-					callback: () => setCookie('cookies-agree', true),
-				}),
+						callback: () => setCookie('cookies-agree', true),
+					}),
 			});
 		}
 	}, [notificationSystem, cookies, setCookie]);
@@ -410,8 +413,8 @@ const Root = ({ history, location }) => {
 										the session
 									</StyledParagraph>
 								) : (
-										<StyledParagraph>You have a room</StyledParagraph>
-									))}
+									<StyledParagraph>You have a room</StyledParagraph>
+								))}
 						</ButtonWrapper>
 					</LandingLeft>
 					<StyledImg src={landing} />
@@ -419,18 +422,28 @@ const Root = ({ history, location }) => {
 				<LandingPage ref={landingPageRef}>
 					<Watermark left={true}>SHARING</Watermark>
 					<StyledTitle>Scared of being honest?</StyledTitle>
-					<StyledSubtitle>Don’t be afraid of telling your coworkers how you feel about them any longer</StyledSubtitle>
+					<StyledSubtitle>
+						Don’t be afraid of telling your coworkers how you feel about them
+						any longer
+					</StyledSubtitle>
 					<ColumnWrapper>
 						<StyledImg src={landing_2} widthScale={true} />
 						<RowWrapper style={{ maxWidth: '400px' }}>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Whole process is fully <b>anonymous</b></span>
+								<span>
+									Whole process is fully <b>anonymous</b>
+								</span>
 							</StyledListItem>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Your notes are <b>never stored</b> after the session finishes</span>
+								<span>
+									Your notes are <b>never stored</b> after the session finishes
+								</span>
 							</StyledListItem>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Notes written by you <b>are visible only by you</b> and person you have written about</span>
+								<span>
+									Notes written by you <b>are visible only by you</b> and person
+									you have written about
+								</span>
 							</StyledListItem>
 						</RowWrapper>
 					</ColumnWrapper>
@@ -438,17 +451,29 @@ const Root = ({ history, location }) => {
 				<LandingPage>
 					<Watermark left={false}>IMPROVING</Watermark>
 					<StyledTitle>Want to improve?</StyledTitle>
-					<StyledSubtitle>Exchanging feedback with your team and you can increase your productivity and self-esteem.</StyledSubtitle>
+					<StyledSubtitle>
+						Exchanging feedback with your team and you can increase your
+						productivity and self-esteem.
+					</StyledSubtitle>
 					<ColumnWrapper style={{ flexWrap: 'wrap-reverse' }}>
 						<RowWrapper style={{ maxWidth: '400px' }}>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Let everyone describe your <b>strengths</b> and <b>weaknesses</b></span>
+								<span>
+									Let everyone describe your <b>strengths</b> and{' '}
+									<b>weaknesses</b>
+								</span>
 							</StyledListItem>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Introduce a <b>routine of sharing</b> your feelings with others</span>
+								<span>
+									Introduce a <b>routine of sharing</b> your feelings with
+									others
+								</span>
 							</StyledListItem>
 							<StyledListItem img={listPositiveIcon} bigger={true}>
-								<span>Become a better version of yourself by receiving a <b>meaningful feedback</b></span>
+								<span>
+									Become a better version of yourself by receiving a{' '}
+									<b>meaningful feedback</b>
+								</span>
 							</StyledListItem>
 						</RowWrapper>
 						<StyledImg src={landing_3} widthScale={true} />
@@ -457,7 +482,10 @@ const Root = ({ history, location }) => {
 				<LandingPage>
 					<Watermark left={true}>CUSTOMIZING</Watermark>
 					<StyledTitle>Pick your plan!</StyledTitle>
-					<StyledSubtitle>Improve your experience by choosing a premium plan. <br />A small price for a huge advantage.</StyledSubtitle>
+					<StyledSubtitle>
+						Improve your experience by choosing a premium plan. <br />A small
+						price for a huge advantage.
+					</StyledSubtitle>
 					<span>
 						<PlanCard
 							title="Basic"
@@ -543,22 +571,27 @@ const Root = ({ history, location }) => {
 						</ModalButtonsWrapper>
 					</Modal>
 				)}
-				{infoModal &&
+				{infoModal && (
 					<Modal
 						title={infoModal.title}
 						description={infoModal.description}
-						onDismissCallback={() => setInfoModal(m => ({ ...m, exit: true }))}
-						isExiting={infoModal.exit}>
+						onDismissCallback={() =>
+							setInfoModal((m) => ({ ...m, exit: true }))
+						}
+						isExiting={infoModal.exit}
+					>
 						<ModalButtonsWrapper>
-							<Button onClick={() => {
-								infoModal.callback && infoModal.callback();
-								setInfoModal(m => ({ ...m, exit: true }));
-							}}>
+							<Button
+								onClick={() => {
+									infoModal.callback && infoModal.callback();
+									setInfoModal((m) => ({ ...m, exit: true }));
+								}}
+							>
 								OK
 							</Button>
 						</ModalButtonsWrapper>
 					</Modal>
-				}
+				)}
 				{loginModal && (
 					<LoginModal
 						input={{ email: loginModal.email, password: loginModal.password }}
@@ -596,7 +629,7 @@ const Root = ({ history, location }) => {
 				)}
 				<NotificationSystem ref={(ns) => setNotificationSystem(ns)} />
 			</LandingWrapper>
-		</StyledWrapper >
+		</StyledWrapper>
 	);
 };
 
