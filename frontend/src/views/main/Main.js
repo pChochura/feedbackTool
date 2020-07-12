@@ -217,7 +217,7 @@ const Main = ({ history }) => {
 		(data) => {
 			notificationSystem.postNotification({
 				title: 'Warning',
-				description: `You have a request from ${data.room.name} to join your session. `,
+				description: `${data.room.name} wants to join your session. `,
 				success: true,
 				persistent: true,
 				action: 'Extend your plan',

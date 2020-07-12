@@ -52,7 +52,7 @@ export class UserController {
 	constructor(
 		private readonly userService: UserService,
 		private readonly exportService: ExportService
-	) {}
+	) { }
 
 	@Post()
 	@ApiOperation({ summary: 'Attempts logging in' })
@@ -138,7 +138,7 @@ export class UserController {
 	})
 	async sendConfirmationEmail(
 		@Headers() headers: any,
-		@Body() body: { token?: string },
+		@Body() body: { token?: string; },
 		@Res() response: Response
 	) {
 		await this.userService.sendConfirmationEmail(
@@ -165,7 +165,7 @@ export class UserController {
 		schema: new BasicResponseSchema('Email is already confirmed'),
 	})
 	async cnfirmEmail(
-		@Body() body: { token: string },
+		@Body() body: { token: string; },
 		@Res() response: Response
 	) {
 		await this.userService.confirmEmail(body.token);
@@ -269,6 +269,7 @@ export class UserController {
 		description: 'Item not found',
 		schema: new OneOfResponseSchema([
 			new BasicResponseSchema('User not found'),
+			new BasicResponseSchema('Room not found'),
 			new BasicResponseSchema('Session not found'),
 		]),
 	})

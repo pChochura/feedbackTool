@@ -25,6 +25,7 @@ export const RowWrapper = styled.div`
 	display: flex;
 	justify-content: center;
 	margin-top: 50px;
+	flex-direction: column;
 `;
 
 export const ColumnWrapper = styled.div`
@@ -34,6 +35,8 @@ export const ColumnWrapper = styled.div`
 	margin-bottom: 30px;
 	align-content: center;
 	justify-items: center;
+	flex-wrap: wrap;
+	justify-content: center;
 `;
 
 export const PlanButton = styled.img`

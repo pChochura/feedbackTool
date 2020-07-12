@@ -48,40 +48,31 @@ export class ExportService {
 		ctx: CanvasRenderingContext2D,
 		content: string,
 		maxWidth: number,
-		maxCharacters: number,
-		newLineCallback?: (line: string, word: string, wordSplit: boolean) => void
+		newLineCallback?: (line: string) => void
 	): number {
-		let currentLine = '';
-		return content.split(' ').reduce((count, word) => {
-			if (word.includes('\n')) {
-				const lines = word.split('\n');
-				lines.forEach((line) => {
-					newLineCallback && newLineCallback('', line, true);
-					count++;
-				});
+		return content.split('\n').map((line) => line.split(' ')).reduce((count, words) => {
+			let currentLine = '';
+			words.forEach((word, index) => {
+				currentLine += word + ' ';
 
-				return count;
-			}
-
-			currentLine += word;
-			if (ctx.measureText(currentLine).width > maxWidth) {
-				const temp = count;
-				while (ctx.measureText(word).width > maxWidth) {
-					newLineCallback && newLineCallback(currentLine, word, true);
-					currentLine = word.substring(0, maxCharacters);
-					word = word.substring(maxCharacters);
+				if (ctx.measureText(currentLine).width > maxWidth) {
+					let tempCurrentLine = '';
+					let letterIndex = 1;
+					do {
+						tempCurrentLine = currentLine.substring(0, currentLine.length - letterIndex++);
+					} while (ctx.measureText(tempCurrentLine).width > maxWidth);
 					count++;
+					newLineCallback && newLineCallback(tempCurrentLine);
+					currentLine = currentLine.substring(tempCurrentLine.length);
 				}
 
-				if (count === temp) {
-					newLineCallback && newLineCallback(currentLine, word, false);
-					currentLine = word + ' ';
-					count++;
+				if (index === words.length - 1) {
+					newLineCallback && newLineCallback(currentLine);
 				}
-			}
+			});
 
-			return count;
-		}, 1);
+			return count + 1;
+		}, 0);
 	}
 
 	async exportAsImage(room: Room): Promise<string> {
@@ -107,8 +98,7 @@ export class ExportService {
 					const linesCount = this.getLineCount(
 						tempContext,
 						note.content,
-						NOTES_WIDTH - NOTES_PADDING * 2,
-						LINE_CHARACTERS
+						NOTES_WIDTH - NOTES_PADDING * 2
 					);
 					return (
 						linesCount * LINE_HEIGHT + NOTES_PADDING * 2 + NOTES_MARGIN + height
@@ -127,7 +117,7 @@ export class ExportService {
 		ctx.fillRect(0, 0, width, height);
 
 		const leaf = await loadImage('./files/leaf.png');
-		const leafs: Array<{ x: number; y: number }> = [];
+		const leafs: Array<{ x: number; y: number; }> = [];
 		for (let i = Math.floor(Math.random() * 3) + 5; i >= 0; i--) {
 			let x: number, y: number;
 			do {
@@ -159,8 +149,8 @@ export class ExportService {
 			ctx.fillText(
 				list.name,
 				index * COLUMN_WIDTH +
-					(COLUMN_WIDTH - ctx.measureText(list.name).width) * 0.5 +
-					LISTS_PADDING,
+				(COLUMN_WIDTH - ctx.measureText(list.name).width) * 0.5 +
+				LISTS_PADDING,
 				50
 			);
 
@@ -170,8 +160,7 @@ export class ExportService {
 				const linesCount = this.getLineCount(
 					ctx,
 					note.content,
-					NOTES_WIDTH - NOTES_PADDING * 2,
-					LINE_CHARACTERS
+					NOTES_WIDTH - NOTES_PADDING * 2
 				);
 				const x = index * COLUMN_WIDTH + LISTS_PADDING + NOTES_MARGIN;
 
@@ -193,38 +182,21 @@ export class ExportService {
 
 				ctx.fillStyle = '#515151';
 
-				let currentLine = '';
-				const lineCount = this.getLineCount(
+				this.getLineCount(
 					ctx,
 					note.content,
 					NOTES_WIDTH - NOTES_PADDING * 2,
-					LINE_CHARACTERS,
-					(line, word, wordSplit) => {
-						if (wordSplit) {
-							ctx.fillText(
-								word.substring(0, LINE_CHARACTERS),
-								x + NOTES_PADDING,
-								y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-							);
-							currentLine = word.substring(0, LINE_CHARACTERS);
-						} else {
-							ctx.fillText(
-								line.substring(0, line.length - word.length - 1),
-								x + NOTES_PADDING,
-								y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-							);
-							currentLine = word + ' ';
-						}
+					(line) => {
+						ctx.fillText(
+							line,
+							x + NOTES_PADDING,
+							y + LINE_HEIGHT * 0.75 + NOTES_PADDING
+						);
 						y += LINE_HEIGHT;
 					}
 				);
-				ctx.fillText(
-					lineCount === 1 ? note.content : currentLine,
-					x + NOTES_PADDING,
-					y + LINE_HEIGHT * 0.75 + NOTES_PADDING
-				);
 
-				y += LINE_HEIGHT + NOTES_PADDING * 2 + NOTES_MARGIN;
+				y += NOTES_PADDING * 2 + NOTES_MARGIN;
 			});
 
 			if (list.notes.length === 0) {
@@ -232,8 +204,8 @@ export class ExportService {
 				ctx.fillText(
 					text,
 					index * COLUMN_WIDTH +
-						(COLUMN_WIDTH - ctx.measureText(text).width) * 0.5 +
-						LISTS_PADDING,
+					(COLUMN_WIDTH - ctx.measureText(text).width) * 0.5 +
+					LISTS_PADDING,
 					80
 				);
 			}
