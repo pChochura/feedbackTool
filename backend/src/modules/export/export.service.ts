@@ -260,7 +260,9 @@ export class ExportService {
 		const maxLength = Math.max(notes.good.length, notes.bad.length);
 		const data = [['           Positive', '           Negative']];
 		for (let i = 0; i < maxLength; i++) {
-			data.push([notes.good[i], notes.bad[i]]);
+			const good = notes.good[i].includes(',') ? `"${notes.good[i]}"` : notes.good[i];
+			const bad = notes.bad[i].includes(',') ? `"${notes.bad[i]}"` : notes.bad[i];
+			data.push([good, bad]);
 		}
 		const result = table(data, {
 			border: getBorderCharacters('ramac'),
@@ -298,11 +300,9 @@ export class ExportService {
 		);
 		const count = Math.max(notes.good.length, notes.bad.length);
 		for (let i = 0; i < count; i++) {
-			result +=
-				(notes.good[i] || '').replace(/\n/g, ' ') +
-				',' +
-				(notes.bad[i] || '').replace(/\n/g, ' ') +
-				'\n';
+			const good = notes.good[i] ? (notes.good[i].includes(',') || notes.good[i].includes('\n') ? `"${notes.good[i]}"` : notes.good[i]) : '';
+			const bad = notes.bad[i] ? (notes.bad[i].includes(',') || notes.bad[i].includes('\n') ? `"${notes.bad[i]}"` : notes.bad[i]) : '';
+			result += `${good.replace(/\n/g, '\r')},${bad.replace(/\n/g, '\r')}\r\n`;
 		}
 
 		const filename = `./files/tempExportNotes_${Date.now()}.txt`;
