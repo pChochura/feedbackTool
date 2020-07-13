@@ -144,7 +144,7 @@ export const StyledAddNoteButton = styled.p`
 	margin: 15px 0px;
 	padding: 10px;
 	border-radius: 5px;
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	&::before {
 		content: '+';
@@ -248,7 +248,7 @@ export const StyledImg = styled.img`
 	height: 24px;
 	border-radius: 50%;
 	padding: 5px;
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	&:hover {
 		background-color: #efefef;
@@ -263,7 +263,7 @@ export const StyledOptionsIcon = styled.img`
 	top: 5px;
 	border-radius: 50%;
 	padding: 5px;
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	&:hover {
 		background-color: #efefef;

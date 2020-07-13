@@ -21,7 +21,7 @@ export const StyledSearch = styled.input`
 	font-size: 1rem;
 	font-family: 'Montserrat';
 	font-weight: 300;
-	transition: 0.5s box-shadow;
+	transition: 0.3s box-shadow;
 
 	&::placeholder {
 		color: #ababab;

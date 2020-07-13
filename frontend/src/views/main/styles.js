@@ -79,7 +79,7 @@ export const StyledDropdown = styled.div`
 	color: #515151;
 	position: relative;
 	cursor: pointer;
-	transition: filter 0.5s;
+	transition: filter 0.3s;
 
 	&:hover {
 		filter: grayscale(0.5);

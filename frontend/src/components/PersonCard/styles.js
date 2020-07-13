@@ -29,7 +29,7 @@ export const StyledCard = styled.div`
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-	transition: 0.5s box-shadow;
+	transition: 0.3s box-shadow;
 	margin: 0 20px 40px 20px;
 	padding: 30px 0px;
 	box-sizing: border-box;
@@ -78,7 +78,7 @@ export const StyledImg = styled.img`
 	border-radius: 50%;
 	padding: 5px;
 	background-color: ${({ background }) => background || 'unset'};
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	${({ clickable }) =>
 		clickable &&
@@ -131,7 +131,7 @@ export const StyledOptions = styled.div`
 	z-index: 50;
 
 	animation-name: ${({ exit }) => (exit ? exitAnimation : enterAnimation)};
-	animation-duration: 0.5s;
+	animation-duration: 0.3s;
 	animation-timing-function: ease;
 	animation-delay: 0s;
 	animation-iteration-count: 1;
@@ -146,7 +146,7 @@ export const StyledOptionItem = styled.p`
 	padding: 5px 10px;
 	cursor: pointer;
 	background-color: #ffffff;
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	&:hover {
 		background-color: #efefef;

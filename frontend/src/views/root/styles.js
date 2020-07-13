@@ -236,3 +236,70 @@ export const Watermark = styled.p`
 				  `};
 	}
 `;
+
+export const FeedbackContainer = styled.div`
+	background: linear-gradient(110.22deg, #3750db 0%, #2d41b3 100%);
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+	border-radius: 5px;
+	width: 70%;
+	height: 30%;
+	margin: 100px 50px;
+	overflow: hidden;
+	padding: 30px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	box-sizing: border-box;
+
+	&::before {
+		content: ' ';
+		display: block;
+		width: 120px;
+		height: 120px;
+		left: -30px;
+		bottom: -30px;
+		position: absolute;
+		background: #ababab;
+		border-radius: 50%;
+		opacity: 0.1;
+	}
+
+	&::after {
+		content: ' ';
+		display: block;
+		width: 30px;
+		height: 30px;
+		left: 50px;
+		top: -10px;
+		position: absolute;
+		background: #ababab;
+		border-radius: 50%;
+		opacity: 0.1;
+	}
+
+	img {
+		position: absolute;
+		right: -10px;
+		top: -10px;
+	}
+
+	h1,
+	h3 {
+		color: #ffffff;
+		text-align: center;
+	}
+
+	h1 {
+		font-weight: 600;
+	}
+
+	button {
+		margin: 50px;
+	}
+
+	@media (max-width: 900px) {
+		width: 100%;
+		margin: 100px 0;
+	}
+`;

@@ -8,6 +8,7 @@ const Button = ({
 	small,
 	secondary,
 	color = '#3750DB',
+	backgroundColor = '#ffffff',
 	loading,
 }) => {
 	return (
@@ -17,6 +18,7 @@ const Button = ({
 			disabled={disabled}
 			small={small}
 			color={color}
+			backgroundColor={backgroundColor}
 		>
 			<StyledButtonText loading={loading ? 'true' : 'false'} color={color}>
 				{loading ? '◓' : children}

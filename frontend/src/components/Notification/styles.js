@@ -57,12 +57,12 @@ export const StyledNotification = styled.div`
 	box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.1);
 	border-radius: 5px;
 	padding: 15px 15px 5px 15px;
-	transition: 0.5s bottom;
+	transition: 0.3s bottom;
 	z-index: 100;
 
 	animation-name: ${({ exit }) =>
 		exit ? exitAnimation(false) : enterAnimation(false)};
-	animation-duration: 0.5s;
+	animation-duration: 0.3s;
 	animation-timing-function: ease;
 	animation-delay: 0s;
 	animation-iteration-count: 1;
@@ -107,7 +107,7 @@ export const StyledImg = styled.img`
 	border-radius: 50%;
 	padding: 5px;
 	background-color: ${({ background }) => background || 'unset'};
-	transition: 0.5s background-color;
+	transition: 0.3s background-color;
 
 	${({ clickable }) =>
 		clickable &&

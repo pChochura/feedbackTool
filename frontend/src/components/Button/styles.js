@@ -10,7 +10,8 @@ const rotation = keyframes`
 `;
 
 export const StyledButton = styled.button`
-	background: ${({ secondary, color }) => (secondary ? '#ffffff' : color)};
+	background: ${({ secondary, color, backgroundColor }) =>
+		secondary ? backgroundColor : color};
 	color: ${({ secondary, color }) => (secondary ? color : '#ffffff')};
 	outline: none;
 	border: ${({ secondary, color }) =>
@@ -21,7 +22,7 @@ export const StyledButton = styled.button`
 	font-size: ${({ small }) => (small ? '0.8rem' : '1.1rem')};
 	font-weight: ${({ secondary }) => (secondary ? '300' : '400')};
 	font-family: 'Montserrat';
-	transition: 0.5s filter;
+	transition: 0.3s filter;
 
 	${({ disabled }) =>
 		disabled
@@ -50,7 +51,7 @@ export const StyledButtonText = styled.p`
 		loading === 'true' &&
 		css`
 			animation-name: ${rotation};
-			animation-duration: 0.5s;
+			animation-duration: 0.3s;
 			animation-timing-function: ease;
 			animation-delay: 0s;
 			animation-iteration-count: infinite;

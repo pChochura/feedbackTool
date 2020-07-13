@@ -16,11 +16,13 @@ import {
 	StyledTitle,
 	StyledSubtitle,
 	Watermark,
+	FeedbackContainer,
 } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import landing from '../../assets/images/landing.svg';
 import landing_2 from '../../assets/images/landing_2.svg';
 import landing_3 from '../../assets/images/landing_3.svg';
+import patternImg from '../../assets/images/pattern.svg';
 import listPositiveIcon from '../../assets/images/list_positive.svg';
 import Button from '../../components/Button/Button';
 import queryParser from 'query-string';
@@ -542,6 +544,30 @@ const Root = ({ history, location }) => {
 						></PlanCard>
 					</span>
 				</LandingPage>
+				<LandingPage>
+					<Watermark left={false}>HELP</Watermark>
+					<StyledTitle>Love using FeedbackTool?</StyledTitle>
+					<StyledSubtitle>
+						Want to appreciate the effort put into making this platform to work
+						as you expect it to?
+					</StyledSubtitle>
+					<FeedbackContainer>
+						<img src={patternImg} alt="" />
+						<StyledTitle>Help us improve</StyledTitle>
+						<StyledSubtitle>
+							Caught a bug or have a question? <br />
+							Contact us and we will answer you as fast as possible!
+						</StyledSubtitle>
+						<Button
+							secondary={true}
+							color="#ffffff"
+							backgroundColor="#00000000"
+							onClick={() => footer.showFeedbackModal()}
+						>
+							Contact us
+						</Button>
+					</FeedbackContainer>
+				</LandingPage>
 				<Footer ref={(footer) => setFooter(footer)} />
 				<ScrollIndicator onClick={() => scrollBottom()}>
 					<ScrollImg src={scrollIcon} /> Scroll down
@@ -575,9 +601,7 @@ const Root = ({ history, location }) => {
 					<Modal
 						title={infoModal.title}
 						description={infoModal.description}
-						onDismissCallback={() =>
-							setInfoModal((m) => ({ ...m, exit: true }))
-						}
+						onDismissCallback={() => setInfoModal()}
 						isExiting={infoModal.exit}
 					>
 						<ModalButtonsWrapper>

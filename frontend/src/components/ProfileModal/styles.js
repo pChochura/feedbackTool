@@ -30,7 +30,7 @@ export const StyledCard = styled.div`
 	z-index: 100;
 
 	animation-name: ${({ exit }) => (exit ? exitAnimation : enterAnimation)};
-	animation-duration: 0.5s;
+	animation-duration: 0.3s;
 	animation-timing-function: ease;
 	animation-delay: 0s;
 	animation-iteration-count: 1;
