@@ -23,6 +23,11 @@ export const StyledTitle = styled.h1`
 	text-align: center;
 	padding: 0 20px;
 	box-sizing: border-box;
+
+	@media (max-width: 900px) {
+		margin: 40px auto 20px auto;
+		font-size: 1.5rem;
+	}
 `;
 
 export const StyledListsWrapper = styled.div`
@@ -77,6 +82,17 @@ const jiggleAnimation = keyframes`
     }
 `;
 
+const blinkAnimation = keyframes`
+    0% {
+		opacity: 0.4;
+        animation-timing-function: ease-in;
+    }
+    100% {
+		opacity: 0.6;
+        animation-timing-function: ease-out;
+    }
+`;
+
 export const StyledListNote = styled.div`
 	width: 100%;
 	min-height: 50px;
@@ -90,12 +106,13 @@ export const StyledListNote = styled.div`
 	border-radius: 5px;
 	word-break: break-all;
 
-	${({ editing }) =>
-		editing &&
+	${({ editing, loading }) =>
+		(editing || loading) &&
 		css`
 			transform-origin: 50% 50%;
 			animation-duration: 0.27s;
-			animation-name: ${jiggleAnimation};
+			animation-name: ${({ loading }) =>
+				loading ? blinkAnimation : jiggleAnimation};
 			animation-iteration-count: infinite;
 			animation-direction: alternate;
 			animation-play-state: running;
@@ -268,4 +285,12 @@ export const StyledOptionsIcon = styled.img`
 	&:hover {
 		background-color: #efefef;
 	}
+`;
+
+export const ImagePlaceholder = styled.img`
+	width: 70%;
+	height: 30%;
+	max-width: 800px;
+	margin: auto;
+	align-self: center;
 `;

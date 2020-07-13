@@ -21,6 +21,7 @@ import {
 	StyledImg,
 	StyledOptionsIcon,
 	SubmitNoteWrapper,
+	ImagePlaceholder,
 } from './styles';
 import TopBar from '../../components/TopBar/TopBar';
 import sadSelectedIcon from '../../assets/images/sad_selected.svg';
@@ -30,6 +31,7 @@ import happyIcon from '../../assets/images/happy_notSelected.svg';
 import closeIcon from '../../assets/images/close.svg';
 import optionsIcon from '../../assets/images/options.svg';
 import arrowIcon from '../../assets/images/arrow_down.svg';
+import emptyImg from '../../assets/images/empty.svg';
 import socketIOClient from 'socket.io-client';
 import Button from '../../components/Button/Button';
 import Footer from '../../components/Footer/Footer';
@@ -46,6 +48,20 @@ const Room = ({ history }) => {
 	const [lists, setLists] = useState({});
 	const { id } = useParams();
 	const ownNotesRef = useRef();
+
+	const addIfNotPresent = (array, entry) => {
+		const index = array.findIndex((e) => e.id === entry.id);
+		if (index !== -1) {
+			array[index] = {
+				...array[index],
+				...entry,
+			};
+		} else {
+			array.push(entry);
+		}
+
+		return array;
+	};
 
 	const getRoom = useCallback(async () => {
 		const room = await (
@@ -106,6 +122,34 @@ const Room = ({ history }) => {
 
 			return;
 		}
+
+		setRoom((room) => ({
+			...room,
+			lists: room.lists.map((list) =>
+				list.id === listId
+					? {
+							...list,
+							notes: addIfNotPresent(list.notes, {
+								content: lists[listId].note,
+								positive: !lists[listId].negative,
+								loading: true,
+								id: noteId,
+							}),
+					  }
+					: list
+			),
+		}));
+
+		setLists((lists) => ({
+			...lists,
+			[listId]: {
+				...lists[listId],
+				note: '',
+				adding: false,
+				editedNoteId: undefined,
+			},
+		}));
+
 		const response = await fetch(
 			`${process.env.REACT_APP_URL}/api/v1/rooms/${id}/note`,
 			{
@@ -128,16 +172,8 @@ const Room = ({ history }) => {
 			});
 			return;
 		}
+
 		getRoom();
-		setLists((lists) => ({
-			...lists,
-			[listId]: {
-				...lists[listId],
-				note: '',
-				adding: false,
-				editedNoteId: undefined,
-			},
-		}));
 	};
 
 	const editNote = (listId, noteId) => {
@@ -364,9 +400,15 @@ const Room = ({ history }) => {
 					}
 				}}
 			/>
-			<StyledTitle>
-				It's your room, <b>{room.name}</b>
-			</StyledTitle>
+			{room.lists.length === 0 ? (
+				<StyledTitle>
+					You're here alone, <b>{room.name}</b>. Wait for others to join
+				</StyledTitle>
+			) : (
+				<StyledTitle>
+					It's your room, <b>{room.name}</b>
+				</StyledTitle>
+			)}
 			<StyledListsWrapper ref={ownNotesRef}>
 				{room.lists.map((list) => (
 					<StyledList key={list.id}>
@@ -375,6 +417,7 @@ const Room = ({ history }) => {
 							<StyledListNote
 								key={note.id}
 								editing={(lists[list.id] || {}).editedNoteId === note.id}
+								loading={note.loading}
 							>
 								<StyledNoteIndicator
 									positive={note.positive}
@@ -382,6 +425,7 @@ const Room = ({ history }) => {
 								/>
 								<StyledAddNoteInput readOnly value={note.content} />
 								{!room.ready &&
+									!note.loading &&
 									(lists[list.id] || {}).editedNoteId !== note.id && (
 										<StyledOptionsIcon
 											src={optionsIcon}
@@ -506,6 +550,7 @@ const Room = ({ history }) => {
 						)}
 					</StyledList>
 				))}
+				{room.lists.length === 0 && <ImagePlaceholder src={emptyImg} />}
 			</StyledListsWrapper>
 			<Footer />
 			{exportAsModal && (
